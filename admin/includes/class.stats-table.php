@@ -67,6 +67,14 @@ if ( ! class_exists( 'MWTSA_Stats_Table' ) ) :
 			    unset( $columns['searches'] );
 			    $columns['results'] = __( 'No. of results', 'mwt-search-analytics' );
 			    $columns['last_search_date'] = __( 'Search Date', 'mwt-search-analytics' );
+
+				if ( ! empty( MWTSA_Options::get_option( 'mwtsa_save_search_country' ) ) ) {
+					$columns['country'] = __( 'Country', 'mwt-search-analytics' );
+				}
+
+				if ( ! empty( MWTSA_Options::get_option( 'mwtsa_save_search_by_user' ) ) ) {
+					$columns['user'] = __( 'User', 'mwt-search-analytics' );
+				}
 			}
 
 			return $columns;
@@ -141,6 +149,33 @@ if ( ! class_exists( 'MWTSA_Stats_Table' ) ) :
 				case 'last_search_date':
 					echo date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $item['last_search_date'] ) );
 					break;
+                case 'country':
+                    if ( ! empty( $item['country'] ) ) {
+	                    $country_parts = explode( ':', $item['country'] );
+
+
+	                    echo '<div><img src="' . MWTSAI()->plugin_admin_url . 'assets/images/flags/' . $country_parts[0] . '.png" alt="' . $country_parts[1] . '" />&nbsp;<span>' . ucwords( $country_parts[1] ) . '</span></div>';
+                    } else {
+                        echo 'N/A';
+                    }
+
+                    break;
+                case 'user':
+                    if ( ! empty( $item['user_id'] ) ) {
+	                    $user_data = get_userdata( $item['user_id'] );
+
+	                    if ( ! $user_data ) {
+		                    echo 'N/A';
+		                    break;
+                        }
+
+	                    echo '<a href="' . get_edit_user_link( $user_data->ID ) . '">' . esc_attr( $user_data->user_nicename ) . '</a>';
+	                    break;
+                    } else {
+                        echo 'N/A';
+                    }
+
+                    break;
 				default:
 					echo 'N/A Yet';
 			}

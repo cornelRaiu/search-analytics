@@ -11,7 +11,8 @@
 
 .mwtsa-wrapper .views-label{ float: left;margin: 8px 10px 0 0;font-size: 13px;padding: 0;line-height: 2; }
 
-.mwtsa-wrapper .date-interval { display: inline-block }
+.mwtsa-wrapper .date-interval { display: inline-block; }
+.mwtsa-wrapper .column-country div { display: flex; align-items: flex-end; }
 
 .mwtsa-stats-widget-wrapper .stats-list-label { width: 40%; display: inline-block; font-weight: bold; }
 .mwtsa-stats-widget-wrapper .stats-list-value { vertical-align: top; }

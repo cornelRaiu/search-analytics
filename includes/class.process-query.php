@@ -40,6 +40,8 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 
 			$exclude_search_for_ips = MWTSA_Options::get_option( 'mwtsa_exclude_searches_from_ip_addresses' );
 
+			$client_ip = get_current_user_ip();
+
 			if ( ! empty( $exclude_search_for_ips ) ) {
 				$ips_list = array();
 				$excluded_ips = explode( ',', $exclude_search_for_ips );
@@ -52,11 +54,31 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 					}
 				}
 
-				$client_ip = isset( $_SERVER['HTTP_CLIENT_IP'] ) ? $_SERVER['HTTP_CLIENT_IP'] : ( isset( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'] );
-
 				if ( in_array( $client_ip, $ips_list ) ) {
 					return false;
 				}
+			}
+
+			$country = '';
+
+			if ( ! empty( MWTSA_Options::get_option( 'mwtsa_save_search_country' ) ) ) {
+				//http://ip-api.com/json/24.48.0?fields=49154
+				// IP-API integration according to the documentation at http://ip-api.com/docs/api:json
+				$ip_details_get = @ file_get_contents( 'http://ip-api.com/json/24.48.0.1?fields=49155' );
+				if ( ! empty( $ip_details_get ) ) {
+					$ip_details = json_decode( $ip_details_get );
+
+					if ( $ip_details->status != 'fail' ) {
+						$country = strtolower( $ip_details->countryCode . ':' . $ip_details->country );
+					}
+				}
+			}
+
+			$user_id = 0;
+
+			if ( ! empty( MWTSA_Options::get_option( 'mwtsa_save_search_by_user' ) ) && is_user_logged_in() ) {
+				$user = wp_get_current_user();
+				$user_id = $user->ID;
 			}
 
 			$search_term = get_search_query();
@@ -70,11 +92,11 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 					return false;
 				}
 
-				$this->save_search_term( $search_term, $total_found_posts );
+				$this->save_search_term( $search_term, $total_found_posts, $country, $user_id );
 			}
 		}
 
-		public function save_search_term( $term, $found_posts ) {
+		public function save_search_term( $term, $found_posts, $country = '', $user_id = 0 ) {
 			global $wpdb, $mwtsa;
 
 
@@ -134,10 +156,12 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 				}
 
 				$success = $wpdb->query( $wpdb->prepare(
-					"INSERT INTO `{$mwtsa->history_table_name}` (`term_id`, `datetime`, `count_posts`)
-					VALUES (%d, UTC_TIMESTAMP(), %d)",
+					"INSERT INTO `{$mwtsa->history_table_name}` (`term_id`, `datetime`, `count_posts`, `country`, `user_id`)
+					VALUES (%d, UTC_TIMESTAMP(), %d, %s, %d)",
 					$term_id,
-					$found_posts
+					$found_posts,
+					$country,
+					$user_id
 				) );
 			}
 		}

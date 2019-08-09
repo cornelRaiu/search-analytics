@@ -47,13 +47,15 @@ if ( ! function_exists( 'mwt_wp_date_format_to_js_datepicker_format' ) ) {
 	}
 }
 
-if ( ! function_exists( 'createDateRange' ) ) {
-	function createDateRange( $startDate, $endDate, $format = "Y-m-d" ) {
+if ( ! function_exists( 'create_date_range' ) ) {
+	function create_date_range( $startDate, $endDate, $format = "Y-m-d", $include_today = true ) {
 		$begin = new DateTime($startDate);
 		$end = new DateTime($endDate);
+		if ( $include_today ) {
+			$end->add(new DateInterval( 'P1D' ));
+		}
 
 		$range = array();
-
 
 		try {
 			$interval = new DateInterval( 'P1D' ); // 1 Day
@@ -66,5 +68,19 @@ if ( ! function_exists( 'createDateRange' ) ) {
 		}
 
 		return $range;
+	}
+}
+
+if ( ! function_exists( 'get_current_user_ip' ) ) {
+	function get_current_user_ip() {
+		if ( ! empty( $_SERVER['HTTP_CLIENT_IP'] ) ) {
+			$ip = $_SERVER['HTTP_CLIENT_IP'];
+		} elseif ( ! empty( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
+			$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+		} else {
+			$ip = $_SERVER['REMOTE_ADDR'];
+		}
+
+		return $ip;
 	}
 }

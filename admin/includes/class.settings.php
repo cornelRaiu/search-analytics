@@ -5,11 +5,9 @@ if( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 
 	class MWTSA_Admin_Settings {
 
-	    public $option_name = 'mwtsa_settings';
 		public $existing_options;
 
 		public function __construct() {
-		    $this->option_name = MWTSA_Options::$option_name;
 		    $this->existing_options = MWTSA_Options::get_options();
 
 			add_action( 'admin_menu', array( $this, 'add_admin_menu' ) );
@@ -30,7 +28,7 @@ if( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 
 		public function mwtsa_settings_init() {
 
-			register_setting( 'general_options', $this->option_name );
+			register_setting( 'general_options', MWTSAI()->main_option_name );
 
 			add_settings_section(
 				'mwtsa_general_options_section',
@@ -103,6 +101,22 @@ if( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 			);
 
 			add_settings_field(
+				'mwtsa_save_search_country',
+				__( 'Save Search Country', 'mwt-search-analytics' ),
+				array( &$this, 'field_save_search_country' ),
+				'general_options',
+				'mwtsa_display_options_sections'
+			);
+
+			add_settings_field(
+				'mwtsa_save_search_by_user',
+				__( 'Save Search By User', 'mwt-search-analytics' ),
+				array( &$this, 'field_save_search_by_user' ),
+				'general_options',
+				'mwtsa_display_options_sections'
+			);
+
+			add_settings_field(
 				'mwtsa_uninstall',
 				__( 'Uninstall', 'mwt-search-analytics' ),
 				array( &$this, 'field_uninstall' ),
@@ -146,7 +160,7 @@ if( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
             <strong><?php _e( 'Note: this will set a cookie in the browser of the user who made any kind of search on the website.<br />This needs to be treated by the site\'s GDPR terms in case it\'s value is a number larger than 0<br />The cookie name is: ', 'mwt-search-analytics' ) ?> <?php echo $mwtsa->cookie_name ?></strong>
             <?php
         }
-		
+
 		public function field_exclude_searches_from_ip_addresses_render() {
 			if ( ! isset( $this->existing_options['mwtsa_exclude_searches_from_ip_addresses'] ) ) {
 				$this->existing_options['mwtsa_exclude_searches_from_ip_addresses'] = '';
@@ -169,7 +183,7 @@ if( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
             <input type="number" min="0" name="mwtsa_settings[mwtsa_minimum_characters]" value="<?php echo $this->existing_options['mwtsa_minimum_characters'] ?>" /> <?php _e( '( Note: set to 0 or leave empty to disable it)', 'mwt-search-analytics' ) ?><br />
 	        <?php
         }
-		
+
 		public function field_display_stats_for_role_render() {
 			$roles = get_editable_roles();
 
@@ -199,6 +213,26 @@ if( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
             <label><input type='checkbox' name='mwtsa_settings[mwtsa_hide_charts]' value='1' <?php checked( $this->existing_options['mwtsa_hide_charts'], 1 ) ?> /> <?php _e( 'Hide graphical charts for representing statistics', 'mwt-search-analytics' ) ?></label><br />
 			<?php
 		}
+
+		public function field_save_search_country() {
+			if( ! isset( $this->existing_options['mwtsa_save_search_country'] ) ) {
+				$this->existing_options['mwtsa_save_search_country'] = 0;
+			}
+			?>
+            <label><input type='checkbox' name='mwtsa_settings[mwtsa_save_search_country]' value='1' <?php checked( $this->existing_options['mwtsa_save_search_country'], 1 ) ?> /> <?php _e( 'Save the country from where the search was launched', 'mwt-search-analytics' ) ?></label><br />
+            <strong><?php _e( 'NOTE: this uses the <a href="http://ip-api.com">http://ip-api.com</a> JSON service which is limited to 150 requests per minute. In case you have more than 150 searches per minute on the website, please uncheck this checkbox. <br />In case the site\'s IP got banned, you can go here: <a href="http://ip-api.com/docs/unban">http://ip-api.com/docs/unban</a> and remove the ban.<br />A future version of Search Analytics will come with support for the PRO service of IP-API.com<br /><br />Disclaimer: I am not associated with the IP-API.com service in any way. I am just using it for providing you with a way of finding out where the users search content from on your website.', 'mwt-search-analytics' ) ?></strong>
+            <?php
+        }
+
+		public function field_save_search_by_user() {
+			if( ! isset( $this->existing_options['mwtsa_save_search_by_user'] ) ) {
+				$this->existing_options['mwtsa_save_search_by_user'] = 0;
+			}
+			?>
+            <label><input type='checkbox' name='mwtsa_settings[mwtsa_save_search_by_user]' value='1' <?php checked( $this->existing_options['mwtsa_save_search_by_user'], 1 ) ?> /> <?php _e( 'Save the user id of the user who launched the search', 'mwt-search-analytics' ) ?></label><br />
+            <strong><?php _e( 'Using this feature will allow you to see which of your registered users searched things on the site.', 'mwt-search-analytics' ) ?></strong>
+            <?php
+        }
 
 		public function settings_section_callback( ) {
 

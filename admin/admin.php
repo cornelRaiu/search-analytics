@@ -12,6 +12,7 @@ if( ! class_exists('MWTSA_Admin') ) {
 
 		private function includes() {
 			include_once ('includes/class.settings.php');
+			include_once ('includes/class.charts.php');
 			include_once ('includes/class.stats.php');
 			include_once ('includes/class.export-csv.php');
 		}

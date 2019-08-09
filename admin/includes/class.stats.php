@@ -10,6 +10,7 @@ if( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
 		public $plugin_options;
 
 		private $view;
+		private $charts;
 
 		public function __construct() {
 			$this->view = 'dashboard_page_search-analytics/admin/includes/class.stats';
@@ -23,6 +24,10 @@ if( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
 
 			add_action( "load-{$this->view}", array( $this, 'add_screen_options' ) );
 			add_filter( 'set-screen-option', array( $this, 'set_screen_options' ), 10, 3);
+
+			if ( ! isset( $_REQUEST['search-term'] ) && empty ( MWTSA_Options::get_option( 'mwtsa_hide_charts' ) ) ) {
+			    $this->charts = new MWTSA_Admin_Charts();
+            }
 
 			include_once ( 'class.history-data.php' );
 			include_once ( 'class.stats-table.php' );
@@ -104,8 +109,6 @@ if( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
 
 			wp_register_style( 'mwtsa-datepicker-ui', '//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css', array(), '1.11.2' );
 
-			wp_enqueue_script( 'mwtsa-chart-bundle-script', $mwtsa->plugin_admin_url . 'assets/js/chart.bundle.min.js', array( 'jquery' ), $mwtsa->version );
-
 			wp_enqueue_script( 'mwtsa-admin-script', $mwtsa->plugin_admin_url . 'assets/js/admin.js', array( 'mwtsa-chart-bundle-script' ), $mwtsa->version );
 
 			wp_localize_script( 'mwtsa-admin-script', 'mwtsa_obj', array(
@@ -175,53 +178,9 @@ if( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
 								?>
                             </form>
                         </div>
-	                    <?php if ( ! isset( $_REQUEST['search-term'] ) && empty ( MWTSA_Options::get_option( 'mwtsa_hide_charts' ) ) )  :
-		                    $args = array(
-			                    'since' => 2,
-			                    'unit' => 'week'
-		                    );
-		                    list( $dates, $history ) = MWTSA_History_Data::get_daily_search_count_for_period_chart( $args );
-		                    ?>
-                            <div class="col-content">
-
-                                <h2><?php _e("Last 2 weeks search results", 'mwt-search-analytics') ?></h2>
-                                <canvas id="mwtsa-stats-chart" width="400" height="100"></canvas>
-                                <script>
-                                    var ctx = document.getElementById("mwtsa-stats-chart").getContext("2d");
-                                    var stepSize = parseInt( <?php echo ceil( max( $history ) / 15 ) ?> );
-                                    var stackedLine = new Chart(ctx, {
-                                        type: 'line',
-                                        data: {
-                                            labels: ["<?php echo implode( '", "', $dates ) ?>"],
-                                            datasets: [{
-                                                label: "No. of Searches",
-                                                data: ["<?php echo implode( '", "', $history ) ?>"],
-                                                borderColor: [
-                                                    'rgba(255,99,132,1)'
-                                                ],
-                                                borderWidth: 1
-                                            }]
-                                        },
-                                        options: {
-                                            scales: {
-                                                yAxes: [{
-                                                    ticks: {
-                                                        beginAtZero:true,
-                                                        callback: function (value) { if (Number.isInteger(value)) { return value; } },
-                                                        stepSize: stepSize
-                                                    }
-                                                }]
-                                            },
-                                            elements: {
-                                                line: {
-                                                    tension: 0
-                                                }
-                                            }
-                                        }
-                                    });
-                                </script>
-                            </div>
-	                    <?php endif; ?>
+	                    <?php if ( ! empty( $this->charts ) ) {
+	                        $this->charts->render_stats_chart();
+	                    } ?>
                     </div>
                     <div class="mwtsa-col-2">
                         <div class="col-content">
