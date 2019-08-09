@@ -1,0 +1,33 @@
+.mwtsa-wrapper{ margin:10px 20px 10px 0; }
+
+.mwtsa-2-col{ margin-right:300px; clear:both }
+.mwtsa-2-col .col-content{ background-color: #fff; padding:10px 10px; border:1px solid #ddd; margin-bottom: 20px; }
+.mwtsa-2-col .mwtsa-col-1{ width:100%; float:left; }
+.mwtsa-2-col .mwtsa-col-2{ float: right;margin-right: -300px;width: 280px; }
+.mwtsa-2-col .mwtsa-col-2 h2{ font-size:25px; }
+
+.mwtsa-wrapper .changelog-list{ list-style: disc inside; }
+.mwtsa-wrapper .changelog-list li{ font-size:12px; }
+
+.mwtsa-wrapper .views-label{ float: left;margin: 8px 10px 0 0;font-size: 13px;padding: 0;line-height: 2; }
+
+.mwtsa-wrapper .date-interval { display: inline-block }
+
+.mwtsa-stats-widget-wrapper .stats-list-label { width: 40%; display: inline-block; font-weight: bold; }
+.mwtsa-stats-widget-wrapper .stats-list-value { vertical-align: top; }
+
+.erase-history-table p.submit{ padding-top: 0; margin-top: 0;}
+
+@media only screen and ( max-width: 960px ) {
+	.mwtsa-2-col { margin-right:0; }
+	.mwtsa-2-col .mwtsa-col-1, .mwtsa-2-col .mwtsa-col-2 { float: none; width: auto; margin: 0; }
+	.mwtsa-2-col .mwtsa-col-1 p.search-box { position: relative; width:100% }
+	.mwtsa-2-col .mwtsa-col-2 { margin-top:20px; }
+
+	.mwtsa-wrapper .views-label{ font-size: 16px; }
+}
+
+@media only screen and ( min-width: 783px ) {
+
+	.mwtsa-2-col .mwtsa-col-1 p.search-box { width:auto; }
+}

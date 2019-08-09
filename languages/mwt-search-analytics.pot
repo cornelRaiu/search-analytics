@@ -1,0 +1,335 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+"Project-Id-Version: Search Analytics\n"
+"POT-Creation-Date: 2019-07-01 00:15+0300\n"
+"PO-Revision-Date: 2019-07-01 00:15+0300\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.2.3\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-Flags-xgettext: --add-comments=translators:\n"
+"X-Poedit-WPHeader: mwt-search-analytics.php\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;"
+"esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;_n_noop:1,2;"
+"_nx_noop:3c,1,2;__ngettext_noop:1,2\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPathExcluded-0: *.min.js\n"
+
+#: admin/includes/class.dashboard.php:18
+msgid "Last Week Search Stats"
+msgstr ""
+
+#: admin/includes/class.dashboard.php:35
+msgid "No search statistics found"
+msgstr ""
+
+#: admin/includes/class.dashboard.php:44
+msgid "Total Searches:"
+msgstr ""
+
+#: admin/includes/class.dashboard.php:47
+msgid "Most Searched Term:"
+msgstr ""
+
+#: admin/includes/class.dashboard.php:50
+msgid "Most Searched Term Count:"
+msgstr ""
+
+#: admin/includes/class.dashboard.php:53
+msgid "Last Searched Term:"
+msgstr ""
+
+#: admin/includes/class.dashboard.php:56
+msgid "Last Searched Date:"
+msgstr ""
+
+#: admin/includes/class.settings.php:37
+msgid "Search Filtering Settings"
+msgstr ""
+
+#: admin/includes/class.settings.php:44
+msgid "Ignore search queries for these user roles:"
+msgstr ""
+
+#: admin/includes/class.settings.php:52
+msgid ""
+"Ignore search queries for the above user roles even after the user has "
+"logged out:"
+msgstr ""
+
+#: admin/includes/class.settings.php:60
+msgid ""
+"Exclude doubled search for same user if interval is lower than ( minutes ):"
+msgstr ""
+
+#: admin/includes/class.settings.php:68
+msgid "Exclude searches made from the following IP addresses:"
+msgstr ""
+
+#: admin/includes/class.settings.php:76
+msgid "Only record searches with at least the number of characters"
+msgstr ""
+
+#: admin/includes/class.settings.php:84
+msgid "General Settings"
+msgstr ""
+
+#: admin/includes/class.settings.php:91
+msgid "Only display the statistics and settings page for these user roles:"
+msgstr ""
+
+#: admin/includes/class.settings.php:99
+msgid "Hide Charts"
+msgstr ""
+
+#: admin/includes/class.settings.php:107
+msgid "Uninstall"
+msgstr ""
+
+#: admin/includes/class.settings.php:133
+msgid ""
+"Note: this will set a cookie in the browser of the user who logged in and "
+"has one of the user roles checked above.<br />This needs to be treated by "
+"the site's GDPR terms in case it is active for public user roles ( e.g. "
+"Subscriber, Client )<br />The cookie name is: "
+msgstr ""
+
+#: admin/includes/class.settings.php:145 admin/includes/class.settings.php:169
+msgid "( Note: set to 0 or leave empty to disable it)"
+msgstr ""
+
+#: admin/includes/class.settings.php:146
+msgid ""
+"Note: this will set a cookie in the browser of the user who made any kind of "
+"search on the website.<br />This needs to be treated by the site's GDPR "
+"terms in case it's value is a number larger than 0<br />The cookie name is: "
+msgstr ""
+
+#: admin/includes/class.settings.php:157
+msgid "( Note: separate IP values by comma )"
+msgstr ""
+
+#: admin/includes/class.settings.php:159
+msgid "Your IP address is: "
+msgstr ""
+
+#: admin/includes/class.settings.php:190
+msgid "Remove plugin tables on uninstall"
+msgstr ""
+
+#: admin/includes/class.settings.php:199
+msgid "Hide graphical charts for representing statistics"
+msgstr ""
+
+#: admin/includes/class.settings.php:234
+msgid "Erase History"
+msgstr ""
+
+#: admin/includes/class.settings.php:244
+msgid "Erase All Data"
+msgstr ""
+
+#: admin/includes/class.settings.php:244
+msgid "Are you sure you want to delete all data?\\n\\nClick `OK` to proceed."
+msgstr ""
+
+#: admin/includes/class.settings.php:245
+msgid "Warning! Clicking this button will delete all historical search data"
+msgstr ""
+
+#: admin/includes/class.settings.php:256
+msgid "days"
+msgstr ""
+
+#: admin/includes/class.settings.php:257
+msgid "Erase Data"
+msgstr ""
+
+#: admin/includes/class.settings.php:257
+msgid ""
+"Are you sure you want to delete the selected data?\\n\\nClick `OK` to "
+"proceed."
+msgstr ""
+
+#: admin/includes/class.settings.php:292
+msgid "Historical data successfully erased!"
+msgstr ""
+
+#: admin/includes/class.stats-table.php:18
+msgid "Search Statistics"
+msgstr ""
+
+#: admin/includes/class.stats-table.php:60
+#: admin/includes/class.stats-table.php:302
+msgid "Term"
+msgstr ""
+
+#: admin/includes/class.stats-table.php:61
+#: admin/includes/class.term-stats.php:52
+msgid "No. of Searches"
+msgstr ""
+
+#: admin/includes/class.stats-table.php:62
+#: admin/includes/class.term-stats.php:48
+msgid "Average no. of results"
+msgstr ""
+
+#: admin/includes/class.stats-table.php:63
+msgid "Last search date"
+msgstr ""
+
+#: admin/includes/class.stats-table.php:68
+msgid "No. of results"
+msgstr ""
+
+#: admin/includes/class.stats-table.php:69
+msgid "Search Date"
+msgstr ""
+
+#: admin/includes/class.stats-table.php:92
+#: admin/includes/class.stats-table.php:107
+msgid "Delete"
+msgstr ""
+
+#: admin/includes/class.stats-table.php:93
+msgid "View Details"
+msgstr ""
+
+#: admin/includes/class.stats-table.php:226
+msgid "Filter"
+msgstr ""
+
+#: admin/includes/class.stats-table.php:227
+msgid "Export Data"
+msgstr ""
+
+#: admin/includes/class.stats-table.php:245
+msgid "Start Date"
+msgstr ""
+
+#: admin/includes/class.stats-table.php:247
+msgid "End Date"
+msgstr ""
+
+#: admin/includes/class.stats-table.php:260
+msgid "Last 24 hours"
+msgstr ""
+
+#: admin/includes/class.stats-table.php:264
+msgid "Last week"
+msgstr ""
+
+#: admin/includes/class.stats-table.php:268
+msgid "Last month"
+msgstr ""
+
+#: admin/includes/class.stats-table.php:272
+msgid "All time"
+msgstr ""
+
+#: admin/includes/class.stats-table.php:283
+msgid "All"
+msgstr ""
+
+#: admin/includes/class.stats-table.php:287
+msgid "Only With Results"
+msgstr ""
+
+#: admin/includes/class.stats-table.php:291
+msgid "Only Without Results"
+msgstr ""
+
+#: admin/includes/class.stats-table.php:306
+msgid "No Group"
+msgstr ""
+
+#: admin/includes/class.stats-table.php:327
+msgid "Search term(s) successfully deleted"
+msgstr ""
+
+#. Plugin Name of the plugin/theme
+#: admin/includes/class.stats.php:91 admin/includes/class.stats.php:228
+msgid "Search Analytics"
+msgstr ""
+
+#: admin/includes/class.stats.php:135
+msgid "Time filters:"
+msgstr ""
+
+#: admin/includes/class.stats.php:138
+msgid "Results filters:"
+msgstr ""
+
+#: admin/includes/class.stats.php:143 admin/includes/class.stats.php:147
+msgid "Group By:"
+msgstr ""
+
+#: admin/includes/class.stats.php:187
+msgid "Last 2 weeks search results"
+msgstr ""
+
+#: admin/includes/class.stats.php:230
+msgid "Changelog"
+msgstr ""
+
+#: admin/includes/class.stats.php:232
+#, php-format
+msgid "New in version %s"
+msgstr ""
+
+#: admin/includes/class.stats.php:244
+msgid "Useful Links"
+msgstr ""
+
+#: admin/includes/class.stats.php:246
+msgid "Settings Page"
+msgstr ""
+
+#: admin/includes/class.term-stats.php:28
+msgid "Term `"
+msgstr ""
+
+#: admin/includes/class.term-stats.php:47
+msgid "Date and Time"
+msgstr ""
+
+#: admin/includes/class.term-stats.php:143
+msgid "Not grouped"
+msgstr ""
+
+#: admin/includes/class.term-stats.php:147
+msgid "By date"
+msgstr ""
+
+#: admin/includes/class.term-stats.php:151
+msgid "By hour"
+msgstr ""
+
+#: mwt-search-analytics.php:46 mwt-search-analytics.php:50
+msgid "Cheatin&#8217; huh?"
+msgstr ""
+
+#. Plugin URI of the plugin/theme
+msgid "https://www.cornelraiu.com/wordpress-plugins/mwt-search-analytics/"
+msgstr ""
+
+#. Description of the plugin/theme
+msgid ""
+"Search Analytics will keep history of the search terms used by your users "
+"and group them in a set of statistics including the number of posts resulted "
+"from that search."
+msgstr ""
+
+#. Author of the plugin/theme
+msgid "Cornel Raiu"
+msgstr ""
+
+#. Author URI of the plugin/theme
+msgid "https://www.cornelraiu.com/"
+msgstr ""
