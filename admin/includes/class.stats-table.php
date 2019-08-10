@@ -151,10 +151,15 @@ if ( ! class_exists( 'MWTSA_Stats_Table' ) ) :
 					break;
                 case 'country':
                     if ( ! empty( $item['country'] ) ) {
-	                    $country_parts = explode( ':', $item['country'] );
 
+	                    // thanks to: https://stackoverflow.com/a/26307388/3741900 for the nice solution
+                        if ( extension_loaded( 'intl' ) ) {
+	                        $country_name = Locale::getDisplayRegion('-' . $item['country'], 'en');
+                        } else {
+                            $country_name = strtoupper( $item['country'] );
+                        }
 
-	                    echo '<div><img src="' . MWTSAI()->plugin_admin_url . 'assets/images/flags/' . $country_parts[0] . '.png" alt="' . $country_parts[1] . '" />&nbsp;<span>' . ucwords( $country_parts[1] ) . '</span></div>';
+	                    echo '<div><img src="' . MWTSAI()->plugin_admin_url . 'assets/images/flags/' . $item['country'] . '.png" alt="' . $country_name . '" />&nbsp;<span>' . ucwords( $country_name ) . '</span></div>';
                     } else {
                         echo 'N/A';
                     }

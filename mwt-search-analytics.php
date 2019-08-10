@@ -95,6 +95,11 @@ if( ! class_exists( 'MWTSA' ) ){
 		public function add_actions_and_filters() {
 			add_action( 'plugins_loaded', array( $this, 'load_plugin_textdomain' ) );
 			add_action( 'wp_insert_site', array( 'MWTSA_Install', 'activation' ) );
+
+			add_action( 'wp', array( 'MWTSA_Process_Query', 'process_search_term_action' ), 20 );
+
+			add_action( 'wp_login', array( 'MWTSA_Cookies', 'set_is_excluded_cookie_if_needed'), 10, 2 );
+			add_action( 'init', array( 'MWTSA_Cookies', 'clear_expired_search_history' ) );
 		}
 
 		public function load_plugin_textdomain() {

@@ -7,26 +7,19 @@ if( ! class_exists('MWTSA_Admin') ) {
 
 		public function __construct() {
 			$this->includes();
-			add_action( 'current_screen', array( $this, 'maybe_include' ) );
+			$this->add_actions_and_filters();
 		}
 
 		private function includes() {
 			include_once ('includes/class.settings.php');
+			include_once ('includes/class.dashboard.php');
 			include_once ('includes/class.charts.php');
 			include_once ('includes/class.stats.php');
 			include_once ('includes/class.export-csv.php');
 		}
 
-		public function maybe_include() {
-			if ( ! $screen = get_current_screen() ) {
-				return;
-			}
-
-			switch ( $screen->id ) {
-				case 'dashboard':
-					include_once ( 'includes/class.dashboard.php' );
-					break;
-			}
+		public function add_actions_and_filters() {
+			add_action( 'wp_dashboard_setup', array( 'MWTSA_Dashboard', 'init_action' ) );
 		}
 	}
 

@@ -5,9 +5,9 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 
 	class MWTSA_Process_Query {
 
-		public function __construct() {
-
-			add_action( 'wp', array( $this, 'process_search_term' ), 20 );
+		public static function process_search_term_action() {
+			$process = new self();
+			$process->process_search_term();
 		}
 
 		public function process_search_term() {
@@ -69,7 +69,7 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 					$ip_details = json_decode( $ip_details_get );
 
 					if ( $ip_details->status != 'fail' ) {
-						$country = strtolower( $ip_details->countryCode . ':' . $ip_details->country );
+						$country = strtolower( $ip_details->countryCode );
 					}
 				}
 			}
@@ -98,7 +98,6 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 
 		public function save_search_term( $term, $found_posts, $country = '', $user_id = 0 ) {
 			global $wpdb, $mwtsa;
-
 
 			//1. add/update term string
 			$existing_term = $wpdb->get_row( $wpdb->prepare(
@@ -169,4 +168,4 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 
 }
 
-return new MWTSA_Process_Query();
+//return new MWTSA_Process_Query();

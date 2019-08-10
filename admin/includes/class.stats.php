@@ -56,7 +56,8 @@ if( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
 					}
 				}
 
-				MWTSA_Export_CSV::mwtsa_export_to_csv( MWTSA_History_Data::get_terms_history_data(), '', $columns );
+				$export_csv = new MWTSA_Export_CSV();
+				$export_csv->mwtsa_export_to_csv( MWTSA_History_Data::get_terms_history_data(), '', $columns );
 			}
         }
 
