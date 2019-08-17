@@ -4,7 +4,7 @@ Tags: search, analytics, statistics, history
 Requires at least: 3.1.0
 Tested up to: 5.2.2
 Requires PHP: 5.6
-Stable tag: 1.3.0
+Stable tag: 1.3.1
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -65,6 +65,10 @@ Yes. You can visit the plugin's [Trello Board](https://trello.com/b/MvIWInjW). T
 For now, you can use the [Support Forum](https://wordpress.org/support/plugin/search-analytics). I will be adding a feature request/voting system to my website soon so everything will be kept in there.
 
 == Changelog ==
+
+= 1.3.1 Hotfix =
+* Bugfix: database not being updated correctly in case of plugin update. It only worked for manual plugin activation
+* Bugfix: search country locked to Canada.
 
 = 1.3.0 =
 * Feature: add **save_search_term()** method to allow external search saving
@@ -174,5 +178,5 @@ For now, you can use the [Support Forum](https://wordpress.org/support/plugin/se
 
 == Upgrade Notice ==
 
-= 1.3.0 =
-This version provides 100% compatibility with WP 5.2.2 + multisite support + a bunch of other features for better data visualization
+= 1.3.1 =
+This version provides 100% compatibility with WP 5.2.2 + multisite support + country geolocation + a bunch of other features for better data visualization

@@ -68,7 +68,7 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 			if ( ! empty( MWTSA_Options::get_option( 'mwtsa_save_search_country' ) ) ) {
 				//http://ip-api.com/json/24.48.0?fields=49154
 				// IP-API integration according to the documentation at http://ip-api.com/docs/api:json
-				$ip_details_get = @ file_get_contents( 'http://ip-api.com/json/24.48.0.1?fields=49155' );
+				$ip_details_get = @ file_get_contents( 'http://ip-api.com/json/' . $client_ip . '?fields=49155' );
 				if ( ! empty( $ip_details_get ) ) {
 					$ip_details = json_decode( $ip_details_get );
 
@@ -106,6 +106,8 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 
 		public function save_search_term( $term, $found_posts, $country = '', $user_id = 0 ) {
 			global $wpdb, $mwtsa;
+
+			MWTSA_Install::activate_single_site();
 
 			//1. add/update term string
 			$existing_term = $wpdb->get_row( $wpdb->prepare(
