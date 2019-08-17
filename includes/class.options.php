@@ -37,6 +37,23 @@ if( ! class_exists('MWTSA_Options') ) {
 
 			return ( isset( self::$existing_options[$name]) ) ? self::$existing_options[$name] : false;
 		}
-	}
 
+		public static function set_option ( $name, $value ) {
+			$options = self::get_options();
+
+			$options[$name] = $value;
+
+			update_option( self::$option_name, $options );
+		}
+
+		public static function set_options ( $_options ) {
+			$options = self::get_options();
+
+			foreach ( $_options as $name => $_option ) {
+				$options[$name] = $_option;
+			}
+
+			update_option( self::$option_name, $options );
+		}
+	}
 }

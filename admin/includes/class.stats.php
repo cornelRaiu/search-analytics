@@ -10,6 +10,7 @@ if( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
 		public $plugin_options;
 
 		private $view;
+		private $charts;
 
 		public function __construct() {
 			$this->view = 'dashboard_page_search-analytics/admin/includes/class.stats';
@@ -23,6 +24,10 @@ if( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
 
 			add_action( "load-{$this->view}", array( $this, 'add_screen_options' ) );
 			add_filter( 'set-screen-option', array( $this, 'set_screen_options' ), 10, 3);
+
+			if ( ! isset( $_REQUEST['search-term'] ) && empty ( MWTSA_Options::get_option( 'mwtsa_hide_charts' ) ) ) {
+			    $this->charts = new MWTSA_Admin_Charts();
+            }
 
 			include_once ( 'class.history-data.php' );
 			include_once ( 'class.stats-table.php' );
@@ -51,7 +56,8 @@ if( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
 					}
 				}
 
-				MWTSA_Export_CSV::mwtsa_export_to_csv( MWTSA_History_Data::get_terms_history_data(), '', $columns );
+				$export_csv = new MWTSA_Export_CSV();
+				$export_csv->mwtsa_export_to_csv( MWTSA_History_Data::get_terms_history_data(), '', $columns );
 			}
         }
 
@@ -103,8 +109,6 @@ if( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
 			}
 
 			wp_register_style( 'mwtsa-datepicker-ui', '//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css', array(), '1.11.2' );
-
-			wp_enqueue_script( 'mwtsa-chart-bundle-script', $mwtsa->plugin_admin_url . 'assets/js/chart.bundle.min.js', array( 'jquery' ), $mwtsa->version );
 
 			wp_enqueue_script( 'mwtsa-admin-script', $mwtsa->plugin_admin_url . 'assets/js/admin.js', array( 'mwtsa-chart-bundle-script' ), $mwtsa->version );
 
@@ -175,53 +179,9 @@ if( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
 								?>
                             </form>
                         </div>
-	                    <?php if ( ! isset( $_REQUEST['search-term'] ) && empty ( MWTSA_Options::get_option( 'mwtsa_hide_charts' ) ) )  :
-		                    $args = array(
-			                    'since' => 2,
-			                    'unit' => 'week'
-		                    );
-		                    list( $dates, $history ) = MWTSA_History_Data::get_daily_search_count_for_period_chart( $args );
-		                    ?>
-                            <div class="col-content">
-
-                                <h2><?php _e("Last 2 weeks search results", 'mwt-search-analytics') ?></h2>
-                                <canvas id="mwtsa-stats-chart" width="400" height="100"></canvas>
-                                <script>
-                                    var ctx = document.getElementById("mwtsa-stats-chart").getContext("2d");
-                                    var stepSize = parseInt( <?php echo ceil( max( $history ) / 15 ) ?> );
-                                    var stackedLine = new Chart(ctx, {
-                                        type: 'line',
-                                        data: {
-                                            labels: ["<?php echo implode( '", "', $dates ) ?>"],
-                                            datasets: [{
-                                                label: "No. of Searches",
-                                                data: ["<?php echo implode( '", "', $history ) ?>"],
-                                                borderColor: [
-                                                    'rgba(255,99,132,1)'
-                                                ],
-                                                borderWidth: 1
-                                            }]
-                                        },
-                                        options: {
-                                            scales: {
-                                                yAxes: [{
-                                                    ticks: {
-                                                        beginAtZero:true,
-                                                        callback: function (value) { if (Number.isInteger(value)) { return value; } },
-                                                        stepSize: stepSize
-                                                    }
-                                                }]
-                                            },
-                                            elements: {
-                                                line: {
-                                                    tension: 0
-                                                }
-                                            }
-                                        }
-                                    });
-                                </script>
-                            </div>
-	                    <?php endif; ?>
+	                    <?php if ( ! empty( $this->charts ) ) {
+	                        $this->charts->render_stats_chart();
+	                    } ?>
                     </div>
                     <div class="mwtsa-col-2">
                         <div class="col-content">
@@ -231,16 +191,19 @@ if( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
 
                             <p><?php echo sprintf( __( 'New in version %s', 'mwt-search-analytics' ), $mwtsa->version ); ?></p>
                             <ul class="changelog-list">
-                                <li>Feature: add ability to delete all search history older than a selected number of days</li>
-                                <li>Feature: add setting: "Exclude searches from IPs list"</li>
-                                <li>Feature: add setting: "Only record searches with at least the number of characters"</li>
-                                <li>Feature: add "Ungroup" view for the list of terms for having a chronological data view</li>
-                                <li>Optimization: <strong>compatibility with version 5.1</strong></li>
-                                <li>Optimization: change default sort to last search date</li>
-                                <li>Optimization: average number of results column to only 2 decimals</li>
-                                <li>Optimization: update the singleton pattern</li>
+                                <li>Feature: add <strong>save_search_term()</strong> method to allow external search saving</li>
+                                <li>Feature: add <strong>mwtsa_extra_exclude_conditions</strong> filter to allow more control over the conditions in which a search is processed</li>
+                                <li>Feature: add <strong>mwtsa_exclude_term</strong> filter to allow more control over the conditions in which terms are saved</li>
+                                <li>Feature: save searches by user so the user can see his search history</li>
+                                <li>Feature: add country geolocation for the searches</li>
+                                <li>Feature: add more options for the chart</li>
+                                <li>Feature: add period comparison in the chart</li>
+                                <li>Optimization: <strong>compatibility with version 5.2.2</strong></li>
+                                <li>Optimization: <strong>Add multisite support</strong></li>
+                                <li>Optimization: Build separate methods for displaying charts to be able to easily integrate it in other views</li>
+                                <li>Optimization: Make chart include "today"</li>
+                                <li>Optimization: general code optimizations</li>
                             </ul>
-
                             <h3><?php _e( 'Useful Links', 'mwt-search-analytics' ) ?></h3>
                             <ul>
                                 <li><a href="options-general.php?page=mwt-search-analytics"><?php _e( 'Settings Page', 'mwt-search-analytics' ) ?></a></li>

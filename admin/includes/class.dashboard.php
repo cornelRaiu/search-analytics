@@ -6,8 +6,9 @@ if( ! class_exists('MWTSA_Dashboard') ) {
 
 	class MWTSA_Dashboard {
 
-		public function __construct() {
-			add_action( 'wp_dashboard_setup', array( $this, 'init' ) );
+		public static function init_action() {
+			$dashboard = new MWTSA_Dashboard();
+			$dashboard->init();
 		}
 
 		public function init() {
@@ -15,6 +16,7 @@ if( ! class_exists('MWTSA_Dashboard') ) {
 			$plugin_options = MWTSA_Options::get_options();
 
 			if ( ! isset( $plugin_options['mwtsa_display_stats_for_role'] ) || array_intersect( $this_user_role, $plugin_options['mwtsa_display_stats_for_role'] ) ) {
+
 				wp_add_dashboard_widget( 'mwtsa_last_week_stats_widget', __( 'Last Week Search Stats', 'mwt-search-analytics' ), array( $this, 'last_week_stats_widget' ) );
 			}
 		}
@@ -59,7 +61,4 @@ if( ! class_exists('MWTSA_Dashboard') ) {
 			echo '</ul>';
 		}
 	}
-
 }
-
-return new MWTSA_Dashboard();

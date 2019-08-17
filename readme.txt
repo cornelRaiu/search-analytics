@@ -2,9 +2,9 @@
 Contributors: cornel.raiu
 Tags: search, analytics, statistics, history
 Requires at least: 3.1.0
-Tested up to: 5.1.0
+Tested up to: 5.2.2
 Requires PHP: 5.6
-Stable tag: 1.2.3
+Stable tag: 1.3.1
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -27,6 +27,8 @@ It can easily aid you in finding what your users are really searching for on you
 * Easily **erase all history from the database** in case a reset is needed
 * Easily **erase history older than** in case a general cleanup is needed
 * Dashboard widget for a quick glance over your last week's search stats
+* **Multisite compatible**
+* Country Geolocation
 
 == Installation ==
 Search Analytics can be installed via the WordPress Automatic Plugin Install page in the admin panel.
@@ -63,6 +65,25 @@ Yes. You can visit the plugin's [Trello Board](https://trello.com/b/MvIWInjW). T
 For now, you can use the [Support Forum](https://wordpress.org/support/plugin/search-analytics). I will be adding a feature request/voting system to my website soon so everything will be kept in there.
 
 == Changelog ==
+
+= 1.3.1 Hotfix =
+* Bugfix: database not being updated correctly in case of plugin update. It only worked for manual plugin activation
+* Bugfix: search country locked to Canada.
+
+= 1.3.0 =
+* Feature: add **save_search_term()** method to allow external search saving
+* Feature: add **mwtsa_extra_exclude_conditions** filter to allow more control over the conditions in which a search is processed
+* Feature: add **mwtsa_exclude_term** filter to allow more control over the conditions in which terms are saved
+* Feature: save searches by user so the user can see his search history
+* Feature: add country geolocation for the searches
+* Feature: add more options for the chart
+* Feature: add period comparison in the chart
+* Optimization: **compatibility with version 5.2.2**
+* Optimization: **Add multisite support**
+* Optimization: Build separate methods for displaying charts to be able to easily integrate it in other views
+* Optimization: Make chart include "today"
+* Optimization: general code optimizations
+* Optimization: general code optimizations
 
 = 1.2.3 =
 * Feature: add ability to delete all search history older than a selected number of days
@@ -157,5 +178,5 @@ For now, you can use the [Support Forum](https://wordpress.org/support/plugin/se
 
 == Upgrade Notice ==
 
-= 1.2.3 =
-This version provides 100% compatibility with WP 5.1.0 + a bunch of other features for better data visualization
+= 1.3.1 =
+This version provides 100% compatibility with WP 5.2.2 + multisite support + country geolocation + a bunch of other features for better data visualization

@@ -5,7 +5,7 @@ if ( ! class_exists( 'MWTSA_Export_CSV' ) ) {
 
 	class MWTSA_Export_CSV {
 
-		public static function mwtsa_export_to_csv ( $values, $filename = '', $columns = array() ) {
+		public function mwtsa_export_to_csv ( $values, $filename = '', $columns = array() ) {
 
 			if ( empty( $values ) ) {
 				return false; //TODO: return error message?

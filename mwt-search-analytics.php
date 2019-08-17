@@ -3,7 +3,7 @@
 Plugin Name: Search Analytics
 Plugin URI: https://www.cornelraiu.com/wordpress-plugins/mwt-search-analytics/
 Description: Search Analytics will keep history of the search terms used by your users and group them in a set of statistics including the number of posts resulted from that search.
-Version: 1.2.3
+Version: 1.3.1
 Author: Cornel Raiu
 Author URI: https://www.cornelraiu.com/
 Text Domain: mwt-search-analytics
@@ -18,8 +18,8 @@ if( ! class_exists( 'MWTSA' ) ){
 
 	final class MWTSA {
 
-		public $version = '1.2.3';
-		public $db_version = '1.0.0';
+		public $version = '1.3.1';
+		public $db_version = '1.1.1';
 		public $text_domain = 'mwt-search-analytics';
 
 		public $plugin_dir;
@@ -27,9 +27,12 @@ if( ! class_exists( 'MWTSA' ) ){
 		public $plugin_admin_dir;
 		public $plugin_admin_url;
 		public $includes_dir;
+		public $terms_table_name_no_prefix;
+		public $history_table_name_no_prefix;
 		public $terms_table_name;
 		public $history_table_name;
 		public $cookie_name;
+		public $main_option_name;
 
 		protected static $_instance = null;
 
@@ -64,10 +67,15 @@ if( ! class_exists( 'MWTSA' ) ){
 			$this->plugin_admin_url = $this->plugin_url .'admin/';
 			$this->includes_dir = $this->plugin_dir . 'includes/';
 
-			$this->terms_table_name = $wpdb->prefix . 'mwt_search_terms';
-			$this->history_table_name = $wpdb->prefix . 'mwt_search_history';
+			// need this separated for the multisite install/uninstall functions
+			$this->terms_table_name_no_prefix = 'mwt_search_terms';
+			$this->history_table_name_no_prefix = 'mwt_search_history';
+
+			$this->terms_table_name = $wpdb->prefix . $this->terms_table_name_no_prefix;
+			$this->history_table_name = $wpdb->prefix . $this->history_table_name_no_prefix;
 
 			$this->cookie_name = 'wp_mwtsa';
+			$this->main_option_name = 'mwtsa_settings';
 		}
 
 		public function includes() {
@@ -85,8 +93,13 @@ if( ! class_exists( 'MWTSA' ) ){
 		}
 
 		public function add_actions_and_filters() {
-
 			add_action( 'plugins_loaded', array( $this, 'load_plugin_textdomain' ) );
+			add_action( 'wp_insert_site', array( 'MWTSA_Install', 'activation' ) );
+
+			add_action( 'wp', array( 'MWTSA_Process_Query', 'process_search_term_action' ), 20 );
+
+			add_action( 'wp_login', array( 'MWTSA_Cookies', 'set_is_excluded_cookie_if_needed'), 10, 2 );
+			add_action( 'init', array( 'MWTSA_Cookies', 'clear_expired_search_history' ) );
 		}
 
 		public function load_plugin_textdomain() {

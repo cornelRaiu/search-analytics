@@ -138,13 +138,13 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
 
 						$group_by = 'GROUP BY h.term_id';
 
-				if ( $args['only_no_results']  ) {
-							$having = " HAVING results_count = 0";
-				}
+						if ( $args['only_no_results']  ) {
+									$having = " HAVING results_count = 0";
+						}
 
-				if ( $args['min_results'] > 0 ) {
-							$having = " HAVING results_count > 0";
-				}
+						if ( $args['min_results'] > 0 ) {
+									$having = " HAVING results_count > 0";
+						}
 
 						$order_by = '`count` DESC, AVG( h.count_posts ) DESC, t.term ASC';
 					} else {
@@ -158,7 +158,14 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
 						}
 					}
 
-					$query = "SELECT t.id, t.term, {$count} {$results_count_col}, {$datetime} as last_search_date
+					$country = ', h.country';
+					$user_id = ', h.user_id';
+					if ( $args['group'] == 'term_id' ) {
+						$country = '';
+						$user_id = '';
+					}
+
+					$query = "SELECT t.id, t.term, {$count} {$results_count_col}, {$datetime} as last_search_date {$country} {$user_id}
 		                FROM {$mwtsa->terms_table_name} as t
 		                JOIN {$mwtsa->history_table_name} as h ON t.id = h.term_id
 		                $where
@@ -173,7 +180,6 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
 			                ORDER BY `datetime` DESC
 			                LIMIT 1";
 				}
-
 			} else {
 
 				if ( isset( $_REQUEST['search-term'] ) && $_REQUEST['search-term'] != "" ) {
@@ -230,13 +236,30 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
 				'since'     => 1,
 				'unit'      => 'day',
 				'format'    => "d/m",
-				'group'     => 'day'
+				'group'     => 'day',
+				'compare'   => false
 			);
 
 			$args = array_merge( $default_args, $args );
 
-			$dates = createDateRange( '-' . $args['since'] . ' ' . $args['unit'], '', $args['format'] );
+			$results = array();
 
+			list( $dates, $results[] ) = self::get_results_for_chart( $args );
+
+			if ( $args['compare'] ) {
+				$args['since'] *= 2;
+				list( $_dates, $results[] ) = self::get_results_for_chart( $args );
+
+				foreach ( $dates as $k => &$date ) {
+					$date = $_dates[$k] . __(' vs ') . $date;
+				}
+			}
+
+			return array( $dates, $results );
+		}
+
+		public static function get_results_for_chart ( $args ) {
+			$dates = create_date_range( '-' . $args['since'] . ' ' . $args['unit'], '', $args['format'] );
 			$results = self::run_terms_history_data_query( $args );
 
 			$_searches = $searches = array();
