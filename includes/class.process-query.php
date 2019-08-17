@@ -59,6 +59,10 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 				}
 			}
 
+			if ( apply_filters( 'mwtsa_extra_exclude_conditions', false ) ) {
+				return false;
+			}
+
 			$country = '';
 
 			if ( ! empty( MWTSA_Options::get_option( 'mwtsa_save_search_country' ) ) ) {
@@ -89,6 +93,10 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 				$minimum_length_term = MWTSA_Options::get_option( 'mwtsa_minimum_characters' );
 
 				if ( ! empty( $minimum_length_term ) && strlen( $search_term ) < $minimum_length_term ) {
+					return false;
+				}
+
+				if ( apply_filters( 'mwtsa_exclude_term', false, $search_term ) ) {
 					return false;
 				}
 

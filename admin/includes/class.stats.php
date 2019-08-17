@@ -191,16 +191,19 @@ if( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
 
                             <p><?php echo sprintf( __( 'New in version %s', 'mwt-search-analytics' ), $mwtsa->version ); ?></p>
                             <ul class="changelog-list">
-                                <li>Feature: add ability to delete all search history older than a selected number of days</li>
-                                <li>Feature: add setting: "Exclude searches from IPs list"</li>
-                                <li>Feature: add setting: "Only record searches with at least the number of characters"</li>
-                                <li>Feature: add "Ungroup" view for the list of terms for having a chronological data view</li>
-                                <li>Optimization: <strong>compatibility with version 5.1</strong></li>
-                                <li>Optimization: change default sort to last search date</li>
-                                <li>Optimization: average number of results column to only 2 decimals</li>
-                                <li>Optimization: update the singleton pattern</li>
+                                <li>Feature: add <strong>save_search_term()</strong> method to allow external search saving</li>
+                                <li>Feature: add <strong>mwtsa_extra_exclude_conditions</strong> filter to allow more control over the conditions in which a search is processed</li>
+                                <li>Feature: add <strong>mwtsa_exclude_term</strong> filter to allow more control over the conditions in which terms are saved</li>
+                                <li>Feature: save searches by user so the user can see his search history</li>
+                                <li>Feature: add country geolocation for the searches</li>
+                                <li>Feature: add more options for the chart</li>
+                                <li>Feature: add period comparison in the chart</li>
+                                <li>Optimization: <strong>compatibility with version 5.2.2</strong></li>
+                                <li>Optimization: <strong>Add multisite support</strong></li>
+                                <li>Optimization: Build separate methods for displaying charts to be able to easily integrate it in other views</li>
+                                <li>Optimization: Make chart include "today"</li>
+                                <li>Optimization: general code optimizations</li>
                             </ul>
-
                             <h3><?php _e( 'Useful Links', 'mwt-search-analytics' ) ?></h3>
                             <ul>
                                 <li><a href="options-general.php?page=mwt-search-analytics"><?php _e( 'Settings Page', 'mwt-search-analytics' ) ?></a></li>
