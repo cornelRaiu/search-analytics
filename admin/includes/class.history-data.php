@@ -57,7 +57,7 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
 
 			$search_str = '';
 
-			if( ! isset( $_REQUEST['search-term'] ) ) {
+			if( empty( $_REQUEST['search-term'] ) ) {
 				$search_str = ( isset( $_REQUEST['s'] ) ) ? $_REQUEST['s'] : '';
 			}
 
@@ -66,21 +66,22 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
 				'since'             => $since,
 				'unit'              => $time_unit,
 				'min_results'       => $min_results,
-				'search_str'        => $search_str,
+				'search_str'        => sanitize_text_field( $search_str ),
 				'only_no_results'   => $only_no_results,
 				'group'             => $group,
 				'date_since'        => ( isset( $_REQUEST['date_from'] ) ) ? $_REQUEST['date_from'] : '',
 				'date_until'        => ( isset( $_REQUEST['date_to'] ) ) ? $_REQUEST['date_to'] : ''
 			);
 
-			$history = self::run_terms_history_data_query( $args );
-
-			return $history;
+			return self::run_terms_history_data_query( $args );
 		}
 
 		public static function run_terms_history_data_query ( $args ) {
 
 			global $wpdb, $mwtsa;
+
+			//make sure db is up to date
+			MWTSA_Install::activate_single_site();
 
 			$default_args = array(
 				'since'             => 1,
@@ -116,7 +117,7 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
 				$where .= " AND ( h.datetime BETWEEN '$since' AND '$until' )";
 			}
 
-			if ( ! isset( $_REQUEST['search-term'] ) && in_array( $args['group'], array( 'term_id', 'no_group' ) ) ) {
+			if ( empty( $_REQUEST['search-term'] ) && in_array( $args['group'], array( 'term_id', 'no_group' ) ) ) {
 				$having = '';
 				$group_by = '';
 
@@ -139,11 +140,11 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
 						$group_by = 'GROUP BY h.term_id';
 
 						if ( $args['only_no_results']  ) {
-									$having = " HAVING results_count = 0";
+							$having = " HAVING results_count = 0";
 						}
 
 						if ( $args['min_results'] > 0 ) {
-									$having = " HAVING results_count > 0";
+							$having = " HAVING results_count > 0";
 						}
 
 						$order_by = '`count` DESC, AVG( h.count_posts ) DESC, t.term ASC';
@@ -160,6 +161,7 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
 
 					$country = ', h.country';
 					$user_id = ', h.user_id';
+
 					if ( $args['group'] == 'term_id' ) {
 						$country = '';
 						$user_id = '';
@@ -182,8 +184,8 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
 				}
 			} else {
 
-				if ( isset( $_REQUEST['search-term'] ) && $_REQUEST['search-term'] != "" ) {
-					$where .= " AND t.id = " . $_REQUEST['search-term'];
+				if ( ! empty( $_REQUEST['search-term'] ) ) {
+					$where .= " AND t.id = " . absint( $_REQUEST['search-term'] );
 				}
 
 				if ( $args['only_no_results']  ) {
@@ -225,9 +227,7 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
 			                ORDER BY `datetime` DESC, results_count DESC";
 			}
 
-			$history = $wpdb->get_results( $query, 'ARRAY_A' );
-
-			return $history;
+			return $wpdb->get_results( $query, 'ARRAY_A' );
 		}
 
 		public static function get_daily_search_count_for_period_chart( $args ) {
@@ -276,5 +276,4 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
 			return array( $dates, $searches );
 		}
 	}
-
 }

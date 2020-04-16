@@ -28,7 +28,7 @@ if( ! class_exists( 'MWTSA_Admin_Charts' ) ) {
 		}
 
 		public function render_stats_chart() {
-			if ( ! isset( $_REQUEST['search-term'] ) && empty ( MWTSA_Options::get_option( 'mwtsa_hide_charts' ) ) ) :
+			if ( empty( $_REQUEST['search-term'] ) && empty ( MWTSA_Options::get_option( 'mwtsa_hide_charts' ) ) ) :
                 $default_line_style = MWTSA_Options::get_option('chart_default_line_style');
                 $default_range = MWTSA_Options::get_option('chart_default_range');
 

@@ -13,6 +13,7 @@ if( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
 		private $charts;
 
 		public function __construct() {
+
 			$this->view = 'dashboard_page_search-analytics/admin/includes/class.stats';
 			$this->set_constants();
 			$this->plugin_options = MWTSA_Options::get_options();
@@ -25,7 +26,7 @@ if( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
 			add_action( "load-{$this->view}", array( $this, 'add_screen_options' ) );
 			add_filter( 'set-screen-option', array( $this, 'set_screen_options' ), 10, 3);
 
-			if ( ! isset( $_REQUEST['search-term'] ) && empty ( MWTSA_Options::get_option( 'mwtsa_hide_charts' ) ) ) {
+			if ( empty( $_REQUEST['search-term'] ) && empty ( MWTSA_Options::get_option( 'mwtsa_hide_charts' ) ) ) {
 			    $this->charts = new MWTSA_Admin_Charts();
             }
 
@@ -45,13 +46,13 @@ if( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
                     'Last Search Date'
                 );
 
-				if ( isset( $_REQUEST['search-term'] ) ) {
+				if ( ! empty( $_REQUEST['search-term'] ) ) {
 					$columns = array(
 						'Average Results',
 						'Date and Time'
 					);
 
-					if ( !empty( $_REQUEST['grouped_view'] ) ) {
+					if ( ! empty( $_REQUEST['grouped_view'] ) ) {
 						$columns[] = "Searches";
 					}
 				}
@@ -91,10 +92,11 @@ if( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
 
 		public function add_admin_menu() {
 			$this_user_role = mwt_get_current_user_roles();
+			$accepted_user_roles = array_intersect( $this_user_role, $this->plugin_options['mwtsa_display_stats_for_role'] );
 
-			if ( ! isset( $this->plugin_options['mwtsa_display_stats_for_role'] ) || array_intersect( $this_user_role, $this->plugin_options['mwtsa_display_stats_for_role'] ) ) {
+			if ( ! isset( $this->plugin_options['mwtsa_display_stats_for_role'] ) || ! empty( $accepted_user_roles ) ) {
 
-				add_submenu_page( 'index.php', __( 'Search Analytics', 'mwt-search-analytics' ), __( 'Search Analytics', 'mwt-search-analytics' ), 'manage_options', __FILE__, array( &$this, 'render_stats_page' ) );
+				add_submenu_page( 'index.php', __( 'Search Analytics', 'mwt-search-analytics' ), __( 'Search Analytics', 'mwt-search-analytics' ), $accepted_user_roles[0], __FILE__, array( &$this, 'render_stats_page' ) );
 
 			}
 		}
@@ -110,7 +112,7 @@ if( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
 
 			wp_register_style( 'mwtsa-datepicker-ui', '//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css', array(), '1.11.2' );
 
-			wp_enqueue_script( 'mwtsa-admin-script', $mwtsa->plugin_admin_url . 'assets/js/admin.js', array( 'mwtsa-chart-bundle-script' ), $mwtsa->version );
+			wp_enqueue_script( 'mwtsa-admin-script', $mwtsa->plugin_admin_url . 'assets/js/admin.js', array(), $mwtsa->version );
 
 			wp_localize_script( 'mwtsa-admin-script', 'mwtsa_obj', array(
 			        'gmt_offset'  => get_option( 'gmt_offset' ),
@@ -122,11 +124,7 @@ if( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
 		public function render_stats_page() {
 			global $mwtsa;
 
-			if ( isset( $_REQUEST['search-term'] ) ) {
-				$stats_table = new MWTSA_Term_Stats_Table();
-            } else {
-				$stats_table = new MWTSA_Stats_Table();
-			}
+			$stats_table = ! empty( $_REQUEST['search-term'] ) ? new MWTSA_Term_Stats_Table() : new MWTSA_Stats_Table();
 
 			?>
             <div class="wrap mwtsa-wrapper">
@@ -142,7 +140,7 @@ if( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
                                 <span class="views-label"><?php _e( 'Results filters:', 'mwt-search-analytics' ) ?></span><?php $stats_table->display_results_views(); ?>
                             </div>
 
-	                        <?php if ( isset( $_REQUEST['search-term'] ) ) : ?>
+	                        <?php if ( ! empty( $_REQUEST['search-term'] ) ) : ?>
                                 <div class="wp-clearfix">
                                     <span class="views-label"><?php _e( 'Group By:', 'mwt-search-analytics' ) ?></span><?php $stats_table->display_group_views(); ?>
                                 </div>
@@ -170,7 +168,7 @@ if( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
 	                            <?php if ( isset ( $_REQUEST['grouped_view'] ) ): ?>
                                     <input type="hidden" name="grouped_view" value="<?php echo $_REQUEST['grouped_view'] ?>">
 	                            <?php endif; ?>
-	                            <?php if ( isset ( $_REQUEST['search-term'] ) ): ?>
+	                            <?php if ( ! empty ( $_REQUEST['search-term'] ) ): ?>
                                     <input type="hidden" name="search-term" value="<?php echo $_REQUEST['search-term'] ?>">
 	                            <?php endif; ?>
 								<?php
@@ -191,18 +189,15 @@ if( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
 
                             <p><?php echo sprintf( __( 'New in version %s', 'mwt-search-analytics' ), $mwtsa->version ); ?></p>
                             <ul class="changelog-list">
-                                <li>Feature: add <strong>save_search_term()</strong> method to allow external search saving</li>
-                                <li>Feature: add <strong>mwtsa_extra_exclude_conditions</strong> filter to allow more control over the conditions in which a search is processed</li>
-                                <li>Feature: add <strong>mwtsa_exclude_term</strong> filter to allow more control over the conditions in which terms are saved</li>
-                                <li>Feature: save searches by user so the user can see his search history</li>
-                                <li>Feature: add country geolocation for the searches</li>
-                                <li>Feature: add more options for the chart</li>
-                                <li>Feature: add period comparison in the chart</li>
-                                <li>Optimization: <strong>compatibility with version 5.2.2</strong></li>
-                                <li>Optimization: <strong>Add multisite support</strong></li>
-                                <li>Optimization: Build separate methods for displaying charts to be able to easily integrate it in other views</li>
-                                <li>Optimization: Make chart include "today"</li>
-                                <li>Optimization: general code optimizations</li>
+                                <li>Bugfix: "Only display the statistics and settings page for these user roles" not working correctly</li>
+                                <li>Bugfix: Fix missing script error if charts disabled</li>
+                                <li>Bugfix: Add prefix to the option setting group to prevent conflicts</li>
+                                <li>Bugfix: Database error if search-term URL param is empty</li>
+                                <li>Feature: Split the "Only display the statistics and settings page for these user roles" in 2 different settings</li>
+                                <li>Optimization: <strong>compatibility with WP versions up to 5.4</strong></li>
+                                <li>Optimization: Add prefix to the option setting group to prevent conflicts</li>
+                                <li>Optimization: Review and patch the plugin from a security perspective</li>
+                                <li>Optimization: Made sure administrator display rights can not be taken away by making the field disabled</li>
                             </ul>
                             <h3><?php _e( 'Useful Links', 'mwt-search-analytics' ) ?></h3>
                             <ul>
