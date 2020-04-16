@@ -17,7 +17,7 @@ if ( ! class_exists( 'MWTSA_Term_Stats_Table' ) ) :
 		var $is_grouped = false;
 
 		public function __construct( $args = array() ) {
-			$this->term_id = $_REQUEST['search-term'];
+			$this->term_id = absint( $_REQUEST['search-term'] );
 			$this->term_data = $this->get_term_data();
 
 			if ( ! empty( $_REQUEST['grouped_view'] ) ) {
@@ -33,9 +33,7 @@ if ( ! class_exists( 'MWTSA_Term_Stats_Table' ) ) :
 		public function get_term_data() {
 			global $wpdb, $mwtsa;
 
-			$data = $wpdb->get_row( "SELECT * FROM {$mwtsa->terms_table_name} WHERE id = {$this->term_id}", 'ARRAY_A' );
-
-			return $data;
+			return $wpdb->get_row( "SELECT * FROM {$mwtsa->terms_table_name} WHERE id = {$this->term_id}", 'ARRAY_A' );
 		}
 
 		public function display_search_box() {

@@ -14,8 +14,9 @@ if( ! class_exists('MWTSA_Dashboard') ) {
 		public function init() {
 			$this_user_role = mwt_get_current_user_roles();
 			$plugin_options = MWTSA_Options::get_options();
+			$accepted_user_roles = array_intersect( $this_user_role, $plugin_options['mwtsa_display_stats_for_role'] );
 
-			if ( ! isset( $plugin_options['mwtsa_display_stats_for_role'] ) || array_intersect( $this_user_role, $plugin_options['mwtsa_display_stats_for_role'] ) ) {
+			if ( ! isset( $plugin_options['mwtsa_display_stats_for_role'] ) || ! empty( $accepted_user_roles ) ) {
 
 				wp_add_dashboard_widget( 'mwtsa_last_week_stats_widget', __( 'Last Week Search Stats', 'mwt-search-analytics' ), array( $this, 'last_week_stats_widget' ) );
 			}

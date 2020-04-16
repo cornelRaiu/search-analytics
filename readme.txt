@@ -2,9 +2,9 @@
 Contributors: cornel.raiu
 Tags: search, analytics, statistics, history
 Requires at least: 3.1.0
-Tested up to: 5.2.2
+Tested up to: 5.4
 Requires PHP: 5.6
-Stable tag: 1.3.1
+Stable tag: 1.3.2
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -65,6 +65,16 @@ Yes. You can visit the plugin's [Trello Board](https://trello.com/b/MvIWInjW). T
 For now, you can use the [Support Forum](https://wordpress.org/support/plugin/search-analytics). I will be adding a feature request/voting system to my website soon so everything will be kept in there.
 
 == Changelog ==
+= 1.3.2 =
+* Bugfix: "Only display the statistics and settings page for these user roles" not working correctly
+* Bugfix: Fix missing script error if charts disabled
+* Bugfix: Add prefix to the option setting group to prevent conflicts
+* Bugfix: Database error if search-term URL param is empty
+* Feature: Split the "Only display the statistics and settings page for these user roles" in 2 different settings
+* Optimization: **compatibility with WP versions up to 5.4**
+* Optimization: Add prefix to the option setting group to prevent conflicts
+* Optimization: Review and patch the plugin from a security perspective
+* Optimization: Made sure administrator display rights can not be taken away by making the field disabled
 
 = 1.3.1 Hotfix =
 * Bugfix: database not being updated correctly in case of plugin update. It only worked for manual plugin activation
@@ -178,5 +188,5 @@ For now, you can use the [Support Forum](https://wordpress.org/support/plugin/se
 
 == Upgrade Notice ==
 
-= 1.3.1 =
-This version provides 100% compatibility with WP 5.2.2 + multisite support + country geolocation + a bunch of other features for better data visualization
+= 1.3.2 =
+This version provides 100% compatibility with WP versions up to 5.4. It also fixes the well known stats visibility for bug.

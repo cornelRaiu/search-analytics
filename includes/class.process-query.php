@@ -107,6 +107,7 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 		public function save_search_term( $term, $found_posts, $country = '', $user_id = 0 ) {
 			global $wpdb, $mwtsa;
 
+			//make sure db is up to date
 			MWTSA_Install::activate_single_site();
 
 			//1. add/update term string

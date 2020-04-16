@@ -3,7 +3,7 @@
 Plugin Name: Search Analytics
 Plugin URI: https://www.cornelraiu.com/wordpress-plugins/mwt-search-analytics/
 Description: Search Analytics will keep history of the search terms used by your users and group them in a set of statistics including the number of posts resulted from that search.
-Version: 1.3.1
+Version: 1.3.2
 Author: Cornel Raiu
 Author URI: https://www.cornelraiu.com/
 Text Domain: mwt-search-analytics
@@ -18,7 +18,7 @@ if( ! class_exists( 'MWTSA' ) ){
 
 	final class MWTSA {
 
-		public $version = '1.3.1';
+		public $version = '1.3.2';
 		public $db_version = '1.1.1';
 		public $text_domain = 'mwt-search-analytics';
 

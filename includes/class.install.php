@@ -28,6 +28,11 @@ if ( ! class_exists( 'MWTSA_Install' ) ) {
 		}
 
 		public static function activate_single_site() {
+			self::setup_db_tables();
+			self::update_options();
+		}
+
+		public static function setup_db_tables() {
 			global $wpdb, $mwtsa;
 
 			$mwtsa = MWTSAI();
@@ -80,6 +85,15 @@ if ( ! class_exists( 'MWTSA_Install' ) ) {
 
 			$wpdb->{$table_name} = $table_name;
 			$wpdb->tables[] = $table_name;
+		}
+
+		public static function update_options() {
+			$display_stats = MWTSA_Options::get_option( 'mwtsa_display_stats_for_role' );
+			$display_settings = MWTSA_Options::get_option( 'mwtsa_display_settings_for_role' );
+
+			if ( ! empty( $display_stats ) && empty( $display_settings ) ) {
+				MWTSA_Options::set_option( 'mwtsa_display_settings_for_role', $display_stats );
+			}
 		}
 	}
 }

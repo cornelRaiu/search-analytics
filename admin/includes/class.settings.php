@@ -18,30 +18,31 @@ if( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 
 		    $this_user_role = mwt_get_current_user_roles();
 
-		    if ( ! isset( $this->existing_options['mwtsa_display_stats_for_role'] ) || array_intersect( $this_user_role, $this->existing_options['mwtsa_display_stats_for_role'] ) ) {
+			$accepted_user_roles = array_intersect( $this_user_role, $this->existing_options['mwtsa_display_settings_for_role'] );
 
-			    add_options_page( 'MWT: Search Analytics', 'MWT: Search Analytics', 'manage_options', 'mwt-search-analytics', array( &$this, 'options_page' ) );
+		    if ( ! isset( $this->existing_options['mwtsa_display_settings_for_role'] ) || ! empty( $accepted_user_roles ) ) {
+
+			    add_options_page( 'MWT: Search Analytics', 'MWT: Search Analytics', $accepted_user_roles[0], 'mwt-search-analytics', array( &$this, 'options_page' ) );
 
 		    }
-
 		}
 
 		public function mwtsa_settings_init() {
 
-			register_setting( 'general_options', MWTSAI()->main_option_name );
+			register_setting( 'mwtsa_general_options', MWTSAI()->main_option_name );
 
 			add_settings_section(
 				'mwtsa_general_options_section',
 				__( 'Search Filtering Settings', 'mwt-search-analytics' ),
 				array( &$this, 'settings_section_callback' ),
-				'general_options'
+				'mwtsa_general_options'
 			);
 
 			add_settings_field(
 				'mwtsa_exclude_search_for_role',
 				__( 'Ignore search queries for these user roles:', 'mwt-search-analytics' ),
 				array( &$this, 'field_exclude_search_for_role_render' ),
-				'general_options',
+				'mwtsa_general_options',
 				'mwtsa_general_options_section'
 			);
 
@@ -49,7 +50,7 @@ if( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 				'mwtsa_exclude_search_for_role_after_logout',
 				__( 'Ignore search queries for the above user roles even after the user has logged out:', 'mwt-search-analytics' ),
 				array( &$this, 'field_exclude_search_for_role_after_logout_render' ),
-				'general_options',
+				'mwtsa_general_options',
 				'mwtsa_general_options_section'
 			);
 
@@ -57,7 +58,7 @@ if( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 				'mwtsa_exclude_doubled_search_for_interval',
 				__( 'Exclude doubled search for same user if interval is lower than ( minutes ):', 'mwt-search-analytics' ),
 				array( &$this, 'field_exclude_doubled_search_for_interval_render' ),
-				'general_options',
+				'mwtsa_general_options',
 				'mwtsa_general_options_section'
 			);
 
@@ -65,7 +66,7 @@ if( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 				'mwtsa_exclude_searches_from_ip_addresses',
 				__( 'Exclude searches made from the following IP addresses:', 'mwt-search-analytics' ),
 				array( &$this, 'field_exclude_searches_from_ip_addresses_render' ),
-				'general_options',
+				'mwtsa_general_options',
 				'mwtsa_general_options_section'
 			);
 
@@ -73,7 +74,7 @@ if( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 				'mwtsa_minimum_characters',
 				__( 'Only record searches with at least the number of characters', 'mwt-search-analytics' ),
 				array( &$this, 'field_minimum_characters_render' ),
-				'general_options',
+				'mwtsa_general_options',
 				'mwtsa_general_options_section'
 			);
 
@@ -81,14 +82,22 @@ if( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 				'mwtsa_display_options_sections',
 				__( 'General Settings', 'mwt-search-analytics' ),
 				array( &$this, 'settings_section_callback' ),
-				'general_options'
+				'mwtsa_general_options'
+			);
+
+			add_settings_field(
+				'mwtsa_display_settings_for_role',
+				__( 'Only display the settings page for these user roles:', 'mwt-search-analytics' ),
+				array( &$this, 'field_display_settings_for_role_render' ),
+				'mwtsa_general_options',
+				'mwtsa_display_options_sections'
 			);
 
 			add_settings_field(
 				'mwtsa_display_stats_for_role',
-				__( 'Only display the statistics and settings page for these user roles:', 'mwt-search-analytics' ),
+				__( 'Only display the statistics page for these user roles:', 'mwt-search-analytics' ),
 				array( &$this, 'field_display_stats_for_role_render' ),
-				'general_options',
+				'mwtsa_general_options',
 				'mwtsa_display_options_sections'
 			);
 
@@ -96,7 +105,7 @@ if( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 				'mwtsa_hide_charts',
 				__( 'Hide Charts', 'mwt-search-analytics' ),
 				array( &$this, 'field_hide_charts' ),
-				'general_options',
+				'mwtsa_general_options',
 				'mwtsa_display_options_sections'
 			);
 
@@ -104,7 +113,7 @@ if( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 				'mwtsa_save_search_country',
 				__( 'Save Search Country', 'mwt-search-analytics' ),
 				array( &$this, 'field_save_search_country' ),
-				'general_options',
+				'mwtsa_general_options',
 				'mwtsa_display_options_sections'
 			);
 
@@ -112,7 +121,7 @@ if( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 				'mwtsa_save_search_by_user',
 				__( 'Save Search By User', 'mwt-search-analytics' ),
 				array( &$this, 'field_save_search_by_user' ),
-				'general_options',
+				'mwtsa_general_options',
 				'mwtsa_display_options_sections'
 			);
 
@@ -120,7 +129,7 @@ if( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 				'mwtsa_uninstall',
 				__( 'Uninstall', 'mwt-search-analytics' ),
 				array( &$this, 'field_uninstall' ),
-				'general_options',
+				'mwtsa_general_options',
 				'mwtsa_display_options_sections'
 			);
 
@@ -140,9 +149,11 @@ if( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 
 		public function field_exclude_search_for_role_after_logout_render() {
 			global $mwtsa;
-			if( ! isset( $this->existing_options['mwtsa_exclude_search_for_role_after_logout'] ) ) {
+
+			if ( ! isset( $this->existing_options['mwtsa_exclude_search_for_role_after_logout'] ) ) {
 				$this->existing_options['mwtsa_exclude_search_for_role_after_logout'] = 0;
 			}
+
 			?>
             <label><input type='checkbox' name='mwtsa_settings[mwtsa_exclude_search_for_role_after_logout]' value='1' <?php checked( $this->existing_options['mwtsa_exclude_search_for_role_after_logout'], 1 ) ?> /> <br /><strong><?php _e( 'Note: this will set a cookie in the browser of the user who logged in and has one of the user roles checked above.<br />This needs to be treated by the site\'s GDPR terms in case it is active for public user roles ( e.g. Subscriber, Client )<br />The cookie name is: ', 'mwt-search-analytics' ) ?> <?php echo $mwtsa->cookie_name ?></strong></label><br />
 			<?php
@@ -151,7 +162,7 @@ if( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 		public function field_exclude_doubled_search_for_interval_render() {
 			global $mwtsa;
 
-			if( ! isset( $this->existing_options['mwtsa_exclude_doubled_search_for_interval'] ) ) {
+			if ( ! isset( $this->existing_options['mwtsa_exclude_doubled_search_for_interval'] ) ) {
 				$this->existing_options['mwtsa_exclude_doubled_search_for_interval'] = 0;
 			}
 
@@ -184,13 +195,29 @@ if( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 	        <?php
         }
 
+		public function field_display_settings_for_role_render() {
+			$roles = get_editable_roles();
+
+			if ( ! empty( $roles ) ) :
+				foreach ( $roles as $role_key => $role ) :
+					$is_readonly = ( 'administrator' == $role_key );
+					$is_checked = ! isset( $this->existing_options['mwtsa_display_settings_for_role'] ) || in_array( $role_key, $this->existing_options['mwtsa_display_settings_for_role'] ) || $is_readonly;
+					?>
+                    <label><input type='checkbox' name='mwtsa_settings[mwtsa_display_settings_for_role][]' value='<?php echo $role_key ?>' <?php checked( $is_checked ) ?> <?php if ( $is_readonly ) echo 'onclick="return false;"'; ?> /> <?php echo $role['name'] ?></label><br />
+				<?php
+				endforeach;
+			endif;
+		}
+
 		public function field_display_stats_for_role_render() {
 			$roles = get_editable_roles();
 
 			if ( ! empty( $roles ) ):
                 foreach ( $roles as $role_key => $role ) :
+                    $is_readonly = ( 'administrator' == $role_key );
+	                $is_checked = ! isset( $this->existing_options['mwtsa_display_stats_for_role'] ) || in_array( $role_key, $this->existing_options['mwtsa_display_stats_for_role'] ) || $is_readonly;
                     ?>
-                    <label><input type='checkbox' name='mwtsa_settings[mwtsa_display_stats_for_role][]' value='<?php echo $role_key ?>' <?php checked( ! isset( $this->existing_options['mwtsa_display_stats_for_role'] ) || in_array( $role_key, $this->existing_options['mwtsa_display_stats_for_role'] ), 1 ) ?> /> <?php echo $role['name'] ?></label><br />
+                    <label><input type='checkbox' name='mwtsa_settings[mwtsa_display_stats_for_role][]' value='<?php echo $role_key ?>' <?php checked( $is_checked ) ?> <?php if ( $is_readonly ) echo 'onclick="return false;"'; ?> /> <?php echo $role['name'] ?></label><br />
                     <?php
 		        endforeach;
             endif;
@@ -220,7 +247,7 @@ if( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 			}
 			?>
             <label><input type='checkbox' name='mwtsa_settings[mwtsa_save_search_country]' value='1' <?php checked( $this->existing_options['mwtsa_save_search_country'], 1 ) ?> /> <?php _e( 'Save the country from where the search was launched', 'mwt-search-analytics' ) ?></label><br />
-            <strong><?php _e( 'NOTE: this uses the <a href="http://ip-api.com">http://ip-api.com</a> JSON service which is limited to 150 requests per minute. In case you have more than 150 searches per minute on the website, please uncheck this checkbox. <br />In case the site\'s IP got banned, you can go here: <a href="http://ip-api.com/docs/unban">http://ip-api.com/docs/unban</a> and remove the ban.<br />A future version of Search Analytics will come with support for the PRO service of IP-API.com<br /><br />Disclaimer: I am not associated with the IP-API.com service in any way. I am just using it for providing you with a way of finding out where the users search content from on your website.', 'mwt-search-analytics' ) ?></strong>
+            <strong><?php _e( 'NOTE: this uses the <a href="http://ip-api.com">http://ip-api.com</a> JSON service which is limited to 150 requests per minute. In case you have more than 150 searches per minute on the website, please uncheck this checkbox. <br />In case the site\'s IP got banned, you can go here: <a href="http://ip-api.com/docs/unban">http://ip-api.com/docs/unban</a> and remove the ban.<br />A future version of Search Analytics will come with support for the PRO service of IP-API.com<br /><br />Disclaimer: I am not associated with the IP-API.com service in any way. I am just using it for providing you a way of finding out where the users search content from on your website.', 'mwt-search-analytics' ) ?></strong>
             <?php
         }
 
@@ -253,8 +280,8 @@ if( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 			?>
 			<form action='options.php' method='post'>
 				<?php
-				settings_fields( 'general_options' );
-				do_settings_sections( 'general_options' );
+				settings_fields( 'mwtsa_general_options' );
+				do_settings_sections( 'mwtsa_general_options' );
 				submit_button();
 				?>
 			</form>
@@ -284,13 +311,13 @@ if( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
                     <tr>
                         <th scope="row">Delete data older than</th>
                         <td>
-            <form action="" method="post">
-				<?php wp_nonce_field( 'mwtsa-erase-data' ); ?>
-                <p class="submit">
+                            <form action="" method="post">
+                                <?php wp_nonce_field( 'mwtsa-erase-data' ); ?>
+                                <p class="submit">
                                     <input type="number" name="mwtsa_data_older_than_days" value="90" /> <?php _e( 'days', 'mwt-search-analytics' ) ?> &nbsp;
                                     <input name="mwtsa_erase_old_data" class="button-secondary" value="<?php esc_attr_e( 'Erase Data', 'mwt-search-analytics' ) ?>" type="submit" onclick="return confirm( '<?php _e('Are you sure you want to delete the selected data?\n\nClick `OK` to proceed.' ) ?>');" />
-                </p>
-            </form>
+                                </p>
+                            </form>
                         </td>
                     </tr>
                 </tbody>
