@@ -197,12 +197,7 @@ if( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
 
                             <p><?php echo sprintf( __( 'New in version %s', 'mwt-search-analytics' ), $mwtsa->version ); ?></p>
                             <ul class="changelog-list">
-                                <li>Bugfix: Times displayed in UTC time instead of the website's timezone</li>
-                                <li>Feature: allow filtering searches by user</li>
-                                <li>Experimental Feature: prevent terms from being saved if they contain certain substrings</li>
-                                <li>Experimental Feature: allow the plugin to capture search strings from custom search parameters</li>
-                                <li>Optimization: hook <i>load_plugin_textdomain</i> on the <i>init</i> action instead of the <i>plugins_loaded</i> one</li>
-                                <li>Optimization: prefix helper functions <i>create_date_range</i> and <i>get_current_user_ip</i> with <i>mwt_</i> to avoid eventual naming conflicts</li>
+                                <li>Bugfix: Fix fatal error for missing `wp_timezone()` in WP < 5.3.0</li>
                             </ul>
                             <h3><?php _e( 'Useful Links', 'mwt-search-analytics' ) ?></h3>
                             <ul>

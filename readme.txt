@@ -1,10 +1,10 @@
 === Search Analytics ===
 Contributors: cornel.raiu
 Tags: search, analytics, statistics, history
-Requires at least: 3.1.0
-Tested up to: 5.4.2
+Requires at least: 4.4.0
+Tested up to: 5.5
 Requires PHP: 5.6
-Stable tag: 1.3.3
+Stable tag: 1.3.4
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -65,6 +65,9 @@ Yes. You can visit the plugin's [Trello Board](https://trello.com/b/MvIWInjW). T
 For now, you can use the [Support Forum](https://wordpress.org/support/plugin/search-analytics). I will be adding a feature request/voting system to my website soon so everything will be kept in there.
 
 == Changelog ==
+= 1.3.4 Hotfix =
+* Bugfix: Fix fatal error for missing `wp_timezone()` in WP < 5.3.0
+
 = 1.3.3 =
 * Bugfix: Times displayed in UTC time instead of the website's timezone
 * Feature: allow filtering searches by user
@@ -196,5 +199,5 @@ For now, you can use the [Support Forum](https://wordpress.org/support/plugin/se
 
 == Upgrade Notice ==
 
-= 1.3.3 =
-Two highly requested features have been added: "custom search parameters" and "ability to exclude terms if they contain certain substrings". It also comes with a few optimizations and bug fixes.
+= 1.3.4 =
+Fix a fatal error for websites that use WP version lower than 5.3.0
