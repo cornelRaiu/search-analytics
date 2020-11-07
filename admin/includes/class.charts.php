@@ -1,165 +1,171 @@
 <?php
-if( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+} // Exit if accessed directly
 
-if( ! class_exists( 'MWTSA_Admin_Charts' ) ) {
+if ( ! class_exists( 'MWTSA_Admin_Charts' ) ) {
 
-	class MWTSA_Admin_Charts {
+    class MWTSA_Admin_Charts {
 
-		public function __construct() {
-			add_action( 'admin_enqueue_scripts', array( $this, 'load_admin_assets' ) );
+        public function __construct() {
+            add_action( 'admin_enqueue_scripts', array( $this, 'load_admin_assets' ) );
 
-			add_action( 'wp_ajax_render_chart_data', array( $this, 'render_chart_data' ) );
-			add_action( 'wp_ajax_save_default_chart_settings', array( $this, 'save_default_chart_settings' ) );
-		}
+            add_action( 'wp_ajax_render_chart_data', array( $this, 'render_chart_data' ) );
+            add_action( 'wp_ajax_save_default_chart_settings', array( $this, 'save_default_chart_settings' ) );
+        }
 
-		public function load_admin_assets( $hook ) {
+        public function load_admin_assets( $hook ) {
 
-		    if ( $hook == 'dashboard_page_search-analytics/admin/includes/class.stats') {
-			    wp_enqueue_script( 'mwtsa-chart-bundle-script', MWTSAI()->plugin_admin_url . 'assets/js/chart.bundle.min.js', array( 'jquery' ), MWTSAI()->version );
+            if ( $hook == 'dashboard_page_search-analytics/admin/includes/class.stats' ) {
+                wp_enqueue_script( 'mwtsa-chart-bundle-script', MWTSAI()->plugin_admin_url . 'assets/js/chart.bundle.min.js', array( 'jquery' ), MWTSAI()->version );
 
-			    wp_enqueue_script( 'mwtsa-chart-controller-script', MWTSAI()->plugin_admin_url . 'assets/js/chart-controller.js', array( 'mwtsa-chart-bundle-script' ) );
+                wp_enqueue_script( 'mwtsa-chart-controller-script', MWTSAI()->plugin_admin_url . 'assets/js/chart-controller.js', array( 'mwtsa-chart-bundle-script' ) );
 
-			    wp_localize_script( 'mwtsa-chart-controller-script', 'mwtsa_obj', array(
-					    'ajax_url'  => admin_url( 'admin-ajax.php' )
-				    )
-			    );
+                wp_localize_script( 'mwtsa-chart-controller-script', 'mwtsa_obj', array(
+                        'ajax_url' => admin_url( 'admin-ajax.php' )
+                    )
+                );
             }
 
-		}
+        }
 
-		public function render_stats_chart() {
-			if ( empty( $_REQUEST['search-term'] ) && empty ( MWTSA_Options::get_option( 'mwtsa_hide_charts' ) ) ) :
-                $default_line_style = MWTSA_Options::get_option('chart_default_line_style');
-                $default_range = MWTSA_Options::get_option('chart_default_range');
+        public function render_stats_chart() {
+            if ( empty( $_REQUEST['search-term'] ) && empty ( MWTSA_Options::get_option( 'mwtsa_hide_charts' ) ) ) :
+                $default_line_style = MWTSA_Options::get_option( 'chart_default_line_style' );
+                $default_range = MWTSA_Options::get_option( 'chart_default_range' );
 
                 $line_options = array(
-	                'basic' => __( 'Basic Line', 'mwt-search-analytics' ),
-	                'stepped' => __( 'Stepped Line', 'mwt-search-analytics' )
+                    'basic'   => __( 'Basic Line', 'mwt-search-analytics' ),
+                    'stepped' => __( 'Stepped Line', 'mwt-search-analytics' )
                 );
 
                 $range_options = array(
-                    '2w' => __( '2 Weeks', 'mwt-search-analytics' ),
+                    '2w'  => __( '2 Weeks', 'mwt-search-analytics' ),
                     '2wc' => __( '2 Weeks Comparison', 'mwt-search-analytics' ),
-                    '1m' => __( '1 Month', 'mwt-search-analytics' ),
+                    '1m'  => __( '1 Month', 'mwt-search-analytics' ),
                     '1mc' => __( '1 Month Comparison', 'mwt-search-analytics' )
                 );
-				?>
-				<div class="col-content">
+                ?>
+                <div class="col-content">
 
-					<h2><?php _e("Search Results Charts", 'mwt-search-analytics') ?></h2>
-					<div class="mwtsa-chart-options">
+                    <h2><?php _e( "Search Results Charts", 'mwt-search-analytics' ) ?></h2>
+                    <div class="mwtsa-chart-options">
                         <label for="chart-type">
                             <select id="chart-type" onchange="loadCharts()">
-                                <?php foreach( $line_options as $value => $label ) : ?>
+                                <?php foreach ( $line_options as $value => $label ) : ?>
                                     <option value="<?php echo $value ?>" <?php selected( $value, $default_line_style, true ) ?>><?php echo $label ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </label>
                         <label for="chart-ranges">
                             <select id="chart-ranges" onchange="loadCharts()">
-                                <?php foreach( $range_options as $value => $label ) : ?>
+                                <?php foreach ( $range_options as $value => $label ) : ?>
                                     <option value="<?php echo $value ?>" <?php selected( $value, $default_range, true ) ?>><?php echo $label ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </label>
                         <span onclick="saveAsDefault()" class="button"><?php _e( 'Save as default', 'mwt-search-analytics' ) ?></span>
-					</div>
+                    </div>
 
                     <div id="chart-content"></div>
-				</div>
-			<?php endif;
-		}
+                </div>
+            <?php endif;
+        }
 
-		public function render_chart_data () {
+        public function render_chart_data() {
 
 
-		    if ( empty( $_REQUEST['line_style'] ) || empty( $_REQUEST['chart_ranges'] ) ) {
-		        echo 'Bad Request!';
+            if ( empty( $_REQUEST['line_style'] ) || empty( $_REQUEST['chart_ranges'] ) ) {
+                echo 'Bad Request!';
             }
 
-		    $stepped_line = ( $_REQUEST['line_style'] == 'stepped' ) ? 'true' : 'false';
+            $stepped_line = ( $_REQUEST['line_style'] == 'stepped' ) ? 'true' : 'false';
 
-			switch ( $_REQUEST['chart_ranges'] ) {
+            switch ( $_REQUEST['chart_ranges'] ) {
                 case '1m':
-	                $args = array(
-		                'since' => 1,
-		                'unit' => 'month',
-		                'compare' => false
-	                );
-	                break;
+                    $args = array(
+                        'since'   => 1,
+                        'unit'    => 'month',
+                        'compare' => false
+                    );
+                    break;
                 case '2wc':
-	                $args = array(
-		                'since' => 2,
-		                'unit' => 'week',
-		                'compare' => true
-	                );
-	                break;
+                    $args = array(
+                        'since'   => 2,
+                        'unit'    => 'week',
+                        'compare' => true
+                    );
+                    break;
                 case '1mc':
-	                $args = array(
-		                'since' => 1,
-		                'unit' => 'month',
-		                'compare' => true
-	                );
-	                break;
-				case '2w':
+                    $args = array(
+                        'since'   => 1,
+                        'unit'    => 'month',
+                        'compare' => true
+                    );
+                    break;
+                case '2w':
                 default:
-					$args = array(
-						'since' => 2,
-						'unit' => 'week',
-						'compare' => false
-					);
-					break;
+                    $args = array(
+                        'since'   => 2,
+                        'unit'    => 'week',
+                        'compare' => false
+                    );
+                    break;
 
             }
 
-			list( $dates, $history ) = MWTSA_History_Data::get_daily_search_count_for_period_chart( $args );
+            list( $dates, $history ) = ( new MWTSA_History_Data )->get_daily_search_count_for_period_chart( $args );
 
             ?>
 
             <canvas id="mwtsa-stats-chart" width="400" height="100"></canvas>
             <script>
-                var ctx = document.getElementById("mwtsa-stats-chart").getContext("2d");
-                var stepSize = parseInt( <?php echo ceil( max( $history[0] ) / 15 ) ?> );
-                var stackedLine = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: ["<?php echo implode( '", "', $dates ) ?>"],
-                        datasets: [
-                            <?php foreach ( $history as $k => $set ) :
-                                $set = implode( '", "', $set );
-                                ?>
-                                {
-                                    label: "<?php echo ( ( $k == 1 ) ? __( 'Previous', 'mwt-search-analytics' ) : __( 'Current', 'mwt-search-analytics' ) ) . ' ' . __( 'Period' ) ?>",
-                                    data: ["<?php echo $set ?>"],
-                                    borderColor: [
-                                        "<?php echo ( $k == 1 ) ? 'rgba(0,0,0,1)' : 'rgba(255,99,132,1)' ?>"
-                                    ],
-                                    borderWidth: 1,
-                                    steppedLine: <?php echo $stepped_line ?>
-                                },
-                            <?php endforeach; ?>
-                        ]
+              var ctx = document.getElementById("mwtsa-stats-chart").getContext("2d");
+              var stepSize = parseInt( <?php echo ceil( max( $history[0] ) / 15 ) ?> );
+              var stackedLine = new Chart(ctx, {
+                type: 'line',
+                data: {
+                  labels: ["<?php echo implode( '", "', $dates ) ?>"],
+                  datasets: [
+                      <?php foreach ( $history as $k => $set ) :
+                      $set = implode( '", "', $set );
+                      ?>
+                    {
+                      label: "<?php echo ( ( $k == 1 ) ? __( 'Previous', 'mwt-search-analytics' ) : __( 'Current', 'mwt-search-analytics' ) ) . ' ' . __( 'Period' ) ?>",
+                      data: ["<?php echo $set ?>"],
+                      borderColor: [
+                        "<?php echo ( $k == 1 ) ? 'rgba(0,0,0,1)' : 'rgba(255,99,132,1)' ?>"
+                      ],
+                      borderWidth: 1,
+                      steppedLine: <?php echo $stepped_line ?>
                     },
-                    options: {
-                        scales: {
-                            yAxes: [{
-                                ticks: {
-                                    beginAtZero:true,
-                                    callback: function (value) { if (Number.isInteger(value)) { return value; } },
-                                    stepSize: stepSize
-                                }
-                            }]
+                      <?php endforeach; ?>
+                  ]
+                },
+                options: {
+                  scales: {
+                    yAxes: [{
+                      ticks: {
+                        beginAtZero: true,
+                        callback: function (value) {
+                          if (Number.isInteger(value)) {
+                            return value;
+                          }
                         },
-                        elements: {
-                            line: {
-                                tension: 0
-                            }
-                        },
-                        tooltips: {
-                            mode: 'index'
-                        }
+                        stepSize: stepSize
+                      }
+                    }]
+                  },
+                  elements: {
+                    line: {
+                      tension: 0
                     }
-                });
+                  },
+                  tooltips: {
+                    mode: 'index'
+                  }
+                }
+              });
             </script>
             <?php
 
@@ -167,16 +173,16 @@ if( ! class_exists( 'MWTSA_Admin_Charts' ) ) {
         }
 
         public function save_default_chart_settings() {
-	        if ( empty( $_REQUEST['line_style'] ) || empty( $_REQUEST['chart_ranges'] ) ) {
-		        echo 'Bad Request!';
-	        }
+            if ( empty( $_REQUEST['line_style'] ) || empty( $_REQUEST['chart_ranges'] ) ) {
+                echo 'Bad Request!';
+            }
 
-	        MWTSA_Options::set_options( array(
+            MWTSA_Options::set_options( array(
                 'chart_default_line_style' => sanitize_text_field( $_REQUEST['line_style'] ),
-                'chart_default_range' => sanitize_text_field( $_REQUEST['chart_ranges'] )
+                'chart_default_range'      => sanitize_text_field( $_REQUEST['chart_ranges'] )
             ) );
 
-	        exit();
+            exit();
         }
-	}
+    }
 }

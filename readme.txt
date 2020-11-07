@@ -2,7 +2,7 @@
 Contributors: cornel.raiu
 Tags: search, analytics, statistics, history
 Requires at least: 4.4.0
-Tested up to: 5.5
+Tested up to: 5.5.3
 Requires PHP: 5.6
 Stable tag: 1.3.4
 License: GPLv3 or later
@@ -14,6 +14,8 @@ Search Analytics will keep history of the search terms used by your users and gr
 Search Analytics will keep history of the search terms used by your users and group them in a set of statistics including the number of posts resulted from that search term.
 
 It can easily aid you in finding what your users are really searching for on your website and make sure you provide exactly what they need.
+
+**NOTE: Search Analytics stores all the statistics in your WordPress instance. No info is sent to third-party services**
 
 = Features =
 * Record all the search queries made using the **standard WordPress search form**.
@@ -65,6 +67,9 @@ Yes. You can visit the plugin's [Trello Board](https://trello.com/b/MvIWInjW). T
 For now, you can use the [Support Forum](https://wordpress.org/support/plugin/search-analytics). I will be adding a feature request/voting system to my website soon so everything will be kept in there.
 
 == Changelog ==
+= 1.3.5
+* Feature: Add support for WpForo
+
 = 1.3.4 Hotfix =
 * Bugfix: Fix fatal error for missing `wp_timezone()` in WP < 5.3.0
 
@@ -199,5 +204,5 @@ For now, you can use the [Support Forum](https://wordpress.org/support/plugin/se
 
 == Upgrade Notice ==
 
-= 1.3.4 =
-Fix a fatal error for websites that use WP version lower than 5.3.0
+= 1.3.5 =
+Add support for WpForo

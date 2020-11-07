@@ -1,90 +1,93 @@
 <?php
-if( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+} // Exit if accessed directly
 
-if( ! class_exists('MWTSA_Options') ) {
+if ( ! class_exists( 'MWTSA_Options' ) ) {
 
-	class MWTSA_Options {
+    class MWTSA_Options {
 
-		public static $option_name = 'mwtsa_settings';
-		public static $existing_options;
+        public static $option_name = 'mwtsa_settings';
+        public static $existing_options;
 
-		public static function init_options() {
-			self::$existing_options = get_option( self::$option_name );
+        public static function init_options() {
+            self::$existing_options = get_option( self::$option_name );
 
-			$options = array(
-				'mwtsa_display_stats_for_role' => [
-					'administrator'
-				],
-				'mwtsa_exclude_search_for_role' => [],
-				'mwtsa_exclude_search_for_role_after_logout' => 0,
-				'mwtsa_save_search_country' => 0,
-				'mwtsa_save_search_by_user' => 0,
-				'mwtsa_exclude_doubled_search_for_interval' => 0,
-				'mwtsa_exclude_searches_from_ip_addresses' => '',
-				'mwtsa_minimum_characters' => 1,
-				'mwtsa_uninstall' => 0,
-				'mwtsa_hide_charts' => 0,
+            $options = array(
+                'mwtsa_display_stats_for_role'               => [
+                    'administrator'
+                ],
+                'mwtsa_exclude_search_for_role'              => [],
+                'mwtsa_exclude_search_for_role_after_logout' => 0,
+                'mwtsa_save_search_country'                  => 0,
+                'mwtsa_save_search_by_user'                  => 0,
+                'mwtsa_exclude_doubled_search_for_interval'  => 0,
+                'mwtsa_exclude_searches_from_ip_addresses'   => '',
+                'mwtsa_minimum_characters'                   => 1,
+                'mwtsa_uninstall'                            => 0,
+                'mwtsa_hide_charts'                          => 0,
 
-				'mwtsa_custom_search_url_params' => '',
+                'mwtsa_custom_search_url_params'   => '',
 //				'mwtsa_display_did_you_know' => 1,
-				'mwtsa_exclude_if_string_contains' => '',
+                'mwtsa_exclude_if_string_contains' => '',
 
-				'chart_default_line_style' => 'basic',
-				'chart_default_range' => '2w'
-			);
+                'chart_default_line_style' => 'basic',
+                'chart_default_range'      => '2w'
+            );
 
-			foreach ( $options as $k => $o ) {
-				if ( ! isset( self::$existing_options[$k] ) ) {
-					self::$existing_options[$k] = $o;
-				}
-			}
-		}
+            foreach ( $options as $k => $o ) {
+                if ( ! isset( self::$existing_options[ $k ] ) ) {
+                    self::$existing_options[ $k ] = $o;
+                }
+            }
+        }
 
-		public static function sanitize_options() {
-			$options = self::$existing_options;
+        public static function sanitize_options() {
+            $options = self::$existing_options;
 
-			if ( ! isset( $options['mwtsa_display_settings_for_role'] ) || ! in_array( 'administrator', $options['mwtsa_display_settings_for_role'] ) ) {
-				self::$existing_options['mwtsa_display_settings_for_role'][] = 'administrator';
-			}
+            if ( ! isset( $options['mwtsa_display_settings_for_role'] ) || ! in_array( 'administrator', $options['mwtsa_display_settings_for_role'] ) ) {
+                self::$existing_options['mwtsa_display_settings_for_role'][] = 'administrator';
+            }
 
-			if ( ! isset( $options['mwtsa_display_stats_for_role'] ) || ! in_array( 'administrator', $options['mwtsa_display_stats_for_role'] ) ) {
-				self::$existing_options['mwtsa_display_stats_for_role'][] = 'administrator';
-			}
-		}
+            if ( ! isset( $options['mwtsa_display_stats_for_role'] ) || ! in_array( 'administrator', $options['mwtsa_display_stats_for_role'] ) ) {
+                self::$existing_options['mwtsa_display_stats_for_role'][] = 'administrator';
+            }
+        }
 
-		public static function get_options() {
-			if ( empty( self::$existing_options ) ) {
-				self::init_options();
-			}
+        public static function get_options() {
+            if ( empty( self::$existing_options ) ) {
+                self::init_options();
+            }
 
-			self::sanitize_options();
-			return self::$existing_options;
-		}
+            self::sanitize_options();
 
-		public static function get_option( $name ) {
-			if ( empty( self::$existing_options ) ) {
-				self::init_options();
-			}
+            return self::$existing_options;
+        }
 
-			return ( isset( self::$existing_options[$name]) ) ? self::$existing_options[$name] : false;
-		}
+        public static function get_option( $name ) {
+            if ( empty( self::$existing_options ) ) {
+                self::init_options();
+            }
 
-		public static function set_option ( $name, $value ) {
-			$options = self::get_options();
+            return ( isset( self::$existing_options[ $name ] ) ) ? self::$existing_options[ $name ] : false;
+        }
 
-			$options[$name] = $value;
+        public static function set_option( $name, $value ) {
+            $options = self::get_options();
 
-			update_option( self::$option_name, $options );
-		}
+            $options[ $name ] = $value;
 
-		public static function set_options ( $_options ) {
-			$options = self::get_options();
+            update_option( self::$option_name, $options );
+        }
 
-			foreach ( $_options as $name => $_option ) {
-				$options[$name] = $_option;
-			}
+        public static function set_options( $_options ) {
+            $options = self::get_options();
 
-			update_option( self::$option_name, $options );
-		}
-	}
+            foreach ( $_options as $name => $_option ) {
+                $options[ $name ] = $_option;
+            }
+
+            update_option( self::$option_name, $options );
+        }
+    }
 }
