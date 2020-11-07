@@ -1,5 +1,4 @@
 (function (_, $) {
-
   /**
    * add Number.isInteger() polyfill for browsers not supporting the function ( especially most versions of IE )
    * Thanks to Walter Roman
@@ -21,13 +20,13 @@
           to = container.find('.field-to'),
           datepickers = $('').add(to).add(from);
 
-        if (jQuery.datepicker) {
+        if ($.datepicker) {
 
-          var siteGMTOffsetHours = parseFloat(mwtsa_obj.gmt_offset),
+          var siteGMTOffsetHours = +mwtsa_admin_obj.gmt_offset / 3600,
             localGMTOffsetHours = new Date().getTimezoneOffset() / 60 * -1,
             totalGMTOffsetHours = siteGMTOffsetHours - localGMTOffsetHours,
             localTime = new Date(),
-            siteTime = new Date(localTime.getTime() + (totalGMTOffsetHours * 60 * 60 * 1000)),
+            siteTime = new Date( localTime.getTime() + (totalGMTOffsetHours * 60 * 60 * 1000) ),
             dayOffset = '0';
 
           if (localTime.getDate() !== siteTime.getDate() || localTime.getMonth() !== siteTime.getMonth()) {
@@ -39,7 +38,7 @@
           }
 
           datepickers.datepicker({
-            dateFormat: mwtsa_obj.date_format,
+            dateFormat: mwtsa_admin_obj.date_format,
             maxDate: dayOffset,
             defaultDate: siteTime,
             showButtonPanel: true,

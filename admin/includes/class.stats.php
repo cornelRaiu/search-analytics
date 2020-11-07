@@ -115,18 +115,17 @@ if ( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
             }
 
             if ( ! empty( MWTSA_Options::get_option( 'mwtsa_save_search_by_user' ) ) ) {
-                wp_register_style( 'select2css', '//cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2.css', false, '1.0', 'all' );
+                wp_register_style( 'select2css', '//cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css', false, '1.0', 'all' );
 
-                wp_enqueue_script( 'select2', '//cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2.js', array( 'jquery' ), '1.0', true );
+                wp_enqueue_script( 'select2', '//cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js', array( 'jquery' ), '1.0', true );
             }
-
 
             wp_register_style( 'mwtsa-datepicker-ui', '//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css', array(), '1.11.2' );
 
             wp_enqueue_script( 'mwtsa-admin-script', $mwtsa->plugin_admin_url . 'assets/js/admin.js', array(), $mwtsa->version );
 
-            wp_localize_script( 'mwtsa-admin-script', 'mwtsa_obj', array(
-                    'gmt_offset'  => get_option( 'gmt_offset' ),
+            wp_localize_script( 'mwtsa-admin-script', 'mwtsa_admin_obj', array(
+                    'gmt_offset'  => wp_timezone()->getOffset(new DateTime()),
                     'date_format' => mwt_wp_date_format_to_js_datepicker_format( get_option( 'date_format' ) )
                 )
             );
