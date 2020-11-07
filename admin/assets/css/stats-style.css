@@ -11,13 +11,36 @@
 
 .mwtsa-wrapper .views-label{ float: left;margin: 8px 10px 0 0;font-size: 13px;padding: 0;line-height: 2; }
 
-.mwtsa-wrapper .date-interval { display: inline-block; }
+.mwtsa-wrapper .date-interval { display: inline-flex; align-items: center }
 .mwtsa-wrapper .column-country div { display: flex; align-items: flex-end; }
 
 .mwtsa-stats-widget-wrapper .stats-list-label { width: 40%; display: inline-block; font-weight: bold; }
 .mwtsa-stats-widget-wrapper .stats-list-value { vertical-align: top; }
 
 .erase-history-table p.submit{ padding-top: 0; margin-top: 0;}
+
+#mwtsa-filters { display: inline-flex; align-items: center }
+
+.mwtsa-wrapper .select2-container { min-width: 8rem; margin-right: 10px; }
+.mwtsa-wrapper .select2-container .select2-choice {
+	font-size: 14px;
+	line-height: 2;
+	color: #32373c;
+	box-shadow: none;
+	border-radius: 3px;
+	padding: 0 24px 0 8px;
+	min-height: 30px;
+	max-width: 25rem;
+	-webkit-appearance: none;
+	background: #fff url(data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M5%206l5%205%205-5%202%201-7%207-7-7%202-1z%22%20fill%3D%22%23555%22%2F%3E%3C%2Fsvg%3E) no-repeat right 5px top 55%;
+	background-size: 16px 16px;
+	cursor: pointer;
+	vertical-align: middle;
+	border: 1px solid #7e8993;
+	box-sizing: border-box;
+}
+
+.mwtsa-wrapper .select2-choice span.select2-arrow { display: none; }
 
 @media only screen and ( max-width: 960px ) {
 	.mwtsa-2-col { margin-right:0; }

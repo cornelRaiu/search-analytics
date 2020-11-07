@@ -24,6 +24,11 @@ if( ! class_exists('MWTSA_Options') ) {
 				'mwtsa_minimum_characters' => 1,
 				'mwtsa_uninstall' => 0,
 				'mwtsa_hide_charts' => 0,
+
+				'mwtsa_custom_search_url_params' => '',
+//				'mwtsa_display_did_you_know' => 1,
+				'mwtsa_exclude_if_string_contains' => '',
+
 				'chart_default_line_style' => 'basic',
 				'chart_default_range' => '2w'
 			);

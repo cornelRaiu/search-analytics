@@ -147,7 +147,9 @@ if ( ! class_exists( 'MWTSA_Stats_Table' ) ) :
 					echo number_format( (float)$item['results_count'], 2, '.', '' );
 					break;
 				case 'last_search_date':
-					echo date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $item['last_search_date'] ) );
+
+					echo date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $item['last_search_date'] ) + wp_timezone()->getOffset( new DateTime( $item['last_search_date'] ) ) );
+
 					break;
                 case 'country':
                     if ( ! empty( $item['country'] ) ) {
@@ -262,6 +264,9 @@ if ( ! class_exists( 'MWTSA_Stats_Table' ) ) :
 
 			if ( $which == 'top' ) {
 				$filters_str = '<div id="mwtsa-filters" class="alignleft actions">';
+                if ( ! empty( MWTSA_Options::get_option( 'mwtsa_save_search_by_user' ) ) ) {
+                    $filters_str .= $this->filter_user();
+                }
 				$filters_str .= $this->filter_date();
 				$filters_str .= sprintf( '<input type="submit" id="mwtsa-filters-submit" class="button" value="%s">', __( 'Filter', 'mwt-search-analytics' ) );
 				$filters_str .= sprintf( '&nbsp; <input type="submit" name="mwtsa-export-csv" class="button" value="%s" />', __( 'Export Data', 'mwt-search-analytics' ) );
@@ -290,6 +295,32 @@ if ( ! class_exists( 'MWTSA_Stats_Table' ) ) :
 
 			return ob_get_clean();
 		}
+
+		function filter_user() {
+		    global $wpdb, $mwtsa;
+		    wp_enqueue_style('select2css');
+
+		    $selected_user = isset( $_REQUEST['filter-user'] ) ? $_REQUEST['filter-user'] : '';
+
+		    $users_with_searches = $wpdb->get_results("SELECT `ID`, `user_nicename` FROM {$wpdb->users} WHERE `ID` IN ( SELECT DISTINCT(`user_id`) FROM {$mwtsa->history_table_name})" );
+
+		    if ( empty( $users_with_searches ) ) {
+		        return '';
+            }
+
+		    ob_start();
+		    ?>
+            <select class="select2-select" name="filter-user">
+                <option value="">Filter by user ...</option>
+                <?php foreach( $users_with_searches as $user ) :
+                    $selected = $user->ID == $selected_user ? 'selected' : '';
+
+                    echo "<option value='{$user->ID}' {$selected}>{$user->user_nicename}</option>";
+                endforeach; ?>
+            </select>
+            <?php
+		    return ob_get_clean();
+        }
 
 		public function display_time_views() {
 			$views = array();

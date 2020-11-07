@@ -55,12 +55,9 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
 				}
 			}
 
-			$search_str = '';
+			$search_str = empty( $_REQUEST['search-term'] ) && isset( $_REQUEST['s'] ) ? $_REQUEST['s'] : '';
 
-			if( empty( $_REQUEST['search-term'] ) ) {
-				$search_str = ( isset( $_REQUEST['s'] ) ) ? $_REQUEST['s'] : '';
-			}
-
+            $user = isset( $_REQUEST['filter-user'] ) ? (int) $_REQUEST['filter-user'] : 0;
 
 			$args = array(
 				'since'             => $since,
@@ -70,7 +67,8 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
 				'only_no_results'   => $only_no_results,
 				'group'             => $group,
 				'date_since'        => ( isset( $_REQUEST['date_from'] ) ) ? $_REQUEST['date_from'] : '',
-				'date_until'        => ( isset( $_REQUEST['date_to'] ) ) ? $_REQUEST['date_to'] : ''
+				'date_until'        => ( isset( $_REQUEST['date_to'] ) ) ? $_REQUEST['date_to'] : '',
+                'user'              => $user
 			);
 
 			return self::run_terms_history_data_query( $args );
@@ -92,7 +90,8 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
 				'date_since'        => '',
 				'date_until'        => '',
 				'return_only_last'  => false,
-				'group'             => 'term_id'
+				'group'             => 'term_id',
+                'user'              => 0
 			);
 
 			$args = array_merge( $default_args, $args );
@@ -102,6 +101,10 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
 			}
 
 			$where = 'WHERE 1=1';
+
+			if ( ! empty( $args['user'] ) ) {
+			    $where .= $wpdb->prepare( " AND user_id = %d", $args['user'] );
+            }
 
 			if ( empty( $args['date_since'] ) && empty( $args['date_until'] ) ) {
 				if ( $args['unit'] != '' ) {
@@ -259,7 +262,7 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
 		}
 
 		public static function get_results_for_chart ( $args ) {
-			$dates = create_date_range( '-' . $args['since'] . ' ' . $args['unit'], '', $args['format'] );
+			$dates = mwt_create_date_range( '-' . $args['since'] . ' ' . $args['unit'], '', $args['format'] );
 			$results = self::run_terms_history_data_query( $args );
 
 			$_searches = $searches = array();

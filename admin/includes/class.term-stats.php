@@ -92,7 +92,7 @@ if ( ! class_exists( 'MWTSA_Term_Stats_Table' ) ) :
 						$glue = ' - ';
 					}
 
-					echo date_i18n( implode( $glue, $date_parts ), strtotime( $item['datetime'] ) );
+                    echo date_i18n( implode( $glue, $date_parts ), strtotime( $item['datetime'] ) + wp_timezone()->getOffset( new DateTime( $item['datetime'] ) ) );
 					break;
 				case 'results':
 					echo number_format( (float)$item['results_count'], 2, '.', '' );
@@ -127,9 +127,7 @@ if ( ! class_exists( 'MWTSA_Term_Stats_Table' ) ) :
 		}
 
 		function get_bulk_actions() {
-			$actions = array();
-
-			return $actions;
+            return array();
 		}
 
 		public function display_group_views () {

@@ -78,6 +78,14 @@ if( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 				'mwtsa_general_options_section'
 			);
 
+            add_settings_field(
+                'mwtsa_exclude_if_string_contains',
+                __( 'Exclude search in case it contains certain substring:', 'mwt-search-analytics' ),
+                array( &$this, 'field_exclude_if_string_contains_render' ),
+                'mwtsa_general_options',
+                'mwtsa_general_options_section'
+            );
+
 			add_settings_section(
 				'mwtsa_display_options_sections',
 				__( 'General Settings', 'mwt-search-analytics' ),
@@ -116,6 +124,14 @@ if( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 				'mwtsa_general_options',
 				'mwtsa_display_options_sections'
 			);
+
+            add_settings_field(
+                'mwtsa_custom_search_url_params',
+                __( 'Add custom search parameters for recording the searches:', 'mwt-search-analytics' ),
+                array( &$this, 'field_custom_search_url_params_render' ),
+                'mwtsa_general_options',
+                'mwtsa_display_options_sections'
+            );
 
 			add_settings_field(
 				'mwtsa_save_search_by_user',
@@ -167,7 +183,7 @@ if( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 			}
 
 			?>
-			<input type="number" min="0" name="mwtsa_settings[mwtsa_exclude_doubled_search_for_interval]" value="<?php echo $this->existing_options['mwtsa_exclude_doubled_search_for_interval'] ?>" /> <?php _e( '( Note: set to 0 or leave empty to disable it)', 'mwt-search-analytics' ) ?><br />
+			<input type="number" min="0" name="mwtsa_settings[mwtsa_exclude_doubled_search_for_interval]" value="<?php echo $this->existing_options['mwtsa_exclude_doubled_search_for_interval'] ?>" /> <?php _e( '( Note: set to 0 or leave empty to disable it )', 'mwt-search-analytics' ) ?><br />
             <strong><?php _e( 'Note: this will set a cookie in the browser of the user who made any kind of search on the website.<br />This needs to be treated by the site\'s GDPR terms in case it\'s value is a number larger than 0<br />The cookie name is: ', 'mwt-search-analytics' ) ?> <?php echo $mwtsa->cookie_name ?></strong>
             <?php
         }
@@ -179,7 +195,7 @@ if( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 
 			$admin_ip = isset( $_SERVER['HTTP_CLIENT_IP'] ) ? $_SERVER['HTTP_CLIENT_IP'] : ( isset( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'] );
 			?>
-			<input type="text" name="mwtsa_settings[mwtsa_exclude_searches_from_ip_addresses]" value="<?php echo $this->existing_options['mwtsa_exclude_searches_from_ip_addresses'] ?>" /> <?php _e( '( Note: separate IP values by comma )', 'mwt-search-analytics' ) ?><br />
+			<input type="text" name="mwtsa_settings[mwtsa_exclude_searches_from_ip_addresses]" value="<?php echo $this->existing_options['mwtsa_exclude_searches_from_ip_addresses'] ?>" placeholder="eg. 127.0.0.1" /> <?php _e( '( Note: separate IP values by comma )', 'mwt-search-analytics' ) ?><br />
 
             <strong><?php _e( 'Your IP address is: ' . $admin_ip, 'mwt-search-analytics' ) ?></strong>
             <?php
@@ -191,8 +207,32 @@ if( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 		        $this->existing_options['mwtsa_minimum_characters'] = 0;
 	        }
 	        ?>
-            <input type="number" min="0" name="mwtsa_settings[mwtsa_minimum_characters]" value="<?php echo $this->existing_options['mwtsa_minimum_characters'] ?>" /> <?php _e( '( Note: set to 0 or leave empty to disable it)', 'mwt-search-analytics' ) ?><br />
+            <input type="number" min="0" name="mwtsa_settings[mwtsa_minimum_characters]" value="<?php echo $this->existing_options['mwtsa_minimum_characters'] ?>" /> <?php _e( '( Note: set to 0 or leave empty to disable it )', 'mwt-search-analytics' ) ?><br />
 	        <?php
+        }
+
+        public function field_exclude_if_string_contains_render() {
+
+            if ( ! isset( $this->existing_options['mwtsa_exclude_if_string_contains'] ) ) {
+                $this->existing_options['mwtsa_exclude_if_string_contains'] = '';
+            }
+
+            ?>
+            <input type="text" name="mwtsa_settings[mwtsa_exclude_if_string_contains]" value="<?php echo $this->existing_options['mwtsa_exclude_if_string_contains']; ?>" placeholder="eg. text, another one" /> <?php _e( '( Note: enter comma (,) separated strings )', 'mwt-search-analytics' ) ?><br />
+            <strong><?php _e( 'IMPORTANT NOTE: This is an experimental feature. If you find any issues with it, please let us know.', 'mwt-search-analytics' ) ?></strong>
+            <?php
+        }
+
+        public function field_custom_search_url_params_render() {
+
+            if ( ! isset( $this->existing_options['mwtsa_custom_search_url_params'] ) ) {
+                $this->existing_options['mwtsa_custom_search_url_params'] = '';
+            }
+
+            ?>
+            <input type="text" name="mwtsa_settings[mwtsa_custom_search_url_params]" value="<?php echo $this->existing_options['mwtsa_custom_search_url_params']; ?>" placeholder="eg. wpv_post_search" /> <?php _e( '( Note: enter comma (,) separated strings )', 'mwt-search-analytics' ) ?><br />
+            <strong><?php _e( 'IMPORTANT NOTE: This is an experimental feature. If you find any issues with it, please let us know.', 'mwt-search-analytics' ) ?></strong>
+            <?php
         }
 
 		public function field_display_settings_for_role_render() {

@@ -87,5 +87,12 @@
 
     $( document ).ready( function() {
         intervals.init( $( '.date-interval' ) );
+
+        var select2Elements = $('.select2-select');
+
+        if ( select2Elements.length > 0 ) {
+            select2Elements.select2();
+        }
+
     });
 })(window, jQuery);

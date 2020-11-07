@@ -2,9 +2,9 @@
 Contributors: cornel.raiu
 Tags: search, analytics, statistics, history
 Requires at least: 3.1.0
-Tested up to: 5.4
+Tested up to: 5.4.2
 Requires PHP: 5.6
-Stable tag: 1.3.2
+Stable tag: 1.3.3
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -18,7 +18,7 @@ It can easily aid you in finding what your users are really searching for on you
 = Features =
 * Record all the search queries made using the **standard WordPress search form**.
 * Exclude searches made by **users with certain user roles** or **with certain IP addresses**
-* Exclude duplicate searches made **in certain conditions (GDPR compliant)**
+* Exclude duplicate searches made **in certain conditions**
 * Choose which user roles are allowed to see the statistics
 * Filter statistics by **time periods, with/without results, strings/substrings**
 * View each term **individual statistics**
@@ -65,6 +65,14 @@ Yes. You can visit the plugin's [Trello Board](https://trello.com/b/MvIWInjW). T
 For now, you can use the [Support Forum](https://wordpress.org/support/plugin/search-analytics). I will be adding a feature request/voting system to my website soon so everything will be kept in there.
 
 == Changelog ==
+= 1.3.3 =
+* Bugfix: Times displayed in UTC time instead of the website's timezone
+* Feature: allow filtering searches by user
+* Experimental Feature: prevent terms from being saved if they contain certain substrings
+* Experimental Feature: allow the plugin to capture search strings from custom search parameters
+* Optimization: hook **load_plugin_textdomain** on the **init** action instead of the **plugins_loaded** one
+* Optimization: prefix helper functions **create_date_range** and **get_current_user_ip** with **mwt_** to avoid eventual naming conflicts
+
 = 1.3.2 =
 * Bugfix: "Only display the statistics and settings page for these user roles" not working correctly
 * Bugfix: Fix missing script error if charts disabled
@@ -188,5 +196,5 @@ For now, you can use the [Support Forum](https://wordpress.org/support/plugin/se
 
 == Upgrade Notice ==
 
-= 1.3.2 =
-This version provides 100% compatibility with WP versions up to 5.4. It also fixes the well known stats visibility for bug.
+= 1.3.3 =
+Two highly requested features have been added: "custom search parameters" and "ability to exclude terms if they contain certain substrings". It also comes with a few optimizations and bug fixes.

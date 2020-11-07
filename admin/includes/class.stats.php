@@ -110,6 +110,14 @@ if( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
 				return;
 			}
 
+            if ( ! empty( MWTSA_Options::get_option( 'mwtsa_save_search_by_user' ) ) ) {
+                wp_register_style( 'select2css', '//cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2.css', false, '1.0', 'all' );
+
+                wp_enqueue_script( 'select2', '//cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2.js', array( 'jquery' ), '1.0', true );
+            }
+
+
+
 			wp_register_style( 'mwtsa-datepicker-ui', '//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css', array(), '1.11.2' );
 
 			wp_enqueue_script( 'mwtsa-admin-script', $mwtsa->plugin_admin_url . 'assets/js/admin.js', array(), $mwtsa->version );
@@ -189,15 +197,12 @@ if( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
 
                             <p><?php echo sprintf( __( 'New in version %s', 'mwt-search-analytics' ), $mwtsa->version ); ?></p>
                             <ul class="changelog-list">
-                                <li>Bugfix: "Only display the statistics and settings page for these user roles" not working correctly</li>
-                                <li>Bugfix: Fix missing script error if charts disabled</li>
-                                <li>Bugfix: Add prefix to the option setting group to prevent conflicts</li>
-                                <li>Bugfix: Database error if search-term URL param is empty</li>
-                                <li>Feature: Split the "Only display the statistics and settings page for these user roles" in 2 different settings</li>
-                                <li>Optimization: <strong>compatibility with WP versions up to 5.4</strong></li>
-                                <li>Optimization: Add prefix to the option setting group to prevent conflicts</li>
-                                <li>Optimization: Review and patch the plugin from a security perspective</li>
-                                <li>Optimization: Made sure administrator display rights can not be taken away by making the field disabled</li>
+                                <li>Bugfix: Times displayed in UTC time instead of the website's timezone</li>
+                                <li>Feature: allow filtering searches by user</li>
+                                <li>Experimental Feature: prevent terms from being saved if they contain certain substrings</li>
+                                <li>Experimental Feature: allow the plugin to capture search strings from custom search parameters</li>
+                                <li>Optimization: hook <i>load_plugin_textdomain</i> on the <i>init</i> action instead of the <i>plugins_loaded</i> one</li>
+                                <li>Optimization: prefix helper functions <i>create_date_range</i> and <i>get_current_user_ip</i> with <i>mwt_</i> to avoid eventual naming conflicts</li>
                             </ul>
                             <h3><?php _e( 'Useful Links', 'mwt-search-analytics' ) ?></h3>
                             <ul>
