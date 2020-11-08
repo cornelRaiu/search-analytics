@@ -21,7 +21,7 @@ if ( ! class_exists( 'MWTSA_Admin_Charts' ) ) {
 
                 wp_enqueue_script( 'mwtsa-chart-controller-script', MWTSAI()->plugin_admin_url . 'assets/js/chart-controller.js', array( 'mwtsa-chart-bundle-script' ) );
 
-                wp_localize_script( 'mwtsa-chart-controller-script', 'mwtsa_obj', array(
+                wp_localize_script( 'mwtsa-chart-controller-script', 'mwtsa_chart_obj', array(
                         'ajax_url' => admin_url( 'admin-ajax.php' )
                     )
                 );

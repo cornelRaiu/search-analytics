@@ -29,6 +29,7 @@ if ( ! class_exists( 'MWTSA' ) ) {
         public $plugin_admin_dir;
         public $plugin_admin_url;
         public $includes_dir;
+        public $shortcodes_dir;
         public $terms_table_name_no_prefix;
         public $history_table_name_no_prefix;
         public $terms_table_name;
@@ -68,6 +69,7 @@ if ( ! class_exists( 'MWTSA' ) ) {
             $this->plugin_admin_dir = $this->plugin_dir . 'admin/';
             $this->plugin_admin_url = $this->plugin_url . 'admin/';
             $this->includes_dir     = $this->plugin_dir . 'includes/';
+            $this->shortcodes_dir     = $this->plugin_dir . 'shortcodes/';
 
             // need this separated for the multisite install/uninstall functions
             $this->terms_table_name_no_prefix   = 'mwt_search_terms';
@@ -92,7 +94,9 @@ if ( ! class_exists( 'MWTSA' ) ) {
 
             require_once( $this->includes_dir . 'class.install.php' );
             require_once( $this->includes_dir . 'class.uninstall.php' );
-            include_once( $this->includes_dir . 'class.process-query.php' );
+            require_once( $this->includes_dir . 'class.process-query.php' );
+
+            require_once( $this->shortcodes_dir . 'class.mwtsa_display_search_stats.php' );
         }
 
         public function add_actions_and_filters() {
@@ -107,6 +111,8 @@ if ( ! class_exists( 'MWTSA' ) ) {
 
             add_action( 'wp_login', array( 'MWTSA_Cookies', 'set_is_excluded_cookie_if_needed' ), 10, 2 );
             add_action( 'init', array( 'MWTSA_Cookies', 'clear_expired_search_history' ) );
+
+            add_action('init', [ 'MWTSA_Display_Search_Stats_Shortcode', 'init'] );
         }
 
         public function load_plugin_textdomain() {

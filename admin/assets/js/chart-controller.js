@@ -11,7 +11,7 @@
       'chart_ranges': chartRanges
     };
 
-    $.post(mwtsa_obj.ajax_url, data, function (response) {
+    $.post(mwtsa_chart_obj.ajax_url, data, function (response) {
       chartContent.html(response);
     });
   };
@@ -26,7 +26,7 @@
       'chart_ranges': chartRanges
     };
 
-    $.post(mwtsa_obj.ajax_url, data, function (response) {
+    $.post(mwtsa_chart_obj.ajax_url, data, function (response) {
       console.log('defaults updated');
     });
   };

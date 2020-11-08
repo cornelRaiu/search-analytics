@@ -8,14 +8,16 @@ Stable tag: 1.3.4
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
-Search Analytics will keep history of the search terms used by your users and group them in a set of statistics including the number of posts resulted from that search.
+Search Analytics will store and display the search terms used on your website. No third-party service is used!
 
 == Description ==
 Search Analytics will keep history of the search terms used by your users and group them in a set of statistics including the number of posts resulted from that search term.
 
 It can easily aid you in finding what your users are really searching for on your website and make sure you provide exactly what they need.
 
-**NOTE: Search Analytics stores all the statistics in your WordPress instance. No info is sent to third-party services**
+Help and/or ideas are greatly appreciated! You can contribute to the GitHub repository: [Search Analytics](https://github.com/cornelRaiu/search-analytics)
+
+**NOTE: Search Analytics stores all the statistics in your WordPress database. No info is sent to third-party services!**
 
 = Features =
 * Record all the search queries made using the **standard WordPress search form**.
@@ -54,6 +56,12 @@ After the installation and activation is complete you should visit the plugin's 
 
 Please make sure you use the standard WordPress search functionality. In V1.3 there will be some functions added to aid other methods into inserting data in the history tables.
 
+= The shortcode is not displaying the stats in widgets
+
+For enabling the shortcodes in widgets you need to add the following code in your child theme's `functions.php` file:
+
+`add_filter( 'widget_text', 'do_shortcode' );`
+
 = The history was not deleted when I deactivated the plugin =
 
 Before uninstalling, you should go to the plugin's settings page and check the "Remove plugin tables on uninstall" setting. After doing that, deactivating the plugin should also remove all tables from the database.
@@ -68,6 +76,7 @@ For now, you can use the [Support Forum](https://wordpress.org/support/plugin/se
 
 == Changelog ==
 = 1.3.5
+* Bugfix: Fix dates filter not allowing you to select the current day in certain timezones
 * Feature: Add support for WpForo
 
 = 1.3.4 Hotfix =

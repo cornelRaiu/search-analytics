@@ -230,8 +230,6 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 
             ?>
             <input type="text" name="mwtsa_settings[mwtsa_exclude_if_string_contains]" value="<?php echo $this->existing_options['mwtsa_exclude_if_string_contains']; ?>" placeholder="eg. text, another one"/> <?php _e( '( Note: enter comma (,) separated strings )', 'mwt-search-analytics' ) ?>
-            <br/>
-            <strong><?php _e( 'IMPORTANT NOTE: This is an experimental feature. If you find any issues with it, please let us know.', 'mwt-search-analytics' ) ?></strong>
             <?php
         }
 
@@ -243,8 +241,6 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 
             ?>
             <input type="text" name="mwtsa_settings[mwtsa_custom_search_url_params]" value="<?php echo $this->existing_options['mwtsa_custom_search_url_params']; ?>" placeholder="eg. wpv_post_search"/> <?php _e( '( Note: enter comma (,) separated strings )', 'mwt-search-analytics' ) ?>
-            <br/>
-            <strong><?php _e( 'IMPORTANT NOTE: This is an experimental feature. If you find any issues with it, please let us know.', 'mwt-search-analytics' ) ?></strong>
             <?php
         }
 
