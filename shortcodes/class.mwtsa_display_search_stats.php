@@ -7,7 +7,7 @@ if ( ! class_exists( 'MWTSA_Display_Search_Stats_Shortcode' ) ) {
     class MWTSA_Display_Search_Stats_Shortcode {
 
         public static function init() {
-            add_shortcode( 'mwtsa_display_stats', [ __CLASS__, 'render' ] );
+            add_shortcode( 'mwtsa_display_search_stats', [ __CLASS__, 'render' ] );
         }
 
         public static function render( $atts ) {
@@ -20,7 +20,14 @@ if ( ! class_exists( 'MWTSA_Display_Search_Stats_Shortcode' ) ) {
                 'user_searches'                   => true,
                 'user_searches_count'             => 5,
                 'user_searches_only_with_results' => true,
-            ], $atts, 'mwtsa_display_stats' );
+            ], $atts, 'mwtsa_display_search_stats' );
+
+            $atts['most_searched'] = filter_var( $atts['most_searched'], FILTER_VALIDATE_BOOLEAN );
+            $atts['most_searched_only_with_results'] = filter_var( $atts['most_searched_only_with_results'], FILTER_VALIDATE_BOOLEAN );
+            $atts['user_searches'] = filter_var( $atts['user_searches'], FILTER_VALIDATE_BOOLEAN );
+            $atts['user_searches_only_with_results'] = filter_var( $atts['user_searches_only_with_results'], FILTER_VALIDATE_BOOLEAN );
+
+            var_dump($atts);
 
             if ( $atts['most_searched_count'] < 1 ) {
                 $atts['most_searched_count'] = 1;
@@ -41,6 +48,7 @@ if ( ! class_exists( 'MWTSA_Display_Search_Stats_Shortcode' ) ) {
                     $search_args['min_results'] = 1;
                 }
 
+                print_r( $search_args );
                 $search_results = ( new MWTSA_History_Data )->run_terms_history_data_query( $search_args );
 
                 $data['most_searched'] = array_slice( $search_results, 0, $atts['most_searched_count'] );
@@ -62,7 +70,7 @@ if ( ! class_exists( 'MWTSA_Display_Search_Stats_Shortcode' ) ) {
 
                 $search_results = ( new MWTSA_History_Data )->run_terms_history_data_query( $user_search_args );
 
-                $data['user_searches'] = array_slice( $search_results, 0, $atts['most_searched_count'] );
+                $data['user_searches'] = array_slice( $search_results, 0, $atts['user_searches_count'] );
             }
 
             ob_start();
