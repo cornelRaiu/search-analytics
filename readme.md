@@ -14,9 +14,12 @@ Starting in V1.3.5 there is a shortcode for displaying the search stats on the f
 
 
 Example: 
+
 `[mwtsa_display_search_stats unit="month" most_searched_count="10" most_searched_only_with_results="false"]`
 
-Result: `The above shortcode will display the most searched terms over the past month with or without results and the last 5 currently logged in user searches that had at least 1 result.`
+Result: 
+
+`The above shortcode will display the most searched terms over the past month with or without results and the last 5 currently logged in user searches that had at least 1 result.`
 
 Here is the list of parameters the shortcode supports:
 
@@ -69,7 +72,7 @@ After the installation and activation is complete you should visit the plugin's 
 
 ## Feature Requests
 
-For now, you can use the [Support Forum](https://wordpress.org/support/plugin/search-analytics) and the issues section on this repository. I will be adding a feature request/voting system to the [www.cornelraiu.com plugin page](https://www.cornelraiu.com/mwt-search-analytics/) soon so everything will be kept in there.
+For now, you can use the [Support Forum](https://wordpress.org/support/plugin/search-analytics) and the issues section of this repository. I will be adding a feature request/voting system to the [plugin page on my website](https://www.cornelraiu.com/mwt-search-analytics/) soon so everything will be kept in there.
 
 Also, you can visit the plugin's [Trello Board](https://trello.com/b/MvIWInjW). This should give you an overview on my plans regarding this plugin.
 

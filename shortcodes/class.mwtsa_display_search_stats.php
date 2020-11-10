@@ -22,12 +22,10 @@ if ( ! class_exists( 'MWTSA_Display_Search_Stats_Shortcode' ) ) {
                 'user_searches_only_with_results' => true,
             ], $atts, 'mwtsa_display_search_stats' );
 
-            $atts['most_searched'] = filter_var( $atts['most_searched'], FILTER_VALIDATE_BOOLEAN );
+            $atts['most_searched']                   = filter_var( $atts['most_searched'], FILTER_VALIDATE_BOOLEAN );
             $atts['most_searched_only_with_results'] = filter_var( $atts['most_searched_only_with_results'], FILTER_VALIDATE_BOOLEAN );
-            $atts['user_searches'] = filter_var( $atts['user_searches'], FILTER_VALIDATE_BOOLEAN );
+            $atts['user_searches']                   = filter_var( $atts['user_searches'], FILTER_VALIDATE_BOOLEAN );
             $atts['user_searches_only_with_results'] = filter_var( $atts['user_searches_only_with_results'], FILTER_VALIDATE_BOOLEAN );
-
-            var_dump($atts);
 
             if ( $atts['most_searched_count'] < 1 ) {
                 $atts['most_searched_count'] = 1;
@@ -48,7 +46,6 @@ if ( ! class_exists( 'MWTSA_Display_Search_Stats_Shortcode' ) ) {
                     $search_args['min_results'] = 1;
                 }
 
-                print_r( $search_args );
                 $search_results = ( new MWTSA_History_Data )->run_terms_history_data_query( $search_args );
 
                 $data['most_searched'] = array_slice( $search_results, 0, $atts['most_searched_count'] );
@@ -56,7 +53,7 @@ if ( ! class_exists( 'MWTSA_Display_Search_Stats_Shortcode' ) ) {
 
             if ( $atts['user_searches'] && ! empty( MWTSA_Options::get_option( 'mwtsa_save_search_by_user' ) ) && is_user_logged_in() ) {
 
-                $user    = wp_get_current_user();
+                $user = wp_get_current_user();
 
                 $user_search_args = [
                     'since' => $atts['amount'],
@@ -103,7 +100,7 @@ if ( ! class_exists( 'MWTSA_Display_Search_Stats_Shortcode' ) ) {
             <?php
             $html = ob_get_clean();
 
-            return apply_filters( 'mwtsa_display_stats_shortcode_output', $html, $atts, $data );
+            return apply_filters( 'mwtsa_display_search_stats_shortcode_output', $html, $atts, $data );
         }
     }
 }

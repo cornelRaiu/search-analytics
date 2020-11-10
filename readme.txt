@@ -75,7 +75,7 @@ Yes. You can visit the plugin's [Trello Board](https://trello.com/b/MvIWInjW). T
 For now, you can use the [Support Forum](https://wordpress.org/support/plugin/search-analytics). I will be adding a feature request/voting system to my website soon so everything will be kept in there.
 
 == Changelog ==
-= 1.3.5
+= 1.3.5 =
 * Bugfix: Fix dates filter not allowing you to select the current day in certain timezones
 * Feature: Add support for WpForo
 
