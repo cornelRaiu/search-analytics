@@ -1,8 +1,5 @@
 <?php
-
-if ( ! defined( 'ABSPATH' ) ) {
-    exit;
-} // Exit if accessed directly
+defined("ABSPATH") || exit;
 
 if ( ! function_exists( 'mwt_array_val' ) ) {
     function mwt_array_val( $arr, $key ) {
@@ -112,9 +109,8 @@ if ( ! function_exists( 'wp_timezone_string' ) ) {
         $sign      = ( $offset < 0 ) ? '-' : '+';
         $abs_hour  = abs( $hours );
         $abs_mins  = abs( $minutes * 60 );
-        $tz_offset = sprintf( '%s%02d:%02d', $sign, $abs_hour, $abs_mins );
 
-        return $tz_offset;
+        return sprintf( '%s%02d:%02d', $sign, $abs_hour, $abs_mins );
     }
 }
 

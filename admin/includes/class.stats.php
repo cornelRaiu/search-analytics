@@ -1,7 +1,5 @@
 <?php
-if ( ! defined( 'ABSPATH' ) ) {
-    exit;
-} // Exit if accessed directly
+defined("ABSPATH") || exit;
 
 if ( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
 
@@ -40,21 +38,21 @@ if ( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
 
             if ( isset( $_REQUEST['mwtsa-export-csv'] ) ) {
                 $columns = array(
-                    'Term ID',
-                    'Term',
-                    'Searches',
-                    'Average Results',
-                    'Last Search Date'
+                    __( 'Term ID', 'search-analytics' ),
+                    __( 'Term', 'search-analytics' ),
+                    __( 'Searches', 'search-analytics' ),
+                    __( 'Average Results', 'search-analytics' ),
+                    __( 'Last Search Date', 'search-analytics' )
                 );
 
                 if ( ! empty( $_REQUEST['search-term'] ) ) {
                     $columns = array(
-                        'Average Results',
-                        'Date and Time'
+                        __( 'Average Results', 'search-analytics' ),
+                        __( 'Date and Time', 'search-analytics' )
                     );
 
                     if ( ! empty( $_REQUEST['grouped_view'] ) ) {
-                        $columns[] = "Searches";
+                        $columns[] = __( 'Searches', 'search-analytics' );
                     }
                 }
 
@@ -67,7 +65,7 @@ if ( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
             $option = 'per_page';
 
             $args = array(
-                'label'   => 'Entries Per Page',
+                'label'   => __( 'Entries Per Page', 'search-analytics' ),
                 'default' => 20,
                 'option'  => 'mwtsa_entries_per_page'
             );
@@ -97,7 +95,7 @@ if ( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
 
             if ( ! isset( $this->plugin_options['mwtsa_display_stats_for_role'] ) || ! empty( $accepted_user_roles ) ) {
 
-                add_submenu_page( 'index.php', __( 'Search Analytics', 'mwt-search-analytics' ), __( 'Search Analytics', 'mwt-search-analytics' ), $accepted_user_roles[0], __FILE__, array(
+                add_submenu_page( 'index.php', __( 'Search Analytics', 'search-analytics' ), __( 'Search Analytics', 'search-analytics' ), $accepted_user_roles[0], __FILE__, array(
                     &$this,
                     'render_stats_page'
                 ) );
@@ -125,7 +123,7 @@ if ( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
             wp_enqueue_script( 'mwtsa-admin-script', $mwtsa->plugin_admin_url . 'assets/js/admin.js', array(), $mwtsa->version );
 
             wp_localize_script( 'mwtsa-admin-script', 'mwtsa_admin_obj', array(
-                    'gmt_offset'  => wp_timezone()->getOffset(new DateTime()),
+                    'gmt_offset'  => wp_timezone()->getOffset( new DateTime() ),
                     'date_format' => mwt_wp_date_format_to_js_datepicker_format( get_option( 'date_format' ) )
                 )
             );
@@ -144,19 +142,19 @@ if ( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
                             <?php echo $stats_table->load_notices(); ?>
                             <?php echo $stats_table->this_title(); ?>
                             <div class="wp-clearfix">
-                                <span class="views-label"><?php _e( 'Time filters:', 'mwt-search-analytics' ) ?></span><?php $stats_table->display_time_views(); ?>
+                                <span class="views-label"><?php _e( 'Time filters:', 'search-analytics' ) ?></span><?php $stats_table->display_time_views(); ?>
                             </div>
                             <div class="wp-clearfix">
-                                <span class="views-label"><?php _e( 'Results filters:', 'mwt-search-analytics' ) ?></span><?php $stats_table->display_results_views(); ?>
+                                <span class="views-label"><?php _e( 'Results filters:', 'search-analytics' ) ?></span><?php $stats_table->display_results_views(); ?>
                             </div>
 
                             <?php if ( ! empty( $_REQUEST['search-term'] ) ) : ?>
                                 <div class="wp-clearfix">
-                                    <span class="views-label"><?php _e( 'Group By:', 'mwt-search-analytics' ) ?></span><?php $stats_table->display_group_views(); ?>
+                                    <span class="views-label"><?php _e( 'Group By:', 'search-analytics' ) ?></span><?php $stats_table->display_group_views(); ?>
                                 </div>
                             <?php else : ?>
                                 <div class="wp-clearfix">
-                                    <span class="views-label"><?php _e( 'Group By:', 'mwt-search-analytics' ) ?></span><?php $stats_table->display_results_grouping(); ?>
+                                    <span class="views-label"><?php _e( 'Group By:', 'search-analytics' ) ?></span><?php $stats_table->display_results_grouping(); ?>
                                 </div>
                             <?php endif; ?>
                             <?php $stats_table->prepare_items(); ?>
@@ -193,18 +191,18 @@ if ( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
                     </div>
                     <div class="mwtsa-col-2">
                         <div class="col-content">
-                            <h2><?php _e( 'Search Analytics', 'mwt-search-analytics' ) ?></h2>
+                            <h2><?php _e( 'Search Analytics', 'search-analytics' ) ?></h2>
 
-                            <h3><?php _e( 'Changelog', 'mwt-search-analytics' ) ?></h3>
+                            <h3><?php _e( 'Changelog', 'search-analytics' ) ?></h3>
 
-                            <p><?php echo sprintf( __( 'New in version %s', 'mwt-search-analytics' ), $mwtsa->version ); ?></p>
+                            <p><?php echo sprintf( __( 'New in version %s', 'search-analytics' ), $mwtsa->version ); ?></p>
                             <ul class="changelog-list">
                                 <li>Bugfix: Fix fatal error for missing `wp_timezone()` in WP < 5.3.0</li>
                             </ul>
-                            <h3><?php _e( 'Useful Links', 'mwt-search-analytics' ) ?></h3>
+                            <h3><?php _e( 'Useful Links', 'search-analytics' ) ?></h3>
                             <ul>
                                 <li>
-                                    <a href="options-general.php?page=mwt-search-analytics"><?php _e( 'Settings Page', 'mwt-search-analytics' ) ?></a>
+                                    <a href="options-general.php?page=mwt-search-analytics"><?php _e( 'Settings Page', 'search-analytics' ) ?></a>
                                 </li>
                             </ul>
                         </div>

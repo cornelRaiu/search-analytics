@@ -1,7 +1,5 @@
 <?php
-if ( ! defined( 'ABSPATH' ) ) {
-    exit;
-} // Exit if accessed directly
+defined("ABSPATH") || exit;
 
 if ( ! class_exists( 'MWTSA_Display_Search_Stats_Shortcode' ) ) {
     class MWTSA_Display_Search_Stats_Shortcode {
@@ -76,21 +74,24 @@ if ( ! class_exists( 'MWTSA_Display_Search_Stats_Shortcode' ) ) {
                 <ul>
                     <?php if ( count( $data['most_searched'] ) > 0 ) : ?>
                         <li>
-                            <p>Most Searched Terms</p>
+                            <p><?php _e( 'Most Searched Terms', 'search-analytics' ) ?></p>
                             <ul>
                                 <?php foreach ( $data['most_searched'] as $term ) : ?>
-                                    <li><?php echo $term['term'] ?></li>
+                                    <li><?php echo esc_attr( $term['term'] ) ?></li>
                                 <?php endforeach; ?>
                             </ul>
                         </li>
                     <?php endif; ?>
                     <?php if ( count( $data['user_searches'] ) > 0 ) :
-                        $title = ( $atts['user_searches_only_with_results'] ) ? 'Your Last Successful Searches' : 'Your Last Searches'; ?>
+                        $title = ( $atts['user_searches_only_with_results'] ) ?
+                            __( 'Your Last Successful Searches', 'search-analytics' ) :
+                            __( 'Your Last Searches', 'search-analytics' );
+                        ?>
                         <li>
                             <p><?php echo $title ?></p>
                             <ul>
                                 <?php foreach ( $data['user_searches'] as $term ) : ?>
-                                    <li><?php echo $term['term'] ?></li>
+                                    <li><?php echo esc_attr( $term['term'] ) ?></li>
                                 <?php endforeach; ?>
                             </ul>
                         </li>

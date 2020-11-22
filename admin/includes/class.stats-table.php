@@ -1,7 +1,5 @@
 <?php
-if ( ! defined( 'ABSPATH' ) ) {
-    exit;
-} // Exit if accessed directly
+defined("ABSPATH") || exit;
 
 if ( ! class_exists( 'WP_List_Table' ) ) {
     require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
@@ -17,7 +15,7 @@ if ( ! class_exists( 'MWTSA_Stats_Table' ) ) :
         public function __construct( $args = array() ) {
 
             parent::__construct( [
-                'title' => ( isset( $args['title'] ) ) ? $args['title'] : __( 'Search Statistics', 'mwt-search-analytics' ),
+                'title' => ( isset( $args['title'] ) ) ? $args['title'] : __( 'Search Statistics', 'search-analytics' ),
                 'ajax'  => ( isset( $args['ajax'] ) ) ? $args['ajax'] : false
             ] );
         }
@@ -59,23 +57,23 @@ if ( ! class_exists( 'MWTSA_Stats_Table' ) ) :
         public function get_columns() {
             $columns = array(
                 'cb'               => '<input type="checkbox" />',
-                'term'             => __( 'Term', 'mwt-search-analytics' ),
-                'searches'         => __( 'No. of Searches', 'mwt-search-analytics' ),
-                'results'          => __( 'Average no. of results', 'mwt-search-analytics' ),
-                'last_search_date' => __( 'Last search date', 'mwt-search-analytics' )
+                'term'             => __( 'Term', 'search-analytics' ),
+                'searches'         => __( 'No. of Searches', 'search-analytics' ),
+                'results'          => __( 'Average no. of results', 'search-analytics' ),
+                'last_search_date' => __( 'Last search date', 'search-analytics' )
             );
 
             if ( isset( $_REQUEST['grouped_view'] ) && $_REQUEST['grouped_view'] == 1 ) {
                 unset( $columns['searches'] );
-                $columns['results']          = __( 'No. of results', 'mwt-search-analytics' );
-                $columns['last_search_date'] = __( 'Search Date', 'mwt-search-analytics' );
+                $columns['results']          = __( 'No. of results', 'search-analytics' );
+                $columns['last_search_date'] = __( 'Search Date', 'search-analytics' );
 
                 if ( ! empty( MWTSA_Options::get_option( 'mwtsa_save_search_country' ) ) ) {
-                    $columns['country'] = __( 'Country', 'mwt-search-analytics' );
+                    $columns['country'] = __( 'Country', 'search-analytics' );
                 }
 
                 if ( ! empty( MWTSA_Options::get_option( 'mwtsa_save_search_by_user' ) ) ) {
-                    $columns['user'] = __( 'User', 'mwt-search-analytics' );
+                    $columns['user'] = __( 'User', 'search-analytics' );
                 }
             }
 
@@ -99,8 +97,8 @@ if ( ! class_exists( 'MWTSA_Stats_Table' ) ) :
 
         public function column_term( $item ) {
             $actions = array(
-                'delete' => sprintf( '<a href="?page=%s&action=%s&search-term=%s">' . __( 'Delete', 'mwt-search-analytics' ) . '</a>', $_REQUEST['page'], 'delete', $item['id'] ),
-                'view'   => sprintf( '<a href="?page=%s&search-term=%s">' . __( 'View Details', 'mwt-search-analytics' ) . '</a>', $_REQUEST['page'], $item['id'] )
+                'delete' => sprintf( '<a href="?page=%s&action=%s&search-term=%s">' . __( 'Delete', 'search-analytics' ) . '</a>', $_REQUEST['page'], 'delete', $item['id'] ),
+                'view'   => sprintf( '<a href="?page=%s&search-term=%s">' . __( 'View Details', 'search-analytics' ) . '</a>', $_REQUEST['page'], $item['id'] )
             );
 
             return sprintf( '<a href="?page=%1$s&search-term=%2$s">%3$s</a> %4$s', $_REQUEST['page'], $item['id'], $item['term'], $this->row_actions( $actions ) );
@@ -113,11 +111,9 @@ if ( ! class_exists( 'MWTSA_Stats_Table' ) ) :
         }
 
         function get_bulk_actions() {
-            $actions = array(
-                'delete' => __( 'Delete', 'mwt-search-analytics' )
+            return array(
+                'delete' => __( 'Delete', 'search-analytics' )
             );
-
-            return $actions;
         }
 
         function process_bulk_action() {
@@ -131,11 +127,15 @@ if ( ! class_exists( 'MWTSA_Stats_Table' ) ) :
                 $wpdb->query( "DELETE FROM {$mwtsa->terms_table_name} WHERE id IN ($terms_to_delete)" );
                 $wpdb->query( "DELETE FROM {$mwtsa->history_table_name} WHERE term_id IN ($terms_to_delete)" );
 
-                wp_redirect( add_query_arg( 'result', 'deleted', remove_query_arg( array(
-                    'action',
-                    'search-term'
-                ) ) ) );
-                wp_die( 'Items deleted!' );
+                wp_die( sprintf( '%s <a href="%s">%s</a>',
+                        __( 'Items deleted!', 'search-analytics' ),
+                        add_query_arg( 'result', 'deleted', remove_query_arg( array(
+                            'action',
+                            'search-term'
+                        ) ) ),
+                        __( 'Go Back!', 'search-analytics' )
+                    )
+                );
             }
 
         }
@@ -273,8 +273,8 @@ if ( ! class_exists( 'MWTSA_Stats_Table' ) ) :
                     $filters_str .= $this->filter_user();
                 }
                 $filters_str .= $this->filter_date();
-                $filters_str .= sprintf( '<input type="submit" id="mwtsa-filters-submit" class="button" value="%s">', __( 'Filter', 'mwt-search-analytics' ) );
-                $filters_str .= sprintf( '&nbsp; <input type="submit" name="mwtsa-export-csv" class="button" value="%s" />', __( 'Export Data', 'mwt-search-analytics' ) );
+                $filters_str .= sprintf( '<input type="submit" id="mwtsa-filters-submit" class="button" value="%s">', __( 'Filter', 'search-analytics' ) );
+                $filters_str .= sprintf( '&nbsp; <input type="submit" name="mwtsa-export-csv" class="button" value="%s" />', __( 'Export Data', 'search-analytics' ) );
                 $filters_str .= '</div>';
 
                 printf( $filters_str );
@@ -292,9 +292,9 @@ if ( ! class_exists( 'MWTSA_Stats_Table' ) ) :
             ob_start();
             ?>
             <div class="date-interval">
-                <input type="text" name="date_from" class="date-picker field-from" placeholder="<?php esc_attr_e( 'Start Date', 'mwt-search-analytics' ) ?>" value="<?php echo esc_attr( $date_from ) ?>">
+                <input type="text" name="date_from" class="date-picker field-from" placeholder="<?php esc_attr_e( 'Start Date', 'search-analytics' ) ?>" value="<?php echo esc_attr( $date_from ) ?>">
                 <span class="dashicons dashicons-minus"></span>
-                <input type="text" name="date_to" class="date-picker field-to" placeholder="<?php esc_attr_e( 'End Date', 'mwt-search-analytics' ) ?>" value="<?php echo esc_attr( $date_to ) ?>">
+                <input type="text" name="date_to" class="date-picker field-to" placeholder="<?php esc_attr_e( 'End Date', 'search-analytics' ) ?>" value="<?php echo esc_attr( $date_to ) ?>">
             </div>
             <?php
 
@@ -328,24 +328,24 @@ if ( ! class_exists( 'MWTSA_Stats_Table' ) ) :
         }
 
         public function display_time_views() {
-            $views   = array();
+            $views   = [];
             $current = ( isset( $_REQUEST['period_view'] ) ? $_REQUEST['period_view'] : 3 );
 
             $class    = ( $current == 0 ) ? ' class="current"' : '';
             $this_url = add_query_arg( 'period_view', 0 );
-            $views[0] = "<a href='{$this_url}' {$class} >" . __( 'Last 24 hours', 'mwt-search-analytics' ) . "</a>";
+            $views[0] = "<a href='{$this_url}' {$class} >" . __( 'Last 24 hours', 'search-analytics' ) . "</a>";
 
             $this_url = add_query_arg( 'period_view', 1 );
             $class    = ( $current == 1 ) ? ' class="current"' : '';
-            $views[1] = "<a href='{$this_url}' {$class} >" . __( 'Last week', 'mwt-search-analytics' ) . "</a>";
+            $views[1] = "<a href='{$this_url}' {$class} >" . __( 'Last week', 'search-analytics' ) . "</a>";
 
             $this_url = add_query_arg( 'period_view', 2 );
             $class    = ( $current == 2 ) ? ' class="current"' : '';
-            $views[2] = "<a href='{$this_url}' {$class} >" . __( 'Last month', 'mwt-search-analytics' ) . "</a>";
+            $views[2] = "<a href='{$this_url}' {$class} >" . __( 'Last month', 'search-analytics' ) . "</a>";
 
             $this_url = remove_query_arg( 'period_view' );
             $class    = ( $current == 3 ) ? ' class="current"' : '';
-            $views[3] = "<a href='{$this_url}' {$class} >" . __( 'All time', 'mwt-search-analytics' ) . "</a>";
+            $views[3] = "<a href='{$this_url}' {$class} >" . __( 'All time', 'search-analytics' ) . "</a>";
 
             $this->format_views_list( $views );
         }
@@ -356,15 +356,15 @@ if ( ! class_exists( 'MWTSA_Stats_Table' ) ) :
 
             $class    = ( $current == 0 ) ? ' class="current"' : '';
             $this_url = remove_query_arg( 'results_view' );
-            $views[0] = "<a href='{$this_url}' {$class} >" . __( 'All', 'mwt-search-analytics' ) . "</a>";
+            $views[0] = "<a href='{$this_url}' {$class} >" . __( 'All', 'search-analytics' ) . "</a>";
 
             $this_url = add_query_arg( 'results_view', 1 );
             $class    = ( $current == 1 ) ? ' class="current"' : '';
-            $views[1] = "<a href='{$this_url}' {$class} >" . __( 'Only With Results', 'mwt-search-analytics' ) . "</a>";
+            $views[1] = "<a href='{$this_url}' {$class} >" . __( 'Only With Results', 'search-analytics' ) . "</a>";
 
             $this_url = add_query_arg( 'results_view', 2 );
             $class    = ( $current == 2 ) ? ' class="current"' : '';
-            $views[2] = "<a href='{$this_url}' {$class} >" . __( 'Only Without Results', 'mwt-search-analytics' ) . "</a>";
+            $views[2] = "<a href='{$this_url}' {$class} >" . __( 'Only Without Results', 'search-analytics' ) . "</a>";
 
             $this->format_views_list( $views );
         }
@@ -375,11 +375,11 @@ if ( ! class_exists( 'MWTSA_Stats_Table' ) ) :
 
             $class    = ( $current == 0 ) ? ' class="current"' : '';
             $this_url = remove_query_arg( 'grouped_view' );
-            $views[0] = "<a href='{$this_url}' {$class} >" . __( 'Term', 'mwt-search-analytics' ) . "</a>";
+            $views[0] = "<a href='{$this_url}' {$class} >" . __( 'Term', 'search-analytics' ) . "</a>";
 
             $this_url = add_query_arg( 'grouped_view', 1 );
             $class    = ( $current == 1 ) ? ' class="current"' : '';
-            $views[1] = "<a href='{$this_url}' {$class} >" . __( 'No Group', 'mwt-search-analytics' ) . "</a>";
+            $views[1] = "<a href='{$this_url}' {$class} >" . __( 'No Group', 'search-analytics' ) . "</a>";
 
             $this->format_views_list( $views );
         }
@@ -400,7 +400,7 @@ if ( ! class_exists( 'MWTSA_Stats_Table' ) ) :
             if ( isset( $_GET['result'] ) && $_GET['result'] == 'deleted' ) {
                 ?>
                 <div class="notice updated mwtsa-notice is-dismissible">
-                    <p><?php _e( 'Search term(s) successfully deleted', 'mwt-search-analytics' ); ?></p>
+                    <p><?php _e( 'Search term(s) successfully deleted', 'search-analytics' ); ?></p>
                 </div>
                 <?php
             }

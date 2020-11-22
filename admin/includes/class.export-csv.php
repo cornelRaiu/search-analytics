@@ -1,7 +1,5 @@
 <?php
-if ( ! defined( 'ABSPATH' ) ) {
-    exit;
-} // Exit if accessed directly
+defined("ABSPATH") || exit;
 
 if ( ! class_exists( 'MWTSA_Export_CSV' ) ) {
 
@@ -14,7 +12,8 @@ if ( ! class_exists( 'MWTSA_Export_CSV' ) ) {
             }
 
             if ( empty( $filename ) ) {
-                $filename = 'export-' . md5( 'export-' . microtime( true ) ) . '.csv';
+
+                $filename = apply_filters( 'mwtsa_export_filename', 'export-' . md5( 'export-' . microtime( true ) ) . '.csv' );
             }
 
             header( 'Content-Type: text/csv' );

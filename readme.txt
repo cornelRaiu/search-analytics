@@ -4,7 +4,7 @@ Tags: search, analytics, statistics, history
 Requires at least: 4.4.0
 Tested up to: 5.5.3
 Requires PHP: 5.6
-Stable tag: 1.3.4
+Stable tag: 1.3.5
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -77,7 +77,10 @@ For now, you can use the [Support Forum](https://wordpress.org/support/plugin/se
 == Changelog ==
 = 1.3.5 =
 * Bugfix: Fix dates filter not allowing you to select the current day in certain timezones
+* Bugfix: Deleting multiple entries with the bulk action would trigger 2 notices
 * Feature: Add support for WpForo
+* Feature: Add **mwtsa_export_filename** filter to allow control over the filename generated when exporting data
+* Optimization: Prepare the plugin for community translation
 
 = 1.3.4 Hotfix =
 * Bugfix: Fix fatal error for missing `wp_timezone()` in WP < 5.3.0
@@ -214,4 +217,4 @@ For now, you can use the [Support Forum](https://wordpress.org/support/plugin/se
 == Upgrade Notice ==
 
 = 1.3.5 =
-Add support for WpForo
+Add support for WpForo, fix 2 bugs, prepare the plugin for community translation and add a shortcode for displaying stats in the frontend

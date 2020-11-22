@@ -1,7 +1,5 @@
 <?php
-if ( ! defined( 'ABSPATH' ) ) {
-    exit;
-} // Exit if accessed directly
+defined("ABSPATH") || exit;
 
 if ( ! class_exists( 'WP_List_Table' ) ) {
     require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
@@ -15,10 +13,10 @@ if ( ! class_exists( 'MWTSA_Term_Stats_Table' ) ) :
     class MWTSA_Term_Stats_Table extends MWTSA_Stats_Table {
 
         var $term_id = 0;
-        var $term_data = array();
+        var $term_data = [];
         var $is_grouped = false;
 
-        public function __construct( $args = array() ) {
+        public function __construct( $args = [] ) {
             $this->term_id   = absint( $_REQUEST['search-term'] );
             $this->term_data = $this->get_term_data();
 
@@ -27,7 +25,7 @@ if ( ! class_exists( 'MWTSA_Term_Stats_Table' ) ) :
             }
 
             parent::__construct( [
-                'title' => __( 'Term `' . $this->term_data['term'] . '` Search Statistics', 'mwt-search-analytics' ),
+                'title' => __( 'Term `' . $this->term_data['term'] . '` Search Statistics', 'search-analytics' ),
                 'ajax'  => false
             ] );
         }
@@ -44,12 +42,12 @@ if ( ! class_exists( 'MWTSA_Term_Stats_Table' ) ) :
 
         public function get_columns() {
             $columns = array(
-                'date_time' => __( 'Date and Time', 'mwt-search-analytics' ),
-                'results'   => __( 'Average no. of results', 'mwt-search-analytics' )
+                'date_time' => __( 'Date and Time', 'search-analytics' ),
+                'results'   => __( 'Average no. of results', 'search-analytics' )
             );
 
             if ( $this->is_grouped ) {
-                $columns['searches'] = __( 'No. of Searches', 'mwt-search-analytics' );
+                $columns['searches'] = __( 'No. of Searches', 'search-analytics' );
             }
 
             return $columns;
@@ -138,15 +136,15 @@ if ( ! class_exists( 'MWTSA_Term_Stats_Table' ) ) :
 
             $class    = ( $current == 0 ) ? ' class="current"' : '';
             $this_url = remove_query_arg( 'grouped_view' );
-            $views[0] = "<a href='{$this_url}' {$class} >" . __( 'Not grouped', 'mwt-search-analytics' ) . "</a>";
+            $views[0] = "<a href='{$this_url}' {$class} >" . __( 'Not grouped', 'search-analytics' ) . "</a>";
 
             $this_url = add_query_arg( 'grouped_view', 1 );
             $class    = ( $current == 1 ) ? ' class="current"' : '';
-            $views[1] = "<a href='{$this_url}' {$class} >" . __( 'By date', 'mwt-search-analytics' ) . "</a>";
+            $views[1] = "<a href='{$this_url}' {$class} >" . __( 'By date', 'search-analytics' ) . "</a>";
 
             $this_url = add_query_arg( 'grouped_view', 2 );
             $class    = ( $current == 2 ) ? ' class="current"' : '';
-            $views[2] = "<a href='{$this_url}' {$class} >" . __( 'By hour', 'mwt-search-analytics' ) . "</a>";
+            $views[2] = "<a href='{$this_url}' {$class} >" . __( 'By hour', 'search-analytics' ) . "</a>";
 
             $this->format_views_list( $views );
         }

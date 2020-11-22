@@ -1,7 +1,5 @@
 <?php
-if ( ! defined( 'ABSPATH' ) ) {
-    exit;
-} // Exit if accessed directly
+defined("ABSPATH") || exit;
 
 if ( ! class_exists( 'MWTSA_Admin_Charts' ) ) {
 
@@ -35,20 +33,20 @@ if ( ! class_exists( 'MWTSA_Admin_Charts' ) ) {
                 $default_range = MWTSA_Options::get_option( 'chart_default_range' );
 
                 $line_options = array(
-                    'basic'   => __( 'Basic Line', 'mwt-search-analytics' ),
-                    'stepped' => __( 'Stepped Line', 'mwt-search-analytics' )
+                    'basic'   => __( 'Basic Line', 'search-analytics' ),
+                    'stepped' => __( 'Stepped Line', 'search-analytics' )
                 );
 
                 $range_options = array(
-                    '2w'  => __( '2 Weeks', 'mwt-search-analytics' ),
-                    '2wc' => __( '2 Weeks Comparison', 'mwt-search-analytics' ),
-                    '1m'  => __( '1 Month', 'mwt-search-analytics' ),
-                    '1mc' => __( '1 Month Comparison', 'mwt-search-analytics' )
+                    '2w'  => __( '2 Weeks', 'search-analytics' ),
+                    '2wc' => __( '2 Weeks Comparison', 'search-analytics' ),
+                    '1m'  => __( '1 Month', 'search-analytics' ),
+                    '1mc' => __( '1 Month Comparison', 'search-analytics' )
                 );
                 ?>
                 <div class="col-content">
 
-                    <h2><?php _e( "Search Results Charts", 'mwt-search-analytics' ) ?></h2>
+                    <h2><?php _e( "Search Results Charts", 'search-analytics' ) ?></h2>
                     <div class="mwtsa-chart-options">
                         <label for="chart-type">
                             <select id="chart-type" onchange="loadCharts()">
@@ -64,7 +62,7 @@ if ( ! class_exists( 'MWTSA_Admin_Charts' ) ) {
                                 <?php endforeach; ?>
                             </select>
                         </label>
-                        <span onclick="saveAsDefault()" class="button"><?php _e( 'Save as default', 'mwt-search-analytics' ) ?></span>
+                        <span onclick="saveAsDefault()" class="button"><?php _e( 'Save as default', 'search-analytics' ) ?></span>
                     </div>
 
                     <div id="chart-content"></div>
@@ -131,7 +129,7 @@ if ( ! class_exists( 'MWTSA_Admin_Charts' ) ) {
                       $set = implode( '", "', $set );
                       ?>
                     {
-                      label: "<?php echo ( ( $k == 1 ) ? __( 'Previous', 'mwt-search-analytics' ) : __( 'Current', 'mwt-search-analytics' ) ) . ' ' . __( 'Period' ) ?>",
+                      label: "<?php echo ( ( $k == 1 ) ? __( 'Previous', 'search-analytics' ) : __( 'Current', 'search-analytics' ) ) . ' ' . __( 'Period' ) ?>",
                       data: ["<?php echo $set ?>"],
                       borderColor: [
                         "<?php echo ( $k == 1 ) ? 'rgba(0,0,0,1)' : 'rgba(255,99,132,1)' ?>"

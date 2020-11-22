@@ -1,8 +1,5 @@
 <?php
-
-if ( ! defined( 'ABSPATH' ) ) {
-    exit;
-} // Exit if accessed directly
+defined("ABSPATH") || exit;
 
 if ( ! class_exists( 'MWTSA_Dashboard' ) ) {
 
@@ -20,7 +17,7 @@ if ( ! class_exists( 'MWTSA_Dashboard' ) ) {
 
             if ( ! isset( $plugin_options['mwtsa_display_stats_for_role'] ) || ! empty( $accepted_user_roles ) ) {
 
-                wp_add_dashboard_widget( 'mwtsa_last_week_stats_widget', __( 'Last Week Search Stats', 'mwt-search-analytics' ), array(
+                wp_add_dashboard_widget( 'mwtsa_last_week_stats_widget', __( 'Last Week Search Stats', 'search-analytics' ), array(
                     $this,
                     'last_week_stats_widget'
                 ) );
@@ -40,7 +37,7 @@ if ( ! class_exists( 'MWTSA_Dashboard' ) ) {
             ) );
 
             if ( empty( $search_results ) ) {
-                _e( 'No search statistics found', 'mwt-search-analytics' );
+                _e( 'No search statistics found', 'search-analytics' );
 
                 return;
             }
@@ -50,20 +47,20 @@ if ( ! class_exists( 'MWTSA_Dashboard' ) ) {
 
             echo '<ul class="mwtsa-stats-widget-wrapper">';
 
-            echo '<li><span class="stats-list-label">' . __( "Total Searches:", 'mwt-search-analytics' ) . '</span>';
-            echo '<span class="stats-list-value">' . $total_searches . '</span></li>';
+            echo '<li><span class="stats-list-label">' . __( "Total Searches:", 'search-analytics' ) . '</span>';
+            echo '<span class="stats-list-value">' . absint( $total_searches ) . '</span></li>';
 
-            echo '<li><span class="stats-list-label">' . __( "Most Searched Term:", 'mwt-search-analytics' ) . '</span>';
-            echo '<span class="stats-list-value">' . $most_searched_term['term'] . '</span></li>';
+            echo '<li><span class="stats-list-label">' . __( "Most Searched Term:", 'search-analytics' ) . '</span>';
+            echo '<span class="stats-list-value">' . esc_attr( $most_searched_term['term'] ) . '</span></li>';
 
-            echo '<li><span class="stats-list-label">' . __( "Most Searched Term Count:", 'mwt-search-analytics' ) . '</span>';
-            echo '<span class="stats-list-value">' . $most_searched_term['count'] . '</span></li>';
+            echo '<li><span class="stats-list-label">' . __( "Most Searched Term Count:", 'search-analytics' ) . '</span>';
+            echo '<span class="stats-list-value">' . absint( $most_searched_term['count'] ) . '</span></li>';
 
-            echo '<li><span class="stats-list-label">' . __( "Last Searched Term:", 'mwt-search-analytics' ) . '</span>';
-            echo '<span class="stats-list-value">' . $last_search_term['term'] . '</span></li>';
+            echo '<li><span class="stats-list-label">' . __( "Last Searched Term:", 'search-analytics' ) . '</span>';
+            echo '<span class="stats-list-value">' . esc_attr( $last_search_term['term'] ) . '</span></li>';
 
-            echo '<li><span class="stats-list-label">' . __( "Last Searched Date:", 'mwt-search-analytics' ) . '</span>';
-            echo '<span class="stats-list-value">' . $last_search_term['last_search_date'] . '</span></li>';
+            echo '<li><span class="stats-list-label">' . __( "Last Searched Date:", 'search-analytics' ) . '</span>';
+            echo '<span class="stats-list-value">' . esc_attr( $last_search_term['last_search_date'] ) . '</span></li>';
 
             echo '</ul>';
         }

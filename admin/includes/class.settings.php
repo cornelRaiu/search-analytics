@@ -1,7 +1,5 @@
 <?php
-if ( ! defined( 'ABSPATH' ) ) {
-    exit;
-} // Exit if accessed directly
+defined("ABSPATH") || exit;
 
 if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 
@@ -24,10 +22,14 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 
             if ( ! isset( $this->existing_options['mwtsa_display_settings_for_role'] ) || ! empty( $accepted_user_roles ) ) {
 
-                add_options_page( 'MWT: Search Analytics', 'MWT: Search Analytics', $accepted_user_roles[0], 'mwt-search-analytics', array(
-                    &$this,
-                    'options_page'
-                ) );
+                add_options_page(
+                    __( 'MWT: Search Analytics', 'search-analytics' ),
+                    __( 'MWT: Search Analytics', 'search-analytics' ),
+                    $accepted_user_roles[0], 'search-analytics', array(
+                        &$this,
+                        'options_page'
+                    )
+                );
 
             }
         }
@@ -38,14 +40,14 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 
             add_settings_section(
                 'mwtsa_general_options_section',
-                __( 'Search Filtering Settings', 'mwt-search-analytics' ),
+                __( 'Search Filtering Settings', 'search-analytics' ),
                 array( &$this, 'settings_section_callback' ),
                 'mwtsa_general_options'
             );
 
             add_settings_field(
                 'mwtsa_exclude_search_for_role',
-                __( 'Ignore search queries for these user roles:', 'mwt-search-analytics' ),
+                __( 'Ignore search queries for these user roles:', 'search-analytics' ),
                 array( &$this, 'field_exclude_search_for_role_render' ),
                 'mwtsa_general_options',
                 'mwtsa_general_options_section'
@@ -53,7 +55,7 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 
             add_settings_field(
                 'mwtsa_exclude_search_for_role_after_logout',
-                __( 'Ignore search queries for the above user roles even after the user has logged out:', 'mwt-search-analytics' ),
+                __( 'Ignore search queries for the above user roles even after the user has logged out:', 'search-analytics' ),
                 array( &$this, 'field_exclude_search_for_role_after_logout_render' ),
                 'mwtsa_general_options',
                 'mwtsa_general_options_section'
@@ -61,7 +63,7 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 
             add_settings_field(
                 'mwtsa_exclude_doubled_search_for_interval',
-                __( 'Exclude doubled search for same user if interval is lower than ( minutes ):', 'mwt-search-analytics' ),
+                __( 'Exclude doubled search for same user if interval is lower than ( minutes ):', 'search-analytics' ),
                 array( &$this, 'field_exclude_doubled_search_for_interval_render' ),
                 'mwtsa_general_options',
                 'mwtsa_general_options_section'
@@ -69,7 +71,7 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 
             add_settings_field(
                 'mwtsa_exclude_searches_from_ip_addresses',
-                __( 'Exclude searches made from the following IP addresses:', 'mwt-search-analytics' ),
+                __( 'Exclude searches made from the following IP addresses:', 'search-analytics' ),
                 array( &$this, 'field_exclude_searches_from_ip_addresses_render' ),
                 'mwtsa_general_options',
                 'mwtsa_general_options_section'
@@ -77,7 +79,7 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 
             add_settings_field(
                 'mwtsa_minimum_characters',
-                __( 'Only record searches with at least the number of characters', 'mwt-search-analytics' ),
+                __( 'Only record searches with at least the number of characters', 'search-analytics' ),
                 array( &$this, 'field_minimum_characters_render' ),
                 'mwtsa_general_options',
                 'mwtsa_general_options_section'
@@ -85,7 +87,7 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 
             add_settings_field(
                 'mwtsa_exclude_if_string_contains',
-                __( 'Exclude search in case it contains certain substring:', 'mwt-search-analytics' ),
+                __( 'Exclude search in case it contains certain substring:', 'search-analytics' ),
                 array( &$this, 'field_exclude_if_string_contains_render' ),
                 'mwtsa_general_options',
                 'mwtsa_general_options_section'
@@ -93,14 +95,14 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 
             add_settings_section(
                 'mwtsa_display_options_sections',
-                __( 'General Settings', 'mwt-search-analytics' ),
+                __( 'General Settings', 'search-analytics' ),
                 array( &$this, 'settings_section_callback' ),
                 'mwtsa_general_options'
             );
 
             add_settings_field(
                 'mwtsa_display_settings_for_role',
-                __( 'Only display the settings page for these user roles:', 'mwt-search-analytics' ),
+                __( 'Only display the settings page for these user roles:', 'search-analytics' ),
                 array( &$this, 'field_display_settings_for_role_render' ),
                 'mwtsa_general_options',
                 'mwtsa_display_options_sections'
@@ -108,7 +110,7 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 
             add_settings_field(
                 'mwtsa_display_stats_for_role',
-                __( 'Only display the statistics page for these user roles:', 'mwt-search-analytics' ),
+                __( 'Only display the statistics page for these user roles:', 'search-analytics' ),
                 array( &$this, 'field_display_stats_for_role_render' ),
                 'mwtsa_general_options',
                 'mwtsa_display_options_sections'
@@ -116,7 +118,7 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 
             add_settings_field(
                 'mwtsa_hide_charts',
-                __( 'Hide Charts', 'mwt-search-analytics' ),
+                __( 'Hide Charts', 'search-analytics' ),
                 array( &$this, 'field_hide_charts' ),
                 'mwtsa_general_options',
                 'mwtsa_display_options_sections'
@@ -124,7 +126,7 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 
             add_settings_field(
                 'mwtsa_save_search_country',
-                __( 'Save Search Country', 'mwt-search-analytics' ),
+                __( 'Save Search Country', 'search-analytics' ),
                 array( &$this, 'field_save_search_country' ),
                 'mwtsa_general_options',
                 'mwtsa_display_options_sections'
@@ -132,7 +134,7 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 
             add_settings_field(
                 'mwtsa_custom_search_url_params',
-                __( 'Add custom search parameters for recording the searches:', 'mwt-search-analytics' ),
+                __( 'Add custom search parameters for recording the searches:', 'search-analytics' ),
                 array( &$this, 'field_custom_search_url_params_render' ),
                 'mwtsa_general_options',
                 'mwtsa_display_options_sections'
@@ -140,7 +142,7 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 
             add_settings_field(
                 'mwtsa_save_search_by_user',
-                __( 'Save Search By User', 'mwt-search-analytics' ),
+                __( 'Save Search By User', 'search-analytics' ),
                 array( &$this, 'field_save_search_by_user' ),
                 'mwtsa_general_options',
                 'mwtsa_display_options_sections'
@@ -148,7 +150,7 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 
             add_settings_field(
                 'mwtsa_uninstall',
-                __( 'Uninstall', 'mwt-search-analytics' ),
+                __( 'Uninstall', 'search-analytics' ),
                 array( &$this, 'field_uninstall' ),
                 'mwtsa_general_options',
                 'mwtsa_display_options_sections'
@@ -178,7 +180,7 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 
             ?>
             <label><input type='checkbox' name='mwtsa_settings[mwtsa_exclude_search_for_role_after_logout]' value='1' <?php checked( $this->existing_options['mwtsa_exclude_search_for_role_after_logout'], 1 ) ?> />
-                <br/><strong><?php _e( 'Note: this will set a cookie in the browser of the user who logged in and has one of the user roles checked above.<br />This needs to be treated by the site\'s GDPR terms in case it is active for public user roles ( e.g. Subscriber, Client )<br />The cookie name is: ', 'mwt-search-analytics' ) ?><?php echo $mwtsa->cookie_name ?></strong></label>
+                <br/><strong><?php _e( 'Note: this will set a cookie in the browser of the user who logged in and has one of the user roles checked above.<br />This needs to be treated by the site\'s GDPR terms in case it is active for public user roles ( e.g. Subscriber, Client )<br />The cookie name is: ', 'search-analytics' ) ?><?php echo $mwtsa->cookie_name ?></strong></label>
             <br/>
             <?php
         }
@@ -191,9 +193,9 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
             }
 
             ?>
-            <input type="number" min="0" name="mwtsa_settings[mwtsa_exclude_doubled_search_for_interval]" value="<?php echo $this->existing_options['mwtsa_exclude_doubled_search_for_interval'] ?>"/> <?php _e( '( Note: set to 0 or leave empty to disable it )', 'mwt-search-analytics' ) ?>
+            <input type="number" min="0" name="mwtsa_settings[mwtsa_exclude_doubled_search_for_interval]" value="<?php echo $this->existing_options['mwtsa_exclude_doubled_search_for_interval'] ?>"/> <?php _e( '( Note: set to 0 or leave empty to disable it )', 'search-analytics' ) ?>
             <br/>
-            <strong><?php _e( 'Note: this will set a cookie in the browser of the user who made any kind of search on the website.<br />This needs to be treated by the site\'s GDPR terms in case it\'s value is a number larger than 0<br />The cookie name is: ', 'mwt-search-analytics' ) ?><?php echo $mwtsa->cookie_name ?></strong>
+            <strong><?php _e( 'Note: this will set a cookie in the browser of the user who made any kind of search on the website.<br />This needs to be treated by the site\'s GDPR terms in case it\'s value is a number larger than 0<br />The cookie name is: ', 'search-analytics' ) ?><?php echo $mwtsa->cookie_name ?></strong>
             <?php
         }
 
@@ -204,10 +206,10 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 
             $admin_ip = isset( $_SERVER['HTTP_CLIENT_IP'] ) ? $_SERVER['HTTP_CLIENT_IP'] : ( isset( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'] );
             ?>
-            <input type="text" name="mwtsa_settings[mwtsa_exclude_searches_from_ip_addresses]" value="<?php echo $this->existing_options['mwtsa_exclude_searches_from_ip_addresses'] ?>" placeholder="eg. 127.0.0.1"/> <?php _e( '( Note: separate IP values by comma )', 'mwt-search-analytics' ) ?>
+            <input type="text" name="mwtsa_settings[mwtsa_exclude_searches_from_ip_addresses]" value="<?php echo $this->existing_options['mwtsa_exclude_searches_from_ip_addresses'] ?>" placeholder="eg. 127.0.0.1"/> <?php _e( '( Note: separate IP values by comma )', 'search-analytics' ) ?>
             <br/>
 
-            <strong><?php _e( 'Your IP address is: ' . $admin_ip, 'mwt-search-analytics' ) ?></strong>
+            <strong><?php _e( 'Your IP address is: ' . $admin_ip, 'search-analytics' ) ?></strong>
             <?php
         }
 
@@ -217,7 +219,7 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
                 $this->existing_options['mwtsa_minimum_characters'] = 0;
             }
             ?>
-            <input type="number" min="0" name="mwtsa_settings[mwtsa_minimum_characters]" value="<?php echo $this->existing_options['mwtsa_minimum_characters'] ?>"/> <?php _e( '( Note: set to 0 or leave empty to disable it )', 'mwt-search-analytics' ) ?>
+            <input type="number" min="0" name="mwtsa_settings[mwtsa_minimum_characters]" value="<?php echo $this->existing_options['mwtsa_minimum_characters'] ?>"/> <?php _e( '( Note: set to 0 or leave empty to disable it )', 'search-analytics' ) ?>
             <br/>
             <?php
         }
@@ -229,7 +231,7 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
             }
 
             ?>
-            <input type="text" name="mwtsa_settings[mwtsa_exclude_if_string_contains]" value="<?php echo $this->existing_options['mwtsa_exclude_if_string_contains']; ?>" placeholder="eg. text, another one"/> <?php _e( '( Note: enter comma (,) separated strings )', 'mwt-search-analytics' ) ?>
+            <input type="text" name="mwtsa_settings[mwtsa_exclude_if_string_contains]" value="<?php echo $this->existing_options['mwtsa_exclude_if_string_contains']; ?>" placeholder="eg. text, another one"/> <?php _e( '( Note: enter comma (,) separated strings )', 'search-analytics' ) ?>
             <?php
         }
 
@@ -240,12 +242,12 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
             }
 
             ?>
-            <input type="text" name="mwtsa_settings[mwtsa_custom_search_url_params]" value="<?php echo $this->existing_options['mwtsa_custom_search_url_params']; ?>" placeholder="eg. wpv_post_search"/> <?php _e( '( Note: enter comma (,) separated strings )', 'mwt-search-analytics' ) ?>
+            <input type="text" name="mwtsa_settings[mwtsa_custom_search_url_params]" value="<?php echo $this->existing_options['mwtsa_custom_search_url_params']; ?>" placeholder="eg. wpv_post_search"/> <?php _e( '( Note: enter comma (,) separated strings )', 'search-analytics' ) ?>
             <?php
         }
 
         public function field_display_settings_for_role_render() {
-            $roles              = get_editable_roles();
+            $roles = get_editable_roles();
 
             if ( ! empty( $roles ) ) :
                 foreach ( $roles as $role_key => $role ) :
@@ -281,7 +283,7 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
                 $this->existing_options['mwtsa_uninstall'] = 0;
             }
             ?>
-            <label><input type='checkbox' name='mwtsa_settings[mwtsa_uninstall]' value='1' <?php checked( $this->existing_options['mwtsa_uninstall'], 1 ) ?> /> <?php _e( 'Remove plugin tables on uninstall', 'mwt-search-analytics' ) ?>
+            <label><input type='checkbox' name='mwtsa_settings[mwtsa_uninstall]' value='1' <?php checked( $this->existing_options['mwtsa_uninstall'], 1 ) ?> /> <?php _e( 'Remove plugin tables on uninstall', 'search-analytics' ) ?>
             </label><br/>
             <?php
         }
@@ -291,7 +293,7 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
                 $this->existing_options['mwtsa_hide_charts'] = 0;
             }
             ?>
-            <label><input type='checkbox' name='mwtsa_settings[mwtsa_hide_charts]' value='1' <?php checked( $this->existing_options['mwtsa_hide_charts'], 1 ) ?> /> <?php _e( 'Hide graphical charts for representing statistics', 'mwt-search-analytics' ) ?>
+            <label><input type='checkbox' name='mwtsa_settings[mwtsa_hide_charts]' value='1' <?php checked( $this->existing_options['mwtsa_hide_charts'], 1 ) ?> /> <?php _e( 'Hide graphical charts for representing statistics', 'search-analytics' ) ?>
             </label><br/>
             <?php
         }
@@ -301,9 +303,9 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
                 $this->existing_options['mwtsa_save_search_country'] = 0;
             }
             ?>
-            <label><input type='checkbox' name='mwtsa_settings[mwtsa_save_search_country]' value='1' <?php checked( $this->existing_options['mwtsa_save_search_country'], 1 ) ?> /> <?php _e( 'Save the country from where the search was launched', 'mwt-search-analytics' ) ?>
+            <label><input type='checkbox' name='mwtsa_settings[mwtsa_save_search_country]' value='1' <?php checked( $this->existing_options['mwtsa_save_search_country'], 1 ) ?> /> <?php _e( 'Save the country from where the search was launched', 'search-analytics' ) ?>
             </label><br/>
-            <strong><?php _e( 'NOTE: this uses the <a href="http://ip-api.com">http://ip-api.com</a> JSON service which is limited to 150 requests per minute. In case you have more than 150 searches per minute on the website, please uncheck this checkbox. <br />In case the site\'s IP got banned, you can go here: <a href="http://ip-api.com/docs/unban">http://ip-api.com/docs/unban</a> and remove the ban.<br />A future version of Search Analytics will come with support for the PRO service of IP-API.com<br /><br />Disclaimer: I am not associated with the IP-API.com service in any way. I am just using it for providing you a way of finding out where the users search content from on your website.', 'mwt-search-analytics' ) ?></strong>
+            <strong><?php _e( 'NOTE: this uses the <a href="http://ip-api.com">http://ip-api.com</a> JSON service which is limited to 150 requests per minute. In case you have more than 150 searches per minute on the website, please uncheck this checkbox. <br />In case the site\'s IP got banned, you can go here: <a href="http://ip-api.com/docs/unban">http://ip-api.com/docs/unban</a> and remove the ban.<br />A future version of Search Analytics will come with support for the PRO service of IP-API.com<br /><br />Disclaimer: I am not associated with the IP-API.com service in any way. I am just using it for providing you a way of finding out where the users search content from on your website.', 'search-analytics' ) ?></strong>
             <?php
         }
 
@@ -312,9 +314,9 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
                 $this->existing_options['mwtsa_save_search_by_user'] = 0;
             }
             ?>
-            <label><input type='checkbox' name='mwtsa_settings[mwtsa_save_search_by_user]' value='1' <?php checked( $this->existing_options['mwtsa_save_search_by_user'], 1 ) ?> /> <?php _e( 'Save the user id of the user who launched the search', 'mwt-search-analytics' ) ?>
+            <label><input type='checkbox' name='mwtsa_settings[mwtsa_save_search_by_user]' value='1' <?php checked( $this->existing_options['mwtsa_save_search_by_user'], 1 ) ?> /> <?php _e( 'Save the user id of the user who launched the search', 'search-analytics' ) ?>
             </label><br/>
-            <strong><?php _e( 'Using this feature will allow you to see which of your registered users searched things on the site.', 'mwt-search-analytics' ) ?></strong>
+            <strong><?php _e( 'Using this feature will allow you to see which of your registered users searched things on the site.', 'search-analytics' ) ?></strong>
             <?php
         }
 
@@ -349,7 +351,7 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 
         function erase_history_form() {
             ?>
-            <h3><?php _e( 'Erase History', 'mwt-search-analytics' ) ?></h3>
+            <h3><?php _e( 'Erase History', 'search-analytics' ) ?></h3>
 
             <table class="form-table erase-history-table">
                 <tbody>
@@ -359,8 +361,8 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
                         <form action="" method="post">
                             <?php wp_nonce_field( 'mwtsa-erase-data' ); ?>
                             <p class="submit">
-                                <input name="mwtsa_erase_data" class="button-secondary" value="<?php esc_attr_e( 'Erase All Data', 'mwt-search-analytics' ) ?>" type="submit" onclick="return confirm( '<?php _e( 'Are you sure you want to delete all data?\n\nClick `OK` to proceed.' ) ?>');"/><br/>
-                                <strong><?php _e( 'Warning! Clicking this button will delete all historical search data', 'mwt-search-analytics' ) ?></strong>
+                                <input name="mwtsa_erase_data" class="button-secondary" value="<?php esc_attr_e( 'Erase All Data', 'search-analytics' ) ?>" type="submit" onclick="return confirm( '<?php _e( 'Are you sure you want to delete all data?\n\nClick `OK` to proceed.' ) ?>');"/><br/>
+                                <strong><?php _e( 'Warning! Clicking this button will delete all historical search data', 'search-analytics' ) ?></strong>
                             </p>
                         </form>
                     </td>
@@ -371,8 +373,8 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
                         <form action="" method="post">
                             <?php wp_nonce_field( 'mwtsa-erase-data' ); ?>
                             <p class="submit">
-                                <input type="number" name="mwtsa_data_older_than_days" value="90"/> <?php _e( 'days', 'mwt-search-analytics' ) ?> &nbsp;
-                                <input name="mwtsa_erase_old_data" class="button-secondary" value="<?php esc_attr_e( 'Erase Data', 'mwt-search-analytics' ) ?>" type="submit" onclick="return confirm( '<?php _e( 'Are you sure you want to delete the selected data?\n\nClick `OK` to proceed.' ) ?>');"/>
+                                <input type="number" name="mwtsa_data_older_than_days" value="90"/> <?php _e( 'days', 'search-analytics' ) ?> &nbsp;
+                                <input name="mwtsa_erase_old_data" class="button-secondary" value="<?php esc_attr_e( 'Erase Data', 'search-analytics' ) ?>" type="submit" onclick="return confirm( '<?php _e( 'Are you sure you want to delete the selected data?\n\nClick `OK` to proceed.' ) ?>');"/>
                             </p>
                         </form>
                     </td>
@@ -407,7 +409,7 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
         function data_erased_notice() {
             ?>
             <div class="notice updated mwtsa-notice is-dismissible">
-                <p><?php _e( 'Historical data successfully erased!', 'mwt-search-analytics' ); ?></p>
+                <p><?php _e( 'Historical data successfully erased!', 'search-analytics' ); ?></p>
             </div>
             <?php
         }
