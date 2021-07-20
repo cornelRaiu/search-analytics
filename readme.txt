@@ -80,6 +80,7 @@ You can use the [Support Forum](https://wordpress.org/support/plugin/search-anal
 * Bugfix: Users can not see the statistics page in some cases. [Bug report](https://github.com/cornelRaiu/search-analytics/issues/3)
 * Bugfix: Database error on term delete success page
 * Optimization: **Compatibility with WP versions up to 5.8**
+* Optimization: **Compatibility with PHP versions between 5.6 - 8.0**
 * Optimization: Security improvements and general code optimization
 * Optimization: Remove filters and groups on the term delete success page
 * Others: Add more "Useful Links"
@@ -229,4 +230,4 @@ You can use the [Support Forum](https://wordpress.org/support/plugin/search-anal
 == Upgrade Notice ==
 
 = 1.3.5 =
-Ensured full compatibility with WP versions up to 5.8 and other bugfixes and optimizations
+Ensured full compatibility with WP versions up to 5.8 and with PHP versions 5.6 to 8.0 and other bugfixes and optimizations
