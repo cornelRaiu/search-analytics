@@ -51,14 +51,14 @@ if ( ! class_exists( 'MWTSA_Admin_Charts' ) ) {
                         <label for="chart-type">
                             <select id="chart-type" onchange="loadCharts()">
                                 <?php foreach ( $line_options as $value => $label ) : ?>
-                                    <option value="<?php echo $value ?>" <?php selected( $value, $default_line_style, true ) ?>><?php echo $label ?></option>
+                                    <option value="<?php echo $value ?>" <?php selected( $value, $default_line_style ) ?>><?php echo $label ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </label>
                         <label for="chart-ranges">
                             <select id="chart-ranges" onchange="loadCharts()">
                                 <?php foreach ( $range_options as $value => $label ) : ?>
-                                    <option value="<?php echo $value ?>" <?php selected( $value, $default_range, true ) ?>><?php echo $label ?></option>
+                                    <option value="<?php echo $value ?>" <?php selected( $value, $default_range ) ?>><?php echo $label ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </label>
@@ -118,9 +118,9 @@ if ( ! class_exists( 'MWTSA_Admin_Charts' ) ) {
 
             <canvas id="mwtsa-stats-chart" width="400" height="100"></canvas>
             <script>
-              var ctx = document.getElementById("mwtsa-stats-chart").getContext("2d");
-              var stepSize = parseInt( <?php echo ceil( max( $history[0] ) / 15 ) ?> );
-              var stackedLine = new Chart(ctx, {
+              const ctx = document.getElementById("mwtsa-stats-chart").getContext("2d");
+              const stepSize = parseInt( <?php echo ceil( max( $history[0] ) / 15 ) ?> );
+              const stackedLine = new Chart(ctx, {
                 type: 'line',
                 data: {
                   labels: ["<?php echo implode( '", "', $dates ) ?>"],

@@ -33,7 +33,7 @@ if ( ! class_exists( 'MWTSA_Term_Stats_Table' ) ) :
         public function get_term_data() {
             global $wpdb, $mwtsa;
 
-            return $wpdb->get_row( "SELECT * FROM {$mwtsa->terms_table_name} WHERE id = {$this->term_id}", 'ARRAY_A' );
+            return $wpdb->get_row( "SELECT * FROM $mwtsa->terms_table_name WHERE id = $this->term_id", 'ARRAY_A' );
         }
 
         public function display_search_box() {
@@ -136,15 +136,15 @@ if ( ! class_exists( 'MWTSA_Term_Stats_Table' ) ) :
 
             $class    = ( $current == 0 ) ? ' class="current"' : '';
             $this_url = remove_query_arg( 'grouped_view' );
-            $views[0] = "<a href='{$this_url}' {$class} >" . __( 'Not grouped', 'search-analytics' ) . "</a>";
+            $views[0] = "<a href='$this_url' $class >" . __( 'Not grouped', 'search-analytics' ) . "</a>";
 
             $this_url = add_query_arg( 'grouped_view', 1 );
             $class    = ( $current == 1 ) ? ' class="current"' : '';
-            $views[1] = "<a href='{$this_url}' {$class} >" . __( 'By date', 'search-analytics' ) . "</a>";
+            $views[1] = "<a href='$this_url' $class >" . __( 'By date', 'search-analytics' ) . "</a>";
 
             $this_url = add_query_arg( 'grouped_view', 2 );
             $class    = ( $current == 2 ) ? ' class="current"' : '';
-            $views[2] = "<a href='{$this_url}' {$class} >" . __( 'By hour', 'search-analytics' ) . "</a>";
+            $views[2] = "<a href='$this_url' $class >" . __( 'By hour', 'search-analytics' ) . "</a>";
 
             $this->format_views_list( $views );
         }

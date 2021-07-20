@@ -79,6 +79,7 @@ if ( ! class_exists( 'MWTSA' ) ) {
             $this->main_option_name = 'mwtsa_settings';
         }
 
+        /** @noinspection PhpIncludeInspection */
         public function includes() {
             require_once( $this->includes_dir . 'helpers.php' );
             require_once( $this->includes_dir . 'class.options.php' );

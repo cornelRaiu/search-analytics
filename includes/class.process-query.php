@@ -24,7 +24,6 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
                 foreach ( $custom_search_params as $param ) {
                     if ( ! empty( $_REQUEST[ $param ] ) ) {
                         $custom_search_value = $_REQUEST[ $param ];
-                        continue;
                     }
                 }
             }
@@ -36,6 +35,8 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
             $search_term = $custom_search_value != '' ? $custom_search_value : get_search_query();
 
             $process->process_search_term( $search_term, $wp_query->found_posts );
+
+            return true;
         }
 
         public function process_search_term( $search_term, $count ) {
@@ -133,6 +134,8 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 
                 $this->save_search_term( $search_term, $count, $country, $user_id );
             }
+
+            return true;
         }
 
         public function save_search_term( $term, $found_posts, $country = '', $user_id = 0 ) {
@@ -144,7 +147,7 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
             //1. add/update term string
             $existing_term = $wpdb->get_row( $wpdb->prepare(
                 "SELECT *
-				FROM `{$mwtsa->terms_table_name}`
+				FROM `$mwtsa->terms_table_name`
 				WHERE term = %s
 				LIMIT 1
 				", $term
@@ -158,7 +161,7 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 
             if ( empty ( $existing_term ) ) {
                 $success = $wpdb->query( $wpdb->prepare(
-                    "INSERT INTO `{$mwtsa->terms_table_name}` (`term`, `total_count`)
+                    "INSERT INTO `$mwtsa->terms_table_name` (`term`, `total_count`)
 					VALUES (%s, %d)",
                     $term,
                     1
@@ -178,7 +181,7 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
                 $total_count = $existing_term->total_count + 1;
 
                 $success = $wpdb->query( $wpdb->prepare(
-                    "UPDATE `{$mwtsa->terms_table_name}`
+                    "UPDATE `$mwtsa->terms_table_name`
 					SET total_count = %d
 					WHERE term = %s
 					LIMIT 1
@@ -199,7 +202,7 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
                 }
 
                 $success = $wpdb->query( $wpdb->prepare(
-                    "INSERT INTO `{$mwtsa->history_table_name}` (`term_id`, `datetime`, `count_posts`, `country`, `user_id`)
+                    "INSERT INTO `$mwtsa->history_table_name` (`term_id`, `datetime`, `count_posts`, `country`, `user_id`)
 					VALUES (%d, UTC_TIMESTAMP(), %d, %s, %d)",
                     $term_id,
                     $found_posts,
