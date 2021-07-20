@@ -203,6 +203,7 @@ if ( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
                                 <li>Bugfix: Users can not see the statistics page in some cases. <a href="https://github.com/cornelRaiu/search-analytics/issues/3">Bug Report</a></li>
                                 <li>Bugfix: Database error on term delete success page</li>
                                 <li>Optimization: <strong>Compatibility with WP versions up to 5.8</strong></li>
+                                <li>Optimization: <strong>Compatibility with PHP versions between 5.6 - 8.0</strong></li>
                                 <li>Optimization: Security improvements and general code optimization</li>
                                 <li>Optimization: Remove filters and groups on the term delete success page</li>
                                 <li>Others: Add more "Useful Links"</li>
