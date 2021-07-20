@@ -91,7 +91,7 @@ if ( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
 
         public function add_admin_menu() {
             $this_user_role      = mwt_get_current_user_roles();
-            $accepted_user_roles = array_intersect( $this_user_role, $this->plugin_options['mwtsa_display_stats_for_role'] );
+            $accepted_user_roles = array_values( array_intersect( $this_user_role, $this->plugin_options['mwtsa_display_stats_for_role'] ) );
 
             if ( ! isset( $this->plugin_options['mwtsa_display_stats_for_role'] ) || ! empty( $accepted_user_roles ) ) {
 
