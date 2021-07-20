@@ -95,6 +95,9 @@ if ( ! class_exists( 'MWTSA_Stats_Table' ) ) :
             return $sortable_columns;
         }
 
+        /**
+         * @deprecated deprecated since version 1.3.6. WIll be removed in version 2.0.0
+         */
         public function column_term( $item ) {
             $actions = array(
                 'delete' => sprintf( '<a href="?page=%s&action=%s&search-term=%s">' . __( 'Delete', 'search-analytics' ) . '</a>', $_REQUEST['page'], 'delete', $item['id'] ),
@@ -122,10 +125,20 @@ if ( ! class_exists( 'MWTSA_Stats_Table' ) ) :
             if ( 'delete' === $this->current_action() && ! empty( $_GET['search-term'] ) ) {
 
                 $terms_to_delete = (array) $_GET['search-term'];
-                $terms_to_delete = implode( ',', $terms_to_delete );
+                $terms_placeholders = implode( ',', array_fill( 0, count( $terms_to_delete ), '%d' ) );
 
-                $wpdb->query( "DELETE FROM {$mwtsa->terms_table_name} WHERE id IN ($terms_to_delete)" );
-                $wpdb->query( "DELETE FROM {$mwtsa->history_table_name} WHERE term_id IN ($terms_to_delete)" );
+                $wpdb->query(
+                      $wpdb->prepare(
+                            "DELETE FROM $mwtsa->terms_table_name WHERE id IN ($terms_placeholders)",
+                          $terms_to_delete
+                      )
+                );
+                $wpdb->query(
+                    $wpdb->prepare(
+                        "DELETE FROM $mwtsa->terms_table_name WHERE term_id IN ($terms_placeholders)",
+                        $terms_to_delete
+                    )
+                );
 
                 wp_die( sprintf( '%s <a href="%s">%s</a>',
                         __( 'Items deleted!', 'search-analytics' ),
@@ -307,7 +320,7 @@ if ( ! class_exists( 'MWTSA_Stats_Table' ) ) :
 
             $selected_user = isset( $_REQUEST['filter-user'] ) ? $_REQUEST['filter-user'] : '';
 
-            $users_with_searches = $wpdb->get_results( "SELECT `ID`, `user_nicename` FROM {$wpdb->users} WHERE `ID` IN ( SELECT DISTINCT(`user_id`) FROM {$mwtsa->history_table_name})" );
+            $users_with_searches = $wpdb->get_results( "SELECT `ID`, `user_nicename` FROM $wpdb->users WHERE `ID` IN ( SELECT DISTINCT(`user_id`) FROM {$mwtsa->history_table_name})" );
 
             if ( empty( $users_with_searches ) ) {
                 return '';
@@ -320,7 +333,7 @@ if ( ! class_exists( 'MWTSA_Stats_Table' ) ) :
                 <?php foreach ( $users_with_searches as $user ) :
                     $selected = $user->ID == $selected_user ? 'selected' : '';
 
-                    echo "<option value='{$user->ID}' {$selected}>{$user->user_nicename}</option>";
+                    echo "<option value='$user->ID' $selected>$user->user_nicename</option>";
                 endforeach; ?>
             </select>
             <?php
@@ -333,19 +346,19 @@ if ( ! class_exists( 'MWTSA_Stats_Table' ) ) :
 
             $class    = ( $current == 0 ) ? ' class="current"' : '';
             $this_url = add_query_arg( 'period_view', 0 );
-            $views[0] = "<a href='{$this_url}' {$class} >" . __( 'Last 24 hours', 'search-analytics' ) . "</a>";
+            $views[0] = "<a href='$this_url' $class >" . __( 'Last 24 hours', 'search-analytics' ) . "</a>";
 
             $this_url = add_query_arg( 'period_view', 1 );
             $class    = ( $current == 1 ) ? ' class="current"' : '';
-            $views[1] = "<a href='{$this_url}' {$class} >" . __( 'Last week', 'search-analytics' ) . "</a>";
+            $views[1] = "<a href='$this_url' $class >" . __( 'Last week', 'search-analytics' ) . "</a>";
 
             $this_url = add_query_arg( 'period_view', 2 );
             $class    = ( $current == 2 ) ? ' class="current"' : '';
-            $views[2] = "<a href='{$this_url}' {$class} >" . __( 'Last month', 'search-analytics' ) . "</a>";
+            $views[2] = "<a href='$this_url' $class >" . __( 'Last month', 'search-analytics' ) . "</a>";
 
             $this_url = remove_query_arg( 'period_view' );
             $class    = ( $current == 3 ) ? ' class="current"' : '';
-            $views[3] = "<a href='{$this_url}' {$class} >" . __( 'All time', 'search-analytics' ) . "</a>";
+            $views[3] = "<a href='$this_url' $class >" . __( 'All time', 'search-analytics' ) . "</a>";
 
             $this->format_views_list( $views );
         }
@@ -356,15 +369,15 @@ if ( ! class_exists( 'MWTSA_Stats_Table' ) ) :
 
             $class    = ( $current == 0 ) ? ' class="current"' : '';
             $this_url = remove_query_arg( 'results_view' );
-            $views[0] = "<a href='{$this_url}' {$class} >" . __( 'All', 'search-analytics' ) . "</a>";
+            $views[0] = "<a href='$this_url' $class >" . __( 'All', 'search-analytics' ) . "</a>";
 
             $this_url = add_query_arg( 'results_view', 1 );
             $class    = ( $current == 1 ) ? ' class="current"' : '';
-            $views[1] = "<a href='{$this_url}' {$class} >" . __( 'Only With Results', 'search-analytics' ) . "</a>";
+            $views[1] = "<a href='$this_url' $class >" . __( 'Only With Results', 'search-analytics' ) . "</a>";
 
             $this_url = add_query_arg( 'results_view', 2 );
             $class    = ( $current == 2 ) ? ' class="current"' : '';
-            $views[2] = "<a href='{$this_url}' {$class} >" . __( 'Only Without Results', 'search-analytics' ) . "</a>";
+            $views[2] = "<a href='$this_url' $class >" . __( 'Only Without Results', 'search-analytics' ) . "</a>";
 
             $this->format_views_list( $views );
         }
@@ -375,11 +388,11 @@ if ( ! class_exists( 'MWTSA_Stats_Table' ) ) :
 
             $class    = ( $current == 0 ) ? ' class="current"' : '';
             $this_url = remove_query_arg( 'grouped_view' );
-            $views[0] = "<a href='{$this_url}' {$class} >" . __( 'Term', 'search-analytics' ) . "</a>";
+            $views[0] = "<a href='$this_url' $class >" . __( 'Term', 'search-analytics' ) . "</a>";
 
             $this_url = add_query_arg( 'grouped_view', 1 );
             $class    = ( $current == 1 ) ? ' class="current"' : '';
-            $views[1] = "<a href='{$this_url}' {$class} >" . __( 'No Group', 'search-analytics' ) . "</a>";
+            $views[1] = "<a href='$this_url' $class >" . __( 'No Group', 'search-analytics' ) . "</a>";
 
             $this->format_views_list( $views );
         }

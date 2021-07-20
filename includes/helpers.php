@@ -11,9 +11,7 @@ if ( ! function_exists( 'mwt_get_current_user_roles' ) ) {
     function mwt_get_current_user_roles() {
         if ( is_user_logged_in() ) {
             $user  = wp_get_current_user();
-            $roles = ( array ) $user->roles;
-
-            return $roles;
+            return ( array ) $user->roles;
         }
 
         return array();
@@ -23,9 +21,7 @@ if ( ! function_exists( 'mwt_get_current_user_roles' ) ) {
 if ( ! function_exists( 'mwt_get_user_roles' ) ) {
     function mwt_get_user_roles( $user ) {
         if ( ! empty( $user ) ) {
-            $roles = ( array ) $user->roles;
-
-            return $roles;
+            return ( array ) $user->roles;
         }
 
         return array();
@@ -108,9 +104,9 @@ if ( ! function_exists( 'wp_timezone_string' ) ) {
 
         $sign      = ( $offset < 0 ) ? '-' : '+';
         $abs_hour  = abs( $hours );
-        $abs_mins  = abs( $minutes * 60 );
+        $abs_minutes  = abs( $minutes * 60 );
 
-        return sprintf( '%s%02d:%02d', $sign, $abs_hour, $abs_mins );
+        return sprintf( '%s%02d:%02d', $sign, $abs_hour, $abs_minutes );
     }
 }
 

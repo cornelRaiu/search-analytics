@@ -23,7 +23,7 @@ if ( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
             add_action( 'admin_menu', array( $this, 'add_admin_menu' ) );
             add_action( 'admin_enqueue_scripts', array( $this, 'load_admin_assets' ) );
 
-            add_action( "load-{$this->view}", array( $this, 'add_screen_options' ) );
+            add_action( "load-$this->view", array( $this, 'add_screen_options' ) );
             add_filter( 'set-screen-option', array( $this, 'set_screen_options' ), 10, 3 );
 
             if ( empty( $_REQUEST['search-term'] ) && empty ( MWTSA_Options::get_option( 'mwtsa_hide_charts' ) ) ) {
@@ -113,9 +113,9 @@ if ( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
             }
 
             if ( ! empty( MWTSA_Options::get_option( 'mwtsa_save_search_by_user' ) ) ) {
-                wp_register_style( 'select2css', '//cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css', false, '1.0', 'all' );
+                wp_register_style( 'select2css', '//cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css', false, '4.0.13');
 
-                wp_enqueue_script( 'select2', '//cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js', array( 'jquery' ), '1.0', true );
+                wp_enqueue_script( 'select2', '//cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js', array( 'jquery' ), '4.0.13', true );
             }
 
             wp_register_style( 'mwtsa-datepicker-ui', '//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css', array(), '1.11.2' );
@@ -139,7 +139,7 @@ if ( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
                 <div class="mwtsa-2-col">
                     <div class="mwtsa-col-1">
                         <div class="col-content">
-                            <?php echo $stats_table->load_notices(); ?>
+                            <?php $stats_table->load_notices(); ?>
                             <?php echo $stats_table->this_title(); ?>
                             <div class="wp-clearfix">
                                 <span class="views-label"><?php _e( 'Time filters:', 'search-analytics' ) ?></span><?php $stats_table->display_time_views(); ?>

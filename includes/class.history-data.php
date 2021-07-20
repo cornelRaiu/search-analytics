@@ -170,17 +170,17 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
                         $user_id = '';
                     }
 
-                    $query = "SELECT t.id, t.term, {$count} {$results_count_col}, {$datetime} as last_search_date {$country} {$user_id}
-		                FROM {$mwtsa->terms_table_name} as t
-		                JOIN {$mwtsa->history_table_name} as h ON t.id = h.term_id
+                    $query = "SELECT t.id, t.term, $count $results_count_col, $datetime as last_search_date $country $user_id
+		                FROM $mwtsa->terms_table_name as t
+		                JOIN $mwtsa->history_table_name as h ON t.id = h.term_id
 		                $where
 		                $group_by
 		                $having
-		                ORDER BY {$order_by}";
+		                ORDER BY $order_by";
                 } else {
                     $query = "SELECT t.id, t.term, h.count_posts, `datetime` as last_search_date
-			                FROM {$mwtsa->terms_table_name} as t
-			                JOIN {$mwtsa->history_table_name} as h ON t.id = h.term_id
+			                FROM $mwtsa->terms_table_name as t
+			                JOIN $mwtsa->history_table_name as h ON t.id = h.term_id
 			                $where
 			                ORDER BY `datetime` DESC
 			                LIMIT 1";
@@ -222,9 +222,9 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
                     $additional_fields = ', COUNT( h.id ) as `count`';
                 }
 
-                $query = "SELECT h.count_posts as results_count, `datetime` {$additional_fields}
-			                FROM {$mwtsa->terms_table_name} as t
-			                JOIN {$mwtsa->history_table_name} as h ON t.id = h.term_id
+                $query = "SELECT h.count_posts as results_count, `datetime` $additional_fields
+			                FROM $mwtsa->terms_table_name as t
+			                JOIN $mwtsa->history_table_name as h ON t.id = h.term_id
 			                $where
 			                $group_by
 			                ORDER BY `datetime` DESC, results_count DESC";

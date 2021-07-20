@@ -305,7 +305,7 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
             ?>
             <label><input type='checkbox' name='mwtsa_settings[mwtsa_save_search_country]' value='1' <?php checked( $this->existing_options['mwtsa_save_search_country'], 1 ) ?> /> <?php _e( 'Save the country from where the search was launched', 'search-analytics' ) ?>
             </label><br/>
-            <strong><?php _e( 'NOTE: this uses the <a href="http://ip-api.com">http://ip-api.com</a> JSON service which is limited to 150 requests per minute. In case you have more than 150 searches per minute on the website, please uncheck this checkbox. <br />In case the site\'s IP got banned, you can go here: <a href="http://ip-api.com/docs/unban">http://ip-api.com/docs/unban</a> and remove the ban.<br />A future version of Search Analytics will come with support for the PRO service of IP-API.com<br /><br />Disclaimer: I am not associated with the IP-API.com service in any way. I am just using it for providing you a way of finding out where the users search content from on your website.', 'search-analytics' ) ?></strong>
+            <strong><?php _e( 'NOTE: this uses the <a href="https://ip-api.com">https://ip-api.com</a> JSON service which is limited to 150 requests per minute. In case you have more than 150 searches per minute on the website, please uncheck this checkbox. <br />In case the site\'s IP got banned, you can go here: <a href="https://ip-api.com/docs/unban">https://ip-api.com/docs/unban</a> and remove the ban.<br />A future version of Search Analytics will come with support for the PRO service of IP-API.com<br /><br />Disclaimer: I am not associated with the IP-API.com service in any way. I am just using it for providing you a way of finding out where the users search content from on your website.', 'search-analytics' ) ?></strong>
             <?php
         }
 
@@ -388,8 +388,8 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
             global $wpdb, $mwtsa;
 
             if ( $older_than == 0 ) {
-                $wpdb->query( "TRUNCATE `{$mwtsa->history_table_name}`" );
-                $wpdb->query( "TRUNCATE `{$mwtsa->terms_table_name}`" );
+                $wpdb->query( "TRUNCATE `$mwtsa->history_table_name`" );
+                $wpdb->query( "TRUNCATE `$mwtsa->terms_table_name`" );
             } else {
 
                 try {
@@ -397,7 +397,7 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
                     $_temp_date->sub( new DateInterval( 'P' . $older_than . 'D' ) );
                     $older_than_datetime = $_temp_date->format( 'Y-m-d H:i:s' );
 
-                    $wpdb->query( $wpdb->prepare( "DELETE FROM `{$mwtsa->history_table_name}` WHERE `datetime` < %s", $older_than_datetime ) );
+                    $wpdb->query( $wpdb->prepare( "DELETE FROM `$mwtsa->history_table_name` WHERE `datetime` < %s", $older_than_datetime ) );
 
                     //TODO: delete recorded terms that no longer have at least 1 entry in the history table ?
                 } catch ( Exception $e ) {
