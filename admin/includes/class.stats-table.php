@@ -135,7 +135,7 @@ if ( ! class_exists( 'MWTSA_Stats_Table' ) ) :
                 );
                 $wpdb->query(
                     $wpdb->prepare(
-                        "DELETE FROM $mwtsa->terms_table_name WHERE term_id IN ($terms_placeholders)",
+                        "DELETE FROM $mwtsa->history_table_name WHERE term_id IN ($terms_placeholders)",
                         $terms_to_delete
                     )
                 );
