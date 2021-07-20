@@ -18,7 +18,7 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 
             $this_user_role = mwt_get_current_user_roles();
 
-            $accepted_user_roles = array_intersect( $this_user_role, $this->existing_options['mwtsa_display_settings_for_role'] );
+            $accepted_user_roles = array_values( array_intersect( $this_user_role, $this->existing_options['mwtsa_display_settings_for_role'] ) );
 
             if ( ! isset( $this->existing_options['mwtsa_display_settings_for_role'] ) || ! empty( $accepted_user_roles ) ) {
 
