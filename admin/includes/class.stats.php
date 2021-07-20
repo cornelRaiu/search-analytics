@@ -133,6 +133,7 @@ if ( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
             global $mwtsa;
 
             $stats_table = ! empty( $_REQUEST['search-term'] ) ? new MWTSA_Term_Stats_Table() : new MWTSA_Stats_Table();
+            $is_delete = ( ! empty( $_REQUEST['action'] ) && 'delete' == $_REQUEST['action'] );
 
             ?>
             <div class="wrap mwtsa-wrapper">
@@ -141,21 +142,23 @@ if ( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
                         <div class="col-content">
                             <?php $stats_table->load_notices(); ?>
                             <?php echo $stats_table->this_title(); ?>
-                            <div class="wp-clearfix">
-                                <span class="views-label"><?php _e( 'Time filters:', 'search-analytics' ) ?></span><?php $stats_table->display_time_views(); ?>
-                            </div>
-                            <div class="wp-clearfix">
-                                <span class="views-label"><?php _e( 'Results filters:', 'search-analytics' ) ?></span><?php $stats_table->display_results_views(); ?>
-                            </div>
+                            <?php if ( ! $is_delete ) : ?>
+                                <div class="wp-clearfix">
+                                    <span class="views-label"><?php _e( 'Time filters:', 'search-analytics' ) ?></span><?php $stats_table->display_time_views(); ?>
+                                </div>
+                                <div class="wp-clearfix">
+                                    <span class="views-label"><?php _e( 'Results filters:', 'search-analytics' ) ?></span><?php $stats_table->display_results_views(); ?>
+                                </div>
 
-                            <?php if ( ! empty( $_REQUEST['search-term'] ) ) : ?>
-                                <div class="wp-clearfix">
-                                    <span class="views-label"><?php _e( 'Group By:', 'search-analytics' ) ?></span><?php $stats_table->display_group_views(); ?>
-                                </div>
-                            <?php else : ?>
-                                <div class="wp-clearfix">
-                                    <span class="views-label"><?php _e( 'Group By:', 'search-analytics' ) ?></span><?php $stats_table->display_results_grouping(); ?>
-                                </div>
+                                <?php if ( ! empty( $_REQUEST['search-term'] ) ) : ?>
+                                    <div class="wp-clearfix">
+                                        <span class="views-label"><?php _e( 'Group By:', 'search-analytics' ) ?></span><?php $stats_table->display_group_views(); ?>
+                                    </div>
+                                <?php else : ?>
+                                    <div class="wp-clearfix">
+                                        <span class="views-label"><?php _e( 'Group By:', 'search-analytics' ) ?></span><?php $stats_table->display_results_grouping(); ?>
+                                    </div>
+                                <?php endif; ?>
                             <?php endif; ?>
                             <?php $stats_table->prepare_items(); ?>
 
