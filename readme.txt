@@ -78,7 +78,10 @@ You can use the [Support Forum](https://wordpress.org/support/plugin/search-anal
 == Changelog ==
 = 1.3.6 =
 * Bugfix: Users can not see the statistics page in some cases. [Bug report](https://github.com/cornelRaiu/search-analytics/issues/3)
-* Optimization: **compatibility with WP versions up to 5.8**
+* Optimization: **Compatibility with WP versions up to 5.8**
+* Optimization: Security improvements and general code optimization
+* Others: Add more "Useful Links"
+* Others: Add quick rate tool
 
 = 1.3.5 =
 * Bugfix: Fix dates filter not allowing you to select the current day in certain timezones
@@ -224,4 +227,4 @@ You can use the [Support Forum](https://wordpress.org/support/plugin/search-anal
 == Upgrade Notice ==
 
 = 1.3.5 =
-Add support for WpForo, fix 2 bugs, prepare the plugin for community translation and add a shortcode for displaying stats in the frontend
+Ensured full compatibility with WP versions up to 5.8 and other bugfixes and optimizations
