@@ -2,9 +2,9 @@
 Contributors: cornel.raiu
 Tags: search, analytics, statistics, history
 Requires at least: 4.4.0
-Tested up to: 5.7
+Tested up to: 5.8
 Requires PHP: 5.6
-Stable tag: 1.3.5
+Stable tag: 1.3.6
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -76,6 +76,10 @@ Yes. You can visit the plugin's [Trello Board](https://trello.com/b/MvIWInjW). T
 You can use the [Support Forum](https://wordpress.org/support/plugin/search-analytics) or open new issues on the GitHub repository: [Search Analytics](https://github.com/cornelRaiu/search-analytics).
 
 == Changelog ==
+= 1.3.6 =
+* Bugfix: Users can not see the statistics page in some cases. [Bug report](https://github.com/cornelRaiu/search-analytics/issues/3)
+* Optimization: **compatibility with WP versions up to 5.8**
+
 = 1.3.5 =
 * Bugfix: Fix dates filter not allowing you to select the current day in certain timezones
 * Bugfix: Deleting multiple entries with the bulk action would trigger 2 notices
