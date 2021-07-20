@@ -12,9 +12,9 @@ if ( ! class_exists( 'MWTSA_Term_Stats_Table' ) ) :
      */
     class MWTSA_Term_Stats_Table extends MWTSA_Stats_Table {
 
-        var $term_id = 0;
-        var $term_data = [];
-        var $is_grouped = false;
+        public $term_id = 0;
+        public $term_data = [];
+        public $is_grouped = false;
 
         public function __construct( $args = [] ) {
             $this->term_id   = absint( $_REQUEST['search-term'] );
@@ -24,8 +24,12 @@ if ( ! class_exists( 'MWTSA_Term_Stats_Table' ) ) :
                 $this->is_grouped = true;
             }
 
+            $title = ( ! empty( $_REQUEST['action'] ) && 'delete' == $_REQUEST['action'] ) ?
+                        __( 'Terms Deleted', 'search-analytics' ) :
+                        __( 'Term `' . $this->term_data['term'] . '` Search Statistics', 'search-analytics' );
+
             parent::__construct( [
-                'title' => __( 'Term `' . $this->term_data['term'] . '` Search Statistics', 'search-analytics' ),
+                'title' => $title,
                 'ajax'  => false
             ] );
         }

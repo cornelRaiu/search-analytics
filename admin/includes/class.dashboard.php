@@ -65,7 +65,7 @@ if ( ! class_exists( 'MWTSA_Dashboard' ) ) {
             echo '</ul>';
         }
 
-        public function add_plugin_meta_links($meta_fields, $file){
+        public static function add_plugin_meta_links($meta_fields, $file){
             if ( $file == 'search-analytics/mwt-search-analytics.php' ) {
 
                 $meta_fields[] = "<a href='" . MWTSA_WORDPRESS_URL . "' target='_blank'>" . esc_html__( 'Support Forum', 'search-analytics' ) . "</a>";
