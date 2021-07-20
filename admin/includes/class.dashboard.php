@@ -64,5 +64,33 @@ if ( ! class_exists( 'MWTSA_Dashboard' ) ) {
 
             echo '</ul>';
         }
+
+        public function add_plugin_meta_links($meta_fields, $file){
+            if($file == 'search-analytics/mwt-search-analytics.php') {
+
+                $meta_fields[] = "<a href='" . MWTSA_WORDPRESS_URL . "' target='_blank'>" . esc_html__( 'Support Forum', 'search-analytics' ) . "</a>";
+                $svg = "<svg xmlns='http://www.w3.org/2000/svg' width='15' height='15' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='feather feather-star'><polygon points='12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2'/></svg>";
+
+                $stars = '<i class="mwtsa-rate-stars">';
+
+                for ( $i = 1; $i <= 5; $i++ ) {
+                    $stars .= '<a href="' . MWTSA_WORDPRESS_URL . '/reviews/?rate=' . $i . '#new-post" target="_blank">' . $svg . '</a>';
+                }
+
+                $stars .= '</i>';
+
+                $meta_fields[] = $stars;
+
+                echo "<style>"
+                     .".mwtsa-rate-stars{display:inline-block;color:#ffb900;position:relative;top:3px;}"
+                     .".mwtsa-rate-stars a {color:#ffb900;}"
+                     .".mwtsa-rate-stars a svg{fill:#ffb900;}"
+                     .".mwtsa-rate-stars a:hover svg{fill:#ffb900}"
+                     .".mwtsa-rate-stars a:hover ~ a svg {fill:none;}"
+                     ."</style>";
+            }
+
+            return $meta_fields;
+        }
     }
 }

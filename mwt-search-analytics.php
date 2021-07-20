@@ -14,6 +14,10 @@ License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
 defined("ABSPATH") || exit;
 
+if ( ! defined( 'MWTSA_WORDPRESS_URL' ) ) {
+    define( 'MWTSA_WORDPRESS_URL', 'https://wordpress.org/support/plugin/search-analytics' );
+}
+
 if ( ! class_exists( 'MWTSA' ) ) {
 
     final class MWTSA {
