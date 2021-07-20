@@ -2,7 +2,7 @@
 Contributors: cornel.raiu
 Tags: search, analytics, statistics, history
 Requires at least: 4.4.0
-Tested up to: 5.5.3
+Tested up to: 5.7
 Requires PHP: 5.6
 Stable tag: 1.3.5
 License: GPLv3 or later
