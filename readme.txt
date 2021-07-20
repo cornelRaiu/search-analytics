@@ -78,8 +78,10 @@ You can use the [Support Forum](https://wordpress.org/support/plugin/search-anal
 == Changelog ==
 = 1.3.6 =
 * Bugfix: Users can not see the statistics page in some cases. [Bug report](https://github.com/cornelRaiu/search-analytics/issues/3)
+* Bugfix: Database error on term delete success page
 * Optimization: **Compatibility with WP versions up to 5.8**
 * Optimization: Security improvements and general code optimization
+* Optimization: Remove filters and groups on the term delete success page
 * Others: Add more "Useful Links"
 * Others: Add quick rate tool
 
