@@ -197,18 +197,22 @@ if ( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
 
                             <p><?php echo sprintf( __( 'New in version %s', 'search-analytics' ), $mwtsa->version ); ?></p>
                             <ul class="changelog-list">
-                                <li>Bugfix: Fix dates filter not allowing you to select the current day in certain timezones</li>
-                                <li>Bugfix: Deleting multiple entries with the bulk action would trigger 2 notices</li>
-                                <li>Feature: Add support for <a href="https://wordpress.org/plugins/wpforo/">WpForo</a></li>
-                                <li>Feature: Add <strong>mwtsa_export_filename</strong> filter to allow control over the filename generated when exporting data</li>
-                                <li>Feature: Add shortcode <strong>mwtsa_display_search_stats</strong> for displaying search statistics on the frontend of the website</li>
-                                <li>Optimization: Prepare the plugin for community translation</li>
+                                <li>Bugfix: Users can not see the statistics page in some cases. <a href="https://github.com/cornelRaiu/search-analytics/issues/3">Bug Report</a></li>
+                                <li>Optimization: <strong>Compatibility with WP versions up to 5.8</strong></li>
                                 <li>Optimization: Security improvements and general code optimization</li>
+                                <li>Others: Add more "Useful Links"</li>
+                                <li>Others: Add quick rate tool</li>
                             </ul>
                             <h3><?php _e( 'Useful Links', 'search-analytics' ) ?></h3>
                             <ul>
                                 <li>
                                     <a href="options-general.php?page=mwt-search-analytics"><?php _e( 'Settings Page', 'search-analytics' ) ?></a>
+                                </li>
+                                <li>
+                                    <a href="<?php echo MWTSA_WORDPRESS_URL ?>"><?php _e( 'Support Forum', 'search-analytics' ) ?></a>
+                                </li>
+                                <li style="font-weight: bold">
+                                    <a href="<?php echo MWTSA_WORDPRESS_URL ?>/reviews/#new-post"><?php _e( 'Rate and review Search Analytics', 'search-analytics' ) ?></a>
                                 </li>
                             </ul>
                         </div>
