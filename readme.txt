@@ -33,6 +33,7 @@ Help and/or ideas are greatly appreciated! You can contribute to the GitHub repo
 * Dashboard widget for a quick glance over your last week's search stats
 * **Multisite compatible**
 * Country Geolocation
+* Display search statistics on the front of your website using shortcodes
 
 == Installation ==
 Search Analytics can be installed via the WordPress Automatic Plugin Install page in the admin panel.
@@ -70,9 +71,9 @@ Before uninstalling, you should go to the plugin's settings page and check the "
 
 Yes. You can visit the plugin's [Trello Board](https://trello.com/b/MvIWInjW). This should give you an overview on my plans regarding this plugin.
 
-= Where can I make feature requests? =
+= Where can I make feature requests or report bugs? =
 
-For now, you can use the [Support Forum](https://wordpress.org/support/plugin/search-analytics). I will be adding a feature request/voting system to my website soon so everything will be kept in there.
+You can use the [Support Forum](https://wordpress.org/support/plugin/search-analytics) or open new issues on the GitHub repository: [Search Analytics](https://github.com/cornelRaiu/search-analytics).
 
 == Changelog ==
 = 1.3.5 =
@@ -80,7 +81,9 @@ For now, you can use the [Support Forum](https://wordpress.org/support/plugin/se
 * Bugfix: Deleting multiple entries with the bulk action would trigger 2 notices
 * Feature: Add support for WpForo
 * Feature: Add **mwtsa_export_filename** filter to allow control over the filename generated when exporting data
+* Feature: Add shortcode **mwtsa_display_search_stats** for displaying search statistics on the frontend of the website
 * Optimization: Prepare the plugin for community translation
+* Optimization: Security improvements and general code optimization
 
 = 1.3.4 Hotfix =
 * Bugfix: Fix fatal error for missing `wp_timezone()` in WP < 5.3.0

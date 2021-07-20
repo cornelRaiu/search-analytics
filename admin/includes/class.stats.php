@@ -197,7 +197,13 @@ if ( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
 
                             <p><?php echo sprintf( __( 'New in version %s', 'search-analytics' ), $mwtsa->version ); ?></p>
                             <ul class="changelog-list">
-                                <li>Bugfix: Fix fatal error for missing `wp_timezone()` in WP < 5.3.0</li>
+                                <li>Bugfix: Fix dates filter not allowing you to select the current day in certain timezones</li>
+                                <li>Bugfix: Deleting multiple entries with the bulk action would trigger 2 notices</li>
+                                <li>Feature: Add support for <a href="https://wordpress.org/plugins/wpforo/">WpForo</a></li>
+                                <li>Feature: Add <strong>mwtsa_export_filename</strong> filter to allow control over the filename generated when exporting data</li>
+                                <li>Feature: Add shortcode <strong>mwtsa_display_search_stats</strong> for displaying search statistics on the frontend of the website</li>
+                                <li>Optimization: Prepare the plugin for community translation</li>
+                                <li>Optimization: Security improvements and general code optimization</li>
                             </ul>
                             <h3><?php _e( 'Useful Links', 'search-analytics' ) ?></h3>
                             <ul>

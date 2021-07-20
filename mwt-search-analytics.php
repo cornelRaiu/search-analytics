@@ -20,7 +20,6 @@ if ( ! class_exists( 'MWTSA' ) ) {
 
         public $version = '1.3.5';
         public $db_version = '1.1.1';
-        public $text_domain = 'search-analytics';
 
         public $plugin_dir;
         public $plugin_url;
@@ -47,11 +46,11 @@ if ( ! class_exists( 'MWTSA' ) ) {
         }
 
         public function __clone() {
-            _doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', $this->text_domain ), $this->version );
+            _doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'search-analytics' ), $this->version );
         }
 
         public function __wakeup() {
-            _doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', $this->text_domain ), $this->version );
+            _doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'search-analytics' ), $this->version );
         }
 
         public function __construct() {
@@ -114,7 +113,7 @@ if ( ! class_exists( 'MWTSA' ) ) {
         }
 
         public function load_plugin_textdomain() {
-            load_plugin_textdomain( $this->text_domain, false, $this->plugin_dir . 'languages/' );
+            load_plugin_textdomain( 'search-analytics', false, $this->plugin_dir . 'languages/' );
         }
     }
 

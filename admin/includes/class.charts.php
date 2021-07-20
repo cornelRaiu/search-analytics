@@ -129,7 +129,7 @@ if ( ! class_exists( 'MWTSA_Admin_Charts' ) ) {
                       $set = implode( '", "', $set );
                       ?>
                     {
-                      label: "<?php echo ( ( $k == 1 ) ? __( 'Previous', 'search-analytics' ) : __( 'Current', 'search-analytics' ) ) . ' ' . __( 'Period' ) ?>",
+                      label: "<?php echo $k == 1 ? __( 'Previous Period', 'search-analytics' ) : __( 'Current Period', 'search-analytics' ) ?>",
                       data: ["<?php echo $set ?>"],
                       borderColor: [
                         "<?php echo ( $k == 1 ) ? 'rgba(0,0,0,1)' : 'rgba(255,99,132,1)' ?>"
