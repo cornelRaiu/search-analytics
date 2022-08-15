@@ -103,18 +103,21 @@ if ( ! class_exists( 'MWTSA' ) ) {
 
         public function add_actions_and_filters() {
             add_action( 'init', array( $this, 'load_plugin_textdomain' ) );
-            add_action( 'wp_insert_site', array( 'MWTSA_Install', 'activation' ) );
+	        add_action( 'init', array( 'MWTSA_Cookies', 'clear_expired_search_history' ) );
+	        add_action( 'init', array( 'MWTSA_Display_Search_Stats_Shortcode', 'init' ) );
+
+            add_action( 'rest_api_init', array( 'MWTSA_Process_Query', 'process_rest_api_search_term_action' ), 20 );
 
             add_action( 'wp', array( 'MWTSA_Process_Query', 'process_search_term_action' ), 20 );
+
             add_action( 'wpforo_search_result_after', array(
                 'MWTSA_Process_Query',
                 'process_wpforo_search_term_action'
             ), 20, 4 );
 
+	        add_action( 'wp_insert_site', array( 'MWTSA_Install', 'activation' ) );
             add_action( 'wp_login', array( 'MWTSA_Cookies', 'set_is_excluded_cookie_if_needed' ), 10, 2 );
-            add_action( 'init', array( 'MWTSA_Cookies', 'clear_expired_search_history' ) );
 
-            add_action('init', [ 'MWTSA_Display_Search_Stats_Shortcode', 'init'] );
         }
 
         public function load_plugin_textdomain() {
