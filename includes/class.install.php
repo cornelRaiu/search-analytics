@@ -6,7 +6,17 @@ if ( ! class_exists( 'MWTSA_Install' ) ) {
     class MWTSA_Install {
 
         public static function activation( $network_wide ) {
-            global $wpdb;
+	        global $wpdb, $wp_version;
+
+	        if (version_compare(PHP_VERSION, '5.6', '<')) {
+		        deactivate_plugins(plugin_basename(__FILE__));
+		        wp_die(__('WP Search Analytics cannot be activated. The plugin requires PHP 5.6 or higher', 'search-analytics'));
+	        }
+
+	        if (version_compare($wp_version, '4.4', '<')) {
+		        deactivate_plugins(plugin_basename(__FILE__));
+		        wp_die(__('WP Search Analytics cannot be activated. The plugin requires WordPress 4.4 or higher', 'search-analytics'));
+	        }
 
             if ( $network_wide ) {
 
