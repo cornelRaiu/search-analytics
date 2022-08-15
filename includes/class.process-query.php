@@ -8,36 +8,75 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
         public static function process_wpforo_search_term_action( $args, $items_count, $posts, $sql ) {
             $process = new self();
 
+	        if ( apply_filters( 'mwtsa_wpforo_do_not_save_search', false ) ) {
+		        return;
+	        }
+
             $process->process_search_term( $args['needle'], $items_count );
         }
+
+	    public static function process_rest_api_search_term_action() {
+		    $process = new self();
+
+		    $custom_search_value = $process->get_custom_search_value();
+
+			if ( apply_filters( 'mwtsa_rest_api_do_not_save_search', $custom_search_value === '' ) ) {
+				return;
+			}
+
+			$result_count = apply_filters( 'mwtsa_rest_api_result_count', 0 );
+
+			if ( $result_count === 0 ) {
+			    $args = array(
+				    'posts_per_page' => -1,
+				    'post_status'    => 'publish',
+					'post_type'      => 'any',
+				    'offset'         => 0,
+					'fields'         => 'ids',
+				    's'              => $custom_search_value,
+			    );
+
+			    $posts = get_posts( apply_filters( 'mwtsa_rest_api_posts_count_args', $args ) );
+
+				if ( $posts ) {
+					$result_count = count( $posts );
+				}
+			}
+
+		    $process->process_search_term( $custom_search_value, $result_count );
+		}
 
         public static function process_search_term_action() {
             global $wp_query;
 
             $process = new self();
 
-            $exclude_custom_search_params = MWTSA_Options::get_option( 'mwtsa_custom_search_url_params' );
+            $custom_search_value = $process->get_custom_search_value();
 
-            $custom_search_value = '';
-            if ( ! empty( $exclude_custom_search_params ) ) {
-                $custom_search_params = array_map( 'trim', explode( ',', $exclude_custom_search_params ) );
-                foreach ( $custom_search_params as $param ) {
-                    if ( ! empty( $_REQUEST[ $param ] ) ) {
-                        $custom_search_value = $_REQUEST[ $param ];
-                    }
-                }
-            }
-
-            if ( ( ! is_search() && $custom_search_value == '' ) || is_admin() ) {
-                return false;
+            if ( apply_filters( 'mwtsa_do_not_save_search', ( ! is_search() && $custom_search_value == '' ) || is_admin() ) ) {
+                return;
             }
 
             $search_term = $custom_search_value != '' ? $custom_search_value : get_search_query();
 
-            $process->process_search_term( $search_term, $wp_query->found_posts );
-
-            return true;
+            $process->process_search_term( $search_term, apply_filters( 'mwtsa_result_count', $wp_query->found_posts ) );
         }
+
+	    public function get_custom_search_value() {
+		    $exclude_custom_search_params = MWTSA_Options::get_option( 'mwtsa_custom_search_url_params' );
+
+		    $custom_search_value = '';
+		    if ( ! empty( $exclude_custom_search_params ) ) {
+			    $custom_search_params = array_map( 'trim', explode( ',', $exclude_custom_search_params ) );
+			    foreach ( $custom_search_params as $param ) {
+				    if ( ! empty( $_REQUEST[ $param ] ) ) {
+					    $custom_search_value = $_REQUEST[ $param ];
+				    }
+			    }
+		    }
+
+			return sanitize_text_field( $custom_search_value );
+		}
 
         public function process_search_term( $search_term, $count ) {
             $exclude_search_for_roles = MWTSA_Options::get_option( 'mwtsa_exclude_search_for_role' );
@@ -142,6 +181,7 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
             global $wpdb, $mwtsa;
 
             //make sure db is up to date
+	        // TODO: move this away
             MWTSA_Install::activate_single_site();
 
             //1. add/update term string
