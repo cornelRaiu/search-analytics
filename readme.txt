@@ -1,10 +1,10 @@
-=== Search Analytics ===
+=== WP Search Analytics ===
 Contributors: cornel.raiu
 Tags: search, analytics, statistics, history
 Requires at least: 4.4.0
-Tested up to: 5.8
+Tested up to: 6.0.1
 Requires PHP: 5.6
-Stable tag: 1.3.6
+Stable tag: 1.3.7
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
