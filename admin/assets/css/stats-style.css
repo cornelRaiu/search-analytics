@@ -14,7 +14,7 @@
 
 .mwtsa-wrapper .changelog-list li { font-size: 12px; }
 
-.mwtsa-wrapper .views-label { float: left;margin: 8px 10px 0 0;font-size: 13px;padding: 0;line-height: 2; }
+.mwtsa-wrapper .views-label { margin: 8px 10px 0 0;font-size: 13px;padding: 0;line-height: 2; }
 
 .mwtsa-wrapper .date-interval { display: inline-flex; align-items: center }
 
@@ -49,6 +49,14 @@
 }
 
 .mwtsa-wrapper .select2-choice span.select2-arrow { display: none; }
+
+.mwtsa-filters-groups-wrapper > div {
+	display: flex;
+}
+
+.mwtsa-filters-groups-wrapper .subsubsub {
+	float: none;
+}
 
 @media only screen and ( max-width: 960px ) {
 	.mwtsa-2-col { margin-right: 0; }

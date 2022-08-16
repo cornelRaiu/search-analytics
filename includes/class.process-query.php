@@ -36,7 +36,7 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 				    's'              => $custom_search_value,
 			    );
 
-			    $posts = get_posts( apply_filters( 'mwtsa_rest_api_posts_count_args', $args ) );
+			    $posts = get_posts( apply_filters( 'mwtsa_rest_api_posts_count_query_args', $args ) );
 
 				if ( $posts ) {
 					$result_count = count( $posts );
