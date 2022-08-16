@@ -6,10 +6,10 @@ if ( ! class_exists( 'MWTSA_Options' ) ) {
     class MWTSA_Options {
 
         public static $option_name = 'mwtsa_settings';
-        public static $existing_options;
+        public static $existing_options = array();
 
         public static function init_options() {
-            self::$existing_options = get_option( self::$option_name );
+            self::$existing_options = get_option( self::$option_name, array() );
 
             $options = array(
                 'mwtsa_display_stats_for_role'               => [
@@ -33,9 +33,9 @@ if ( ! class_exists( 'MWTSA_Options' ) ) {
                 'chart_default_range'      => '2w'
             );
 
-            foreach ( $options as $k => $o ) {
-                if ( ! isset( self::$existing_options[ $k ] ) ) {
-                    self::$existing_options[ $k ] = $o;
+            foreach ( $options as $key => $option ) {
+                if ( ! isset( self::$existing_options[ $key ] ) ) {
+                    self::$existing_options[ $key ] = $option;
                 }
             }
         }
