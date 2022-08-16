@@ -8,7 +8,7 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
         public static function process_wpforo_search_term_action( $args, $items_count, $posts, $sql ) {
             $process = new self();
 
-	        if ( apply_filters( 'mwtsa_wpforo_do_not_save_search', false ) ) {
+	        if ( apply_filters( 'mwtsa_wpforo_do_not_save_search', false, $args['needle'] ) ) {
 		        return;
 	        }
 
@@ -20,11 +20,11 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 
 		    $custom_search_value = $process->get_custom_search_value();
 
-			if ( apply_filters( 'mwtsa_rest_api_do_not_save_search', $custom_search_value === '' ) ) {
+			if ( apply_filters( 'mwtsa_rest_api_do_not_save_search', $custom_search_value === '', $custom_search_value ) ) {
 				return;
 			}
 
-			$result_count = apply_filters( 'mwtsa_rest_api_result_count', 0 );
+			$result_count = apply_filters( 'mwtsa_rest_api_result_count', 0, $custom_search_value );
 
 			if ( $result_count === 0 ) {
 			    $args = array(
@@ -53,13 +53,13 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 
             $custom_search_value = $process->get_custom_search_value();
 
-            if ( apply_filters( 'mwtsa_do_not_save_search', ( ! is_search() && $custom_search_value == '' ) || is_admin() ) ) {
+            if ( apply_filters( 'mwtsa_do_not_save_search', ( ! is_search() && $custom_search_value == '' ) || is_admin(), $custom_search_value ) ) {
                 return;
             }
 
             $search_term = $custom_search_value != '' ? $custom_search_value : get_search_query();
 
-            $process->process_search_term( $search_term, apply_filters( 'mwtsa_result_count', $wp_query->found_posts ) );
+            $process->process_search_term( $search_term, apply_filters( 'mwtsa_result_count', $wp_query->found_posts, $search_term ) );
         }
 
 	    public function get_custom_search_value() {
@@ -133,7 +133,7 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
                 }
             }
 
-            if ( apply_filters( 'mwtsa_extra_exclude_conditions', false ) ) {
+            if ( apply_filters( 'mwtsa_extra_exclude_conditions', false, $search_term ) ) {
                 return false;
             }
 
