@@ -8,16 +8,16 @@ Stable tag: 1.4.0
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
-Search Analytics will store and display the search terms used on your website. No third-party service is used!
+WP Search Analytics will store and display the search terms used on your website. No third-party service is used!
 
 == Description ==
-Search Analytics will keep history of the search terms used by your users and group them in a set of statistics including the number of posts resulted from that search term.
+WP Search Analytics will keep history of the search terms used by your users and group them in a set of statistics including the number of posts resulted from that search term.
 
 It can easily aid you in finding what your users are really searching for on your website and make sure you provide exactly what they need.
 
-Help and/or ideas are greatly appreciated! You can contribute to the GitHub repository: [Search Analytics](https://github.com/cornelRaiu/search-analytics)
+Help and/or ideas are greatly appreciated! You can contribute to the GitHub repository: [WP Search Analytics](https://github.com/cornelRaiu/search-analytics)
 
-**NOTE: Search Analytics stores all the statistics in your WordPress database. No info is sent to third-party services!**
+**NOTE: WP Search Analytics stores all the statistics in your WordPress database. No info is sent to third-party services!**
 
 = Features =
 * Record all the search queries made using the **standard WordPress search form**.
@@ -36,7 +36,7 @@ Help and/or ideas are greatly appreciated! You can contribute to the GitHub repo
 * Display search statistics on the front of your website using shortcodes
 
 == Installation ==
-Search Analytics can be installed via the WordPress Automatic Plugin Install page in the admin panel.
+WP Search Analytics can be installed via the WordPress Automatic Plugin Install page in the admin panel.
 It can also be downloaded from the WordPress Plugin Directory and installed manually.
 
 After the installation and activation is complete you should visit the plugin's settings page ( Settings -> MWT: Search Analytics ) to make sure it is properly configured for your needs.
@@ -55,7 +55,7 @@ After the installation and activation is complete you should visit the plugin's 
 
 = The search history on my website is not being saved =
 
-Please make sure you use the standard WordPress search functionality. In V1.3 there will be some functions added to aid other methods into inserting data in the history tables.
+The plugin works with the standard WordPress search functionality by default. However, if you need to you can add custom search queries in the plugin's settings or, why not, programmatically add searches to the plugin's database tables to be displayed in the admin panel. For other requirements, please use the [Support Forum](https://wordpress.org/support/plugin/search-analytics) or open new issues on the GitHub repository: [WP Search Analytics](https://github.com/cornelRaiu/search-analytics).
 
 = The shortcode is not displaying the stats in widgets
 
@@ -67,15 +67,23 @@ For enabling the shortcodes in widgets you need to add the following code in you
 
 Before uninstalling, you should go to the plugin's settings page and check the "Remove plugin tables on uninstall" setting. After doing that, deactivating the plugin should also remove all tables from the database.
 
-= Is there any development roadmap for the plugin? =
-
-Yes. You can visit the plugin's [Trello Board](https://trello.com/b/MvIWInjW). This should give you an overview on my plans regarding this plugin.
-
 = Where can I make feature requests or report bugs? =
 
-You can use the [Support Forum](https://wordpress.org/support/plugin/search-analytics) or open new issues on the GitHub repository: [Search Analytics](https://github.com/cornelRaiu/search-analytics).
+You can use the [Support Forum](https://wordpress.org/support/plugin/search-analytics) or open new issues on the GitHub repository: [WP Search Analytics](https://github.com/cornelRaiu/search-analytics).
 
 == Changelog ==
+= 1.4.0 =
+* Feature: Add REST API search support
+* Feature: Add 9 filters for developers to be able to extend the plugin. An overview post will be published here: [Search Analytics: Filters Reference](https://www.cornelraiu.com/search-analytics-filters-reference/)
+* Optimization: Add the search term to the **mwtsa_extra_exclude_conditions** filter
+* Optimization: Check for minimum PHP and WP versions when activating the plugin
+* Optimization: **Compatibility with WP versions up to 6.0.1**
+* Optimization: **Compatibility with PHP v8.1**
+* Optimization: Security improvements and general code optimization
+* Bugfix: Fix styling on WP 4.4.0 - 4.9.20
+* Bugfix: Fix broken settings page URL from the results page
+* Others: Rename the plugin to "WP Search Analytics"
+
 = 1.3.6 =
 * Bugfix: Users can not see the statistics page in some cases. [Bug report](https://github.com/cornelRaiu/search-analytics/issues/3)
 * Bugfix: Database error on term delete success page
@@ -229,5 +237,5 @@ You can use the [Support Forum](https://wordpress.org/support/plugin/search-anal
 
 == Upgrade Notice ==
 
-= 1.3.5 =
-Ensured full compatibility with WP versions up to 5.8 and with PHP versions 5.6 to 8.0 and other bugfixes and optimizations
+= 1.4.0 =
+Full compatibility with WP versions up to 6.0.1 and with PHP versions 5.6 to 8.1, added support for REST API search tracking, introduced 9 new filters for manipulating the way the plugin works and other improvements.
