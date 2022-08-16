@@ -206,19 +206,21 @@ if ( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
 
                             <p><?php echo sprintf( __( 'New in version %s', 'search-analytics' ), $mwtsa->version ); ?></p>
                             <ul class="changelog-list">
-                                <li>Bugfix: Users can not see the statistics page in some cases. <a href="https://github.com/cornelRaiu/search-analytics/issues/3">Bug Report</a></li>
-                                <li>Bugfix: Database error on term delete success page</li>
-                                <li>Optimization: <strong>Compatibility with WP versions up to 5.8</strong></li>
-                                <li>Optimization: <strong>Compatibility with PHP versions between 5.6 - 8.0</strong></li>
+                                <li>Feature: <strong>Add REST API search support</strong></li>
+                                <li>Feature: <strong>Add 9 filters</strong> for developers to be able to extend the plugin. An overview post will be published soon here: <a href="https://www.cornelraiu.com/search-analytics-filters-reference/">Search Analytics: Filters Reference</a></li>
+                                <li>Optimization: Add the search term to the <strong>mwtsa_extra_exclude_conditions</strong> filter</li>
+                                <li>Optimization: Check for minimum PHP and WP versions when activating the plugin</li>
+                                <li>Optimization: <strong>Compatibility with WP versions up to 6.0.1</strong></li>
+                                <li>Optimization: <strong>Compatibility with PHP v8.1</strong></li>
                                 <li>Optimization: Security improvements and general code optimization</li>
-                                <li>Optimization: Remove filters and groups on the term delete success page</li>
-                                <li>Others: Add more "Useful Links"</li>
-                                <li>Others: Add quick rate tool</li>
+                                <li>Bugfix: Fix styling on WP 4.4.0 - 4.9.20</li>
+                                <li>Bugfix: Fix broken settings page URL from the results page</li>
+                                <li>Others: Rename the plugin to "WP Search Analytics"</li>
                             </ul>
                             <h3><?php _e( 'Useful Links', 'search-analytics' ) ?></h3>
                             <ul>
                                 <li>
-                                    <a href="options-general.php?page=mwt-search-analytics"><?php _e( 'Settings Page', 'search-analytics' ) ?></a>
+                                    <a href="options-general.php?page=search-analytics"><?php _e( 'Settings Page', 'search-analytics' ) ?></a>
                                 </li>
                                 <li>
                                     <a href="<?php echo MWTSA_WORDPRESS_URL ?>"><?php _e( 'Support Forum', 'search-analytics' ) ?></a>
