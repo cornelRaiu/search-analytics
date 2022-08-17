@@ -206,27 +206,22 @@ if ( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
 
                             <p><?php echo sprintf( __( 'New in version %s', 'search-analytics' ), $mwtsa->version ); ?></p>
                             <ul class="changelog-list">
-                                <li>Feature: <strong>Add REST API search support</strong></li>
-                                <li>Feature: <strong>Add 9 filters</strong> for developers to be able to extend the plugin. An overview post will be published soon here: <a href="https://www.cornelraiu.com/search-analytics-filters-reference/">Search Analytics: Filters Reference</a></li>
-                                <li>Optimization: Add the search term to the <strong>mwtsa_extra_exclude_conditions</strong> filter</li>
-                                <li>Optimization: Check for minimum PHP and WP versions when activating the plugin</li>
-                                <li>Optimization: <strong>Compatibility with WP versions up to 6.0.1</strong></li>
-                                <li>Optimization: <strong>Compatibility with PHP v8.1</strong></li>
+                                <li>Feature: Add shortcode <strong>mwtsa_display_latest_searches</strong> for displaying the latest searches on the frontend of the website</li>
+                                <li>Feature: <strong>Add 3 more filters</strong> for developers to be able to extend the plugin. An overview post will be published soon here: <a href="https://www.cornelraiu.com/search-analytics-filters-reference/" target="_blank">Search Analytics: Filters Reference</a></li>
                                 <li>Optimization: Security improvements and general code optimization</li>
-                                <li>Bugfix: Fix styling on WP 4.4.0 - 4.9.20</li>
-                                <li>Bugfix: Fix broken settings page URL from the results page</li>
-                                <li>Others: Rename the plugin to "WP Search Analytics"</li>
+                                <li>Others: Add link to the complete changelog</li>
                             </ul>
+                            <p><a href="https://www.cornelraiu.com/mwt-search-analytics-changelog/" target="_blank">Click here to check the complete log</a></p>
                             <h3><?php _e( 'Useful Links', 'search-analytics' ) ?></h3>
                             <ul>
                                 <li>
                                     <a href="options-general.php?page=search-analytics"><?php _e( 'Settings Page', 'search-analytics' ) ?></a>
                                 </li>
                                 <li>
-                                    <a href="<?php echo MWTSA_WORDPRESS_URL ?>"><?php _e( 'Support Forum', 'search-analytics' ) ?></a>
+                                    <a href="<?php echo MWTSA_WORDPRESS_URL ?>" target="_blank"><?php _e( 'Support Forum', 'search-analytics' ) ?></a>
                                 </li>
                                 <li style="font-weight: bold">
-                                    <a href="<?php echo MWTSA_WORDPRESS_URL ?>/reviews/#new-post"><?php _e( 'Rate and review Search Analytics', 'search-analytics' ) ?></a>
+                                    <a href="<?php echo MWTSA_WORDPRESS_URL ?>/reviews/#new-post" target="_blank"><?php _e( 'Rate and review Search Analytics', 'search-analytics' ) ?></a>
                                 </li>
                             </ul>
                         </div>

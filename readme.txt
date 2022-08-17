@@ -72,6 +72,12 @@ Before uninstalling, you should go to the plugin's settings page and check the "
 You can use the [Support Forum](https://wordpress.org/support/plugin/search-analytics) or open new issues on the GitHub repository: [WP Search Analytics](https://github.com/cornelRaiu/search-analytics).
 
 == Changelog ==
+= 1.4.1 =
+* Feature: Add shortcode **mwtsa_display_latest_searches** for displaying the latest searches on the frontend of the website
+* Feature: Add 3 more filters for developers to be able to extend the plugin. An overview post will be published here: [Search Analytics: Filters Reference](https://www.cornelraiu.com/search-analytics-filters-reference/)
+* Optimization: Security improvements and general code optimization
+* Others: Add link to the complete changelog
+
 = 1.4.0 =
 * Feature: Add REST API search support
 * Feature: Add 9 filters for developers to be able to extend the plugin. An overview post will be published here: [Search Analytics: Filters Reference](https://www.cornelraiu.com/search-analytics-filters-reference/)
