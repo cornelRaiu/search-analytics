@@ -91,13 +91,18 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
                 'date_until'       => '',
                 'return_only_last' => false,
                 'group'            => 'term_id',
-                'user'             => 0
+                'user'             => 0,
+	            'count'            => -1
             );
 
             $args = array_merge( $default_args, $args );
 
-            if ( in_array( $args['unit'], array( 'day', 'minute', 'week', 'month' ) ) ) {
+			$args['since'] = (int) $args['since'];
+
+            if ( in_array( $args['unit'], array( 'minute', 'day', 'week', 'month' ) ) ) {
                 $args['unit'] = strtoupper( $args['unit'] );
+            } else {
+				$args['unit'] = 'day';
             }
 
             $where = 'WHERE 1=1';
@@ -108,24 +113,35 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
 
             if ( empty( $args['date_since'] ) && empty( $args['date_until'] ) ) {
                 if ( $args['unit'] != '' ) {
-                    $where .= " AND DATE_SUB( CURDATE(), INTERVAL {$args['since']} {$args['unit']} ) <= h.datetime";
+					// $args['since'] and $args['unit'] are already clean at this point
+                    $where .= " AND DATE_SUB( CURDATE(), INTERVAL {$args['since']} {$args['unit']} ) <= h.datetime" ;
                 }
             } else {
                 $since = ( empty( $args['date_since'] ) ) ? time() : strtotime( $args['date_since'] );
                 $until = ( empty( $args['date_until'] ) ) ? time() : ( strtotime( $args['date_until'] ) + 86399 ); //added 23:59:59 to make sure it includes the "until" day
 
-                $since = date( 'Y-m-d H:i:s', $since );
-                $until = date( 'Y-m-d H:i:s', $until );
+	            // make sure the strtotime call did not return false
+	            if ( $since && $until ) {
+		            $since = date( 'Y-m-d H:i:s', $since );
+		            $until = date( 'Y-m-d H:i:s', $until );
 
-                $where .= " AND ( h.datetime BETWEEN '$since' AND '$until' )";
+		            $where .= $wpdb->prepare(" AND ( h.datetime BETWEEN %s AND %s )", $since, $until );
+	            }
             }
+
+	        $limit = '';
+
+	        if ( $args['count'] > -1 ) {
+		        $count = (int) $args['count'];
+		        $limit = " LIMIT $count";
+	        }
 
             if ( empty( $_REQUEST['search-term'] ) && in_array( $args['group'], array( 'term_id', 'no_group' ) ) ) {
                 $having   = '';
                 $group_by = '';
 
                 if ( $args['search_str'] != '' ) {
-                    $where .= " AND t.term LIKE '%{$args['search_str'] }%'";
+                    $where .= $wpdb->prepare(" AND t.term LIKE '%%%s%%'", $wpdb->esc_like( $args['search_str'] ));
                 }
 
                 if ( ! $args['return_only_last'] ) {
@@ -170,13 +186,16 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
                         $user_id = '';
                     }
 
+					$order_by = apply_filters( 'mwtsa_run_terms_history_order_by', $order_by, $args );
+
                     $query = "SELECT t.id, t.term, $count $results_count_col, $datetime as last_search_date $country $user_id
 		                FROM $mwtsa->terms_table_name as t
 		                JOIN $mwtsa->history_table_name as h ON t.id = h.term_id
 		                $where
 		                $group_by
 		                $having
-		                ORDER BY $order_by";
+		                ORDER BY $order_by
+		                $limit";
                 } else {
                     $query = "SELECT t.id, t.term, h.count_posts, `datetime` as last_search_date
 			                FROM $mwtsa->terms_table_name as t
@@ -188,7 +207,7 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
             } else {
 
                 if ( ! empty( $_REQUEST['search-term'] ) ) {
-                    $where .= " AND t.id = " . absint( $_REQUEST['search-term'] );
+                    $where .= $wpdb->prepare( " AND t.id = %d", (int) $_REQUEST['search-term'] );
                 }
 
                 if ( $args['only_no_results'] ) {
@@ -227,7 +246,8 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
 			                JOIN $mwtsa->history_table_name as h ON t.id = h.term_id
 			                $where
 			                $group_by
-			                ORDER BY `datetime` DESC, results_count DESC";
+			                ORDER BY `datetime` DESC, results_count DESC
+			                $limit";
             }
 
             return $wpdb->get_results( $query, 'ARRAY_A' );

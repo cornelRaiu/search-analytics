@@ -15,9 +15,11 @@ if ( ! class_exists( 'MWTSA_Display_Search_Stats_Shortcode' ) ) {
                 'most_searched'                   => true,
                 'most_searched_count'             => 5,
                 'most_searched_only_with_results' => true,
+                'most_searched_label'             => '',
                 'user_searches'                   => true,
                 'user_searches_count'             => 5,
                 'user_searches_only_with_results' => true,
+                'user_searches_label'             => '',
                 'wrapper_class'                   => 'mwtsa-search-stats',
             ), $atts, 'mwtsa_display_search_stats' );
 
@@ -25,6 +27,18 @@ if ( ! class_exists( 'MWTSA_Display_Search_Stats_Shortcode' ) ) {
             $atts['most_searched_only_with_results'] = filter_var( $atts['most_searched_only_with_results'], FILTER_VALIDATE_BOOLEAN );
             $atts['user_searches']                   = filter_var( $atts['user_searches'], FILTER_VALIDATE_BOOLEAN );
             $atts['user_searches_only_with_results'] = filter_var( $atts['user_searches_only_with_results'], FILTER_VALIDATE_BOOLEAN );
+
+	        if ( $atts['most_searched_label'] === '' ) {
+		        $atts['most_searched_label'] = ( $atts['most_searched_only_with_results'] ) ?
+			        __( 'Most Searched Terms With Results', 'search-analytics' ) :
+			        __( 'Most Searched Terms', 'search-analytics' );
+	        }
+
+            if ( $atts['user_searches_label'] === '' ) {
+                $atts['user_searches_label'] = ( $atts['user_searches_only_with_results'] ) ?
+	                __( 'Your Last Successful Searches', 'search-analytics' ) :
+	                __( 'Your Last Searches', 'search-analytics' );
+            }
 
             if ( $atts['most_searched_count'] < 1 ) {
                 $atts['most_searched_count'] = 1;
@@ -35,7 +49,7 @@ if ( ! class_exists( 'MWTSA_Display_Search_Stats_Shortcode' ) ) {
                 'user_searches' => apply_filters( 'mwtsa_display_search_stats_shortcode_user_searches_terms', array() )
             ];
 
-            if ( $atts['most_searched'] ) {
+            if ( $atts['most_searched'] && count( $data['most_searched'] ) === 0 ) {
                 $search_args = array(
                     'since' => $atts['amount'],
                     'unit'  => $atts['unit']
@@ -47,10 +61,10 @@ if ( ! class_exists( 'MWTSA_Display_Search_Stats_Shortcode' ) ) {
 
                 $search_results = ( new MWTSA_History_Data )->run_terms_history_data_query( $search_args );
 
-                $data['most_searched'] = array_slice( $search_results, 0, $atts['most_searched_count'] );
+                $data['most_searched'] = array_slice( $search_results, 0, (int) $atts['most_searched_count'] );
             }
 
-            if ( $atts['user_searches'] && ! empty( MWTSA_Options::get_option( 'mwtsa_save_search_by_user' ) ) && is_user_logged_in() ) {
+            if ( $atts['user_searches'] && count( $data['user_searches'] ) === 0 && ! empty( MWTSA_Options::get_option( 'mwtsa_save_search_by_user' ) ) && is_user_logged_in() ) {
 
                 $user = wp_get_current_user();
 
@@ -66,7 +80,7 @@ if ( ! class_exists( 'MWTSA_Display_Search_Stats_Shortcode' ) ) {
 
                 $search_results = ( new MWTSA_History_Data )->run_terms_history_data_query( $user_search_args );
 
-                $data['user_searches'] = array_slice( $search_results, 0, $atts['user_searches_count'] );
+                $data['user_searches'] = array_slice( $search_results, 0, (int) $atts['user_searches_count'] );
             }
 
             ob_start();
@@ -75,7 +89,7 @@ if ( ! class_exists( 'MWTSA_Display_Search_Stats_Shortcode' ) ) {
                 <ul>
                     <?php if ( count( $data['most_searched'] ) > 0 ) : ?>
                         <li>
-                            <p><?php _e( 'Most Searched Terms', 'search-analytics' ) ?></p>
+                            <p><?php echo $atts['most_searched_label'] ?></p>
                             <ul>
 	                            <?php foreach ( $data['most_searched'] as $term ) :
 		                            echo apply_filters(
@@ -91,13 +105,9 @@ if ( ! class_exists( 'MWTSA_Display_Search_Stats_Shortcode' ) ) {
                             </ul>
                         </li>
                     <?php endif; ?>
-                    <?php if ( count( $data['user_searches'] ) > 0 ) :
-                        $title = ( $atts['user_searches_only_with_results'] ) ?
-                            __( 'Your Last Successful Searches', 'search-analytics' ) :
-                            __( 'Your Last Searches', 'search-analytics' );
-                        ?>
+                    <?php if ( count( $data['user_searches'] ) > 0 ) : ?>
                         <li>
-                            <p><?php echo $title ?></p>
+                            <p><?php echo $atts['user_searches_label'] ?></p>
                             <ul>
 	                            <?php foreach ( $data['user_searches'] as $term ) :
 		                            echo apply_filters(
