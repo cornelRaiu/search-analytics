@@ -206,10 +206,7 @@ if ( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
 
                             <p><?php echo sprintf( __( 'New in version %s', 'search-analytics' ), $mwtsa->version ); ?></p>
                             <ul class="changelog-list">
-                                <li>Feature: Add shortcode <strong>mwtsa_display_latest_searches</strong> for displaying the latest searches on the frontend of the website</li>
-                                <li>Feature: <strong>Add 3 more filters</strong> for developers to be able to extend the plugin. An overview post will be published soon here: <a href="https://www.cornelraiu.com/search-analytics-filters-reference/" target="_blank">Search Analytics: Filters Reference</a></li>
-                                <li>Optimization: Security improvements and general code optimization</li>
-                                <li>Others: Add link to the complete changelog</li>
+                                <li>Bugfix: fix default filters in the results view</li>
                             </ul>
                             <p><a href="https://www.cornelraiu.com/mwt-search-analytics-changelog/" target="_blank">Click here to check the complete log</a></p>
                             <h3><?php _e( 'Useful Links', 'search-analytics' ) ?></h3>

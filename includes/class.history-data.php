@@ -102,7 +102,7 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
             if ( in_array( $args['unit'], array( 'minute', 'day', 'week', 'month' ) ) ) {
                 $args['unit'] = strtoupper( $args['unit'] );
             } else {
-				$args['unit'] = 'day';
+				$args['unit'] = '';
             }
 
             $where = 'WHERE 1=1';
