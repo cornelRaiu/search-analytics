@@ -4,7 +4,7 @@ Tags: search, analytics, statistics, history
 Requires at least: 4.4.0
 Tested up to: 6.0.1
 Requires PHP: 5.6
-Stable tag: 1.4.1
+Stable tag: 1.4.3
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -72,6 +72,10 @@ Before uninstalling, you should go to the plugin's settings page and check the "
 You can use the [Support Forum](https://wordpress.org/support/plugin/search-analytics) or open new issues on the GitHub repository: [WP Search Analytics](https://github.com/cornelRaiu/search-analytics).
 
 == Changelog ==
+= 1.4.3 =
+* Bugfix: Make sure that shortcode **mwtsa_display_latest_searches** displays unique terms
+* Feature: Add more parameters to some filters. An overview post will be published here: [Search Analytics: Filters Reference](https://www.cornelraiu.com/search-analytics-filters-reference/)
+
 = 1.4.2 Hotfix =
 * Bugfix: fix default filters in the results view
 
@@ -246,5 +250,5 @@ You can use the [Support Forum](https://wordpress.org/support/plugin/search-anal
 
 == Upgrade Notice ==
 
-= 1.4.2 Hotfix =
-Fixes a regression introduced in v1.4.1 regarding the default filters applied in the results view.
+= 1.4.3 Hotfix =
+Added some more parameters to filters and fixed duplicate results in the `mwtsa_display_latest_searches` shortcode

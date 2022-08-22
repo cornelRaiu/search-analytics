@@ -3,7 +3,7 @@
 Plugin Name: WP Search Analytics
 Plugin URI: https://www.cornelraiu.com/wordpress-plugins/mwt-search-analytics/
 Description: WP Search Analytics will store and display the search terms used on your website. No third-party service is used!
-Version: 1.4.2
+Version: 1.4.3
 Author: Cornel Raiu
 Author URI: https://www.cornelraiu.com/
 Text Domain: search-analytics
@@ -22,7 +22,7 @@ if ( ! class_exists( 'MWTSA' ) ) {
 
     final class MWTSA {
 
-        public $version = '1.4.2';
+        public $version = '1.4.3';
         public $db_version = '1.1.1';
 
         public $plugin_dir;

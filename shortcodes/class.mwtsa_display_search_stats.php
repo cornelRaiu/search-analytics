@@ -96,10 +96,11 @@ if ( ! class_exists( 'MWTSA_Display_Search_Stats_Shortcode' ) ) {
                                         'mwtsa_display_search_stats_shortcode_list_item_output',
 			                            sprintf(
 				                            '<li>%s</li>',
-				                            esc_attr( $term['term'] )
+				                            esc_attr( $term['term'] ),
 			                            ),
 			                            $atts,
-                                        'most_searched'
+                                        'most_searched',
+                                        $term
                                     );
 	                            endforeach; ?>
                             </ul>
@@ -117,7 +118,8 @@ if ( ! class_exists( 'MWTSA_Display_Search_Stats_Shortcode' ) ) {
 				                            esc_attr( $term['term'] )
 			                            ),
 			                            $atts,
-			                            'user_searches'
+			                            'user_searches',
+                                        $term
 		                            );
 	                            endforeach; ?>
                             </ul>

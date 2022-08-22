@@ -206,7 +206,8 @@ if ( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
 
                             <p><?php echo sprintf( __( 'New in version %s', 'search-analytics' ), $mwtsa->version ); ?></p>
                             <ul class="changelog-list">
-                                <li>Bugfix: fix default filters in the results view</li>
+                                <li>Bugfix: Make sure that shortcode <strong>mwtsa_display_latest_searches</strong> displays unique terms</li>
+                                <li>Feature: Add more parameters to some filters. An overview post will be published soon here: <a href="https://www.cornelraiu.com/search-analytics-filters-reference/" target="_blank">Search Analytics: Filters Reference</a></li>
                             </ul>
                             <p><a href="https://www.cornelraiu.com/mwt-search-analytics-changelog/" target="_blank">Click here to check the complete log</a></p>
                             <h3><?php _e( 'Useful Links', 'search-analytics' ) ?></h3>

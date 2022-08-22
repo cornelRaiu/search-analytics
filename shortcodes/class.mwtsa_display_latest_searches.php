@@ -9,7 +9,7 @@ if ( ! class_exists( 'MWTSA_Display_Latest_Searches_Shortcode' ) ) {
         }
 
 	    public static function order_by_latest() {
-		    return "`datetime` DESC";
+		    return "`last_search_date` DESC";
         }
 
         public static function render( $atts ) {
@@ -33,14 +33,13 @@ if ( ! class_exists( 'MWTSA_Display_Latest_Searches_Shortcode' ) ) {
 	        $search_args = array(
 		        'since' => (int) $atts['amount'],
 		        'unit'  => $atts['unit'],
-		        'group' => 'no_group',
+		        'group' => 'term_id',
 		        'count' => $atts['count']
 	        );
 
 	        if ( $atts['only_with_results'] ) {
 		        $search_args['min_results'] = 1;
 	        }
-
 
 	        add_filter( 'mwtsa_run_terms_history_order_by', array( __CLASS__, 'order_by_latest' ) );
 
@@ -61,7 +60,8 @@ if ( ! class_exists( 'MWTSA_Display_Latest_Searches_Shortcode' ) ) {
                                     '<li>%s</li>',
                                     esc_attr( $term['term'] )
                                 ),
-                                $atts
+                                $atts,
+                                $term
                             );
                         endforeach; ?>
                     </ul>
