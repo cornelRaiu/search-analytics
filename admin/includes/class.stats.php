@@ -206,13 +206,7 @@ if ( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
 
                             <p><?php echo sprintf( __( 'New in version %s', 'search-analytics' ), $mwtsa->version ); ?></p>
                             <ul class="changelog-list">
-                                <li>Bugfix: Date filters not working if the browser is set in a language different from English</li>
-                                <li>Feature: Add setting: "Show results dates as UTC", default: true</li>
-                                <li>Feature: Make dates in the results list show as UTC by default.</li>
-                                <li>Feature: Add 6 more filters and 2 actions for developers to be able to extend the plugin. An overview post will be published soon here: <a href="https://www.cornelraiu.com/search-analytics-filters-reference/" target="_blank">Search Analytics: Filters Reference</a></li>
-                                <li>Optimization: Security improvements and general code optimization</li>
-                                <li>Optimization: Updates to the settings page</li>
-                                <li>Deprecations: Deprecated the `mwt_wp_date_format_to_js_datepicker_format()` helper function</li>
+                                <li>Bugfix: Fix PHP Compatibility issue: PHP 5.6 - 7.2</li>
                             </ul>
                             <p><a href="https://www.cornelraiu.com/mwt-search-analytics-changelog/" target="_blank">Click here to check the complete log</a></p>
                             <h3><?php _e( 'Useful Links', 'search-analytics' ) ?></h3>
