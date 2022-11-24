@@ -3,22 +3,22 @@ defined("ABSPATH") || exit;
 
 if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 
-    class MWTSA_Process_Query {
+	class MWTSA_Process_Query {
 
-        public static function process_wpforo_search_term_action( $args, $items_count, $posts, $sql ) {
-            $process = new self();
+		public static function process_wpforo_search_term_action( $args, $items_count, $posts, $sql ) {
+			$process = new self();
 
-	        if ( apply_filters( 'mwtsa_wpforo_do_not_save_search', false, $args['needle'] ) ) {
-		        return;
-	        }
+			if ( apply_filters( 'mwtsa_wpforo_do_not_save_search', false, $args['needle'] ) ) {
+				return;
+			}
 
-            $process->process_search_term( $args['needle'], $items_count );
-        }
+			$process->process_search_term( $args['needle'], $items_count );
+		}
 
-	    public static function process_rest_api_search_term_action() {
-		    $process = new self();
+		public static function process_rest_api_search_term_action() {
+			$process = new self();
 
-		    $custom_search_value = $process->get_custom_search_value();
+			$custom_search_value = $process->get_custom_search_value();
 
 			if ( apply_filters( 'mwtsa_rest_api_do_not_save_search', $custom_search_value === '', $custom_search_value ) ) {
 				return;
@@ -27,231 +27,242 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 			$result_count = apply_filters( 'mwtsa_rest_api_result_count', 0, $custom_search_value );
 
 			if ( $result_count === 0 ) {
-			    $args = array(
-				    'posts_per_page' => -1,
-				    'post_status'    => 'publish',
+				$args = array(
+					'posts_per_page' => -1,
+					'post_status'    => 'publish',
 					'post_type'      => 'any',
-				    'offset'         => 0,
+					'offset'         => 0,
 					'fields'         => 'ids',
-				    's'              => $custom_search_value,
-			    );
+					's'              => $custom_search_value,
+				);
 
-			    $posts = get_posts( apply_filters( 'mwtsa_rest_api_posts_count_query_args', $args ) );
+				$posts = get_posts( apply_filters( 'mwtsa_rest_api_posts_count_query_args', $args ) );
 
 				if ( $posts ) {
 					$result_count = count( $posts );
 				}
 			}
 
-		    $process->process_search_term( $custom_search_value, $result_count );
+			$process->process_search_term( $custom_search_value, $result_count );
 		}
 
-        public static function process_search_term_action() {
-            global $wp_query;
+		public static function process_search_term_action() {
+			global $wp_query;
 
-            $process = new self();
+			$process = new self();
 
-            $custom_search_value = $process->get_custom_search_value();
+			$custom_search_value = $process->get_custom_search_value();
 
-            if ( apply_filters( 'mwtsa_do_not_save_search', ( ! is_search() && $custom_search_value == '' ) || is_admin(), $custom_search_value ) ) {
-                return;
-            }
+			if ( apply_filters( 'mwtsa_do_not_save_search', ( ! is_search() && $custom_search_value == '' ) || is_admin(), $custom_search_value ) ) {
+				return;
+			}
 
-            $search_term = $custom_search_value != '' ? $custom_search_value : get_search_query();
+			$search_term = $custom_search_value != '' ? $custom_search_value : get_search_query();
 
-            $process->process_search_term( $search_term, apply_filters( 'mwtsa_result_count', $wp_query->found_posts, $search_term ) );
-        }
+			$process->process_search_term( $search_term, apply_filters( 'mwtsa_result_count', $wp_query->found_posts, $search_term ) );
+		}
 
-	    public function get_custom_search_value() {
-		    $exclude_custom_search_params = MWTSA_Options::get_option( 'mwtsa_custom_search_url_params' );
+		public function get_custom_search_value() {
+			$exclude_custom_search_params = MWTSA_Options::get_option( 'mwtsa_custom_search_url_params' );
 
-		    $custom_search_value = '';
-		    if ( ! empty( $exclude_custom_search_params ) ) {
-			    $custom_search_params = array_map( 'trim', explode( ',', $exclude_custom_search_params ) );
-			    foreach ( $custom_search_params as $param ) {
-				    if ( ! empty( $_REQUEST[ $param ] ) ) {
-					    $custom_search_value = $_REQUEST[ $param ];
-				    }
-			    }
-		    }
+			$custom_search_value = '';
+			if ( ! empty( $exclude_custom_search_params ) ) {
+				$custom_search_params = array_map( 'trim', explode( ',', $exclude_custom_search_params ) );
+				foreach ( $custom_search_params as $param ) {
+					if ( ! empty( $_REQUEST[ $param ] ) ) {
+						$custom_search_value = $_REQUEST[ $param ];
+					}
+				}
+			}
 
 			return sanitize_text_field( $custom_search_value );
 		}
 
-        public function process_search_term( $search_term, $count ) {
-            $exclude_search_for_roles = MWTSA_Options::get_option( 'mwtsa_exclude_search_for_role' );
-            $current_user_roles       = mwt_get_current_user_roles();
+		public function process_search_term( $search_term, $count ) {
 
-            $exclude_search_for_roles_after_logout = MWTSA_Options::get_option( 'mwtsa_exclude_search_for_role_after_logout' );
+			$exclude_search_for_roles = MWTSA_Options::get_option( 'mwtsa_exclude_search_for_role' );
+			$current_user_roles       = mwt_get_current_user_roles();
 
-            if ( ! empty( $exclude_search_for_roles_after_logout ) ) {
-                $current_user_cookie = MWTSA_Cookies::get_cookie_value();
+			$exclude_search_for_roles_after_logout = MWTSA_Options::get_option( 'mwtsa_exclude_search_for_role_after_logout' );
 
-                if ( isset( $current_user_cookie['is_excluded'] ) && $current_user_cookie['is_excluded'] == 1 ) {
-                    return false;
-                }
-            }
+			if ( ! empty( $exclude_search_for_roles_after_logout ) ) {
+				$current_user_cookie = MWTSA_Cookies::get_cookie_value();
 
-            if ( is_array( $exclude_search_for_roles ) ) {
-                $matching_roles = array_intersect( $exclude_search_for_roles, $current_user_roles );
+				if ( isset( $current_user_cookie['is_excluded'] ) && $current_user_cookie['is_excluded'] == 1 ) {
+					return false;
+				}
+			}
 
-                if ( count( $matching_roles ) > 0 ) {
-                    return false;
-                }
-            }
+			if ( is_array( $exclude_search_for_roles ) ) {
+				$matching_roles = array_intersect( $exclude_search_for_roles, $current_user_roles );
 
-            $exclude_search_for_ips = MWTSA_Options::get_option( 'mwtsa_exclude_searches_from_ip_addresses' );
+				if ( count( $matching_roles ) > 0 ) {
+					return false;
+				}
+			}
 
-            $client_ip = mwt_get_current_user_ip();
+			$exclude_search_for_ips = MWTSA_Options::get_option( 'mwtsa_exclude_searches_from_ip_addresses' );
 
-            if ( ! empty( $exclude_search_for_ips ) ) {
-                $ips_list     = array();
-                $excluded_ips = explode( ',', $exclude_search_for_ips );
+			$client_ip = mwt_get_current_user_ip();
 
-                foreach ( $excluded_ips as $ip ) {
-                    $ip = trim( $ip );
+			if ( ! empty( $exclude_search_for_ips ) ) {
+				$ips_list     = array();
+				$excluded_ips = explode( ',', $exclude_search_for_ips );
 
-                    if ( filter_var( $ip, FILTER_VALIDATE_IP ) ) {
-                        $ips_list[] = $ip;
-                    }
-                }
+				foreach ( $excluded_ips as $ip ) {
+					$ip = trim( $ip );
 
-                if ( in_array( $client_ip, $ips_list ) ) {
-                    return false;
-                }
-            }
+					if ( filter_var( $ip, FILTER_VALIDATE_IP ) ) {
+						$ips_list[] = $ip;
+					}
+				}
 
-            $exclude_if_contains = MWTSA_Options::get_option( 'mwtsa_exclude_if_string_contains' );
+				if ( in_array( $client_ip, $ips_list ) ) {
+					return false;
+				}
+			}
 
-            if ( ! empty( $exclude_if_contains ) ) {
-                $match_against = array_map( 'trim', explode( ',', $exclude_if_contains ) );
+			$exclude_if_contains = MWTSA_Options::get_option( 'mwtsa_exclude_if_string_contains' );
 
-                preg_match( '/(' . implode( '|', $match_against ) . ')/i', $search_term, $matches );
+			if ( ! empty( $exclude_if_contains ) ) {
+				$match_against = array_map( 'trim', explode( ',', $exclude_if_contains ) );
 
-                if ( count( $matches ) > 0 ) {
-                    return false;
-                }
-            }
+				preg_match( '/(' . implode( '|', $match_against ) . ')/i', $search_term, $matches );
 
-            if ( apply_filters( 'mwtsa_extra_exclude_conditions', false, $search_term ) ) {
-                return false;
-            }
+				if ( count( $matches ) > 0 ) {
+					return false;
+				}
+			}
 
-            $country = '';
+			if ( apply_filters( 'mwtsa_extra_exclude_conditions', false, $search_term ) ) {
+				return false;
+			}
 
-            if ( ! empty( MWTSA_Options::get_option( 'mwtsa_save_search_country' ) ) ) {
-                //http://ip-api.com/json/24.48.0?fields=49154
-                // IP-API integration according to the documentation at http://ip-api.com/docs/api:json
-                $ip_details_get = @ file_get_contents( 'http://ip-api.com/json/' . $client_ip . '?fields=49155' );
-                if ( ! empty( $ip_details_get ) ) {
-                    $ip_details = json_decode( $ip_details_get );
+			$country = '';
 
-                    if ( $ip_details->status != 'fail' ) {
-                        $country = strtolower( $ip_details->countryCode );
-                    }
-                }
-            }
+			if ( ! empty( MWTSA_Options::get_option( 'mwtsa_save_search_country' ) ) ) {
+				//http://ip-api.com/json/24.48.0?fields=49154
+				// IP-API integration according to the documentation at http://ip-api.com/docs/api:json
+				$ip_details_get = @ file_get_contents( 'http://ip-api.com/json/' . $client_ip . '?fields=49155' );
+				if ( ! empty( $ip_details_get ) ) {
+					$ip_details = json_decode( $ip_details_get );
 
-            $user_id = 0;
+					if ( $ip_details->status != 'fail' ) {
+						$country = strtolower( $ip_details->countryCode );
+					}
+				}
+			}
 
-            if ( ! empty( MWTSA_Options::get_option( 'mwtsa_save_search_by_user' ) ) && is_user_logged_in() ) {
-                $user    = wp_get_current_user();
-                $user_id = $user->ID;
-            }
+			$user_id = 0;
 
-            if ( ! empty( $search_term ) ) {
+			if ( ! empty( MWTSA_Options::get_option( 'mwtsa_save_search_by_user' ) ) && is_user_logged_in() ) {
+				$user    = wp_get_current_user();
+				$user_id = $user->ID;
+			}
 
-                $minimum_length_term = MWTSA_Options::get_option( 'mwtsa_minimum_characters' );
+			if ( ! empty( $search_term ) ) {
 
-                if ( ! empty( $minimum_length_term ) && strlen( $search_term ) < $minimum_length_term ) {
-                    return false;
-                }
+				$minimum_length_term = MWTSA_Options::get_option( 'mwtsa_minimum_characters' );
 
-                if ( apply_filters( 'mwtsa_exclude_term', false, $search_term ) ) {
-                    return false;
-                }
+				if ( ! empty( $minimum_length_term ) && strlen( $search_term ) < $minimum_length_term ) {
+					return false;
+				}
 
-                $this->save_search_term( $search_term, $count, $country, $user_id );
-            }
+				if ( apply_filters( 'mwtsa_exclude_term', false, $search_term ) ) {
+					return false;
+				}
 
-            return true;
-        }
+				$this->save_search_term( $search_term, $count, $country, $user_id );
+			}
 
-        public function save_search_term( $term, $found_posts, $country = '', $user_id = 0 ) {
-            global $wpdb, $mwtsa;
+			return true;
+		}
 
-            //make sure db is up to date
-	        // TODO: move this away
-            MWTSA_Install::activate_single_site();
+		public function save_search_term( $term, $found_posts, $country = '', $user_id = 0 ) {
+			global $wpdb, $mwtsa;
 
-            //1. add/update term string
-            $existing_term = $wpdb->get_row( $wpdb->prepare(
-                "SELECT *
+			//make sure db is up to date
+			// TODO: move this away
+			MWTSA_Install::activate_single_site();
+
+			//1. add/update term string
+			$existing_term = $wpdb->get_row( $wpdb->prepare(
+				"SELECT *
 				FROM `$mwtsa->terms_table_name`
 				WHERE term = %s
 				LIMIT 1
 				", $term
-            ) );
+			) );
 
-            $exclude_doubled_search_for = MWTSA_Options::get_option( 'mwtsa_exclude_doubled_search_for_interval' );
+			$exclude_doubled_search_for = MWTSA_Options::get_option( 'mwtsa_exclude_doubled_search_for_interval' );
 
-            $current_user_cookie = MWTSA_Cookies::get_cookie_value();
+			$current_user_cookie = MWTSA_Cookies::get_cookie_value();
 
-            $term_id = null;
+			$term_id = null;
 
-            if ( empty ( $existing_term ) ) {
-                $success = $wpdb->query( $wpdb->prepare(
-                    "INSERT INTO `$mwtsa->terms_table_name` (`term`, `total_count`)
+			if ( empty ( $existing_term ) ) {
+				$success = $wpdb->query( $wpdb->prepare(
+					"INSERT INTO `$mwtsa->terms_table_name` (`term`, `total_count`)
 					VALUES (%s, %d)",
-                    $term,
-                    1
-                ) );
+					$term,
+					1
+				) );
 
-                if ( $success ) {
-                    $term_id = $wpdb->insert_id;
-                }
-            } else {
+				if ( $success ) {
+					$term_id = $wpdb->insert_id;
+				}
+			} else {
 
-                if ( ! empty ( $exclude_doubled_search_for ) ) {
-                    if ( isset( $current_user_cookie['search'] ) && isset( $current_user_cookie['search'][ $existing_term->id ] ) && ( $current_user_cookie['search'][ $existing_term->id ] + ( 60 * $exclude_doubled_search_for ) ) > time() ) {
-                        return false;
-                    }
-                }
+				if ( ! empty ( $exclude_doubled_search_for ) ) {
+					if ( isset( $current_user_cookie['search'] ) && isset( $current_user_cookie['search'][ $existing_term->id ] ) && ( $current_user_cookie['search'][ $existing_term->id ] + ( 60 * $exclude_doubled_search_for ) ) > time() ) {
+						return false;
+					}
+				}
 
-                $total_count = $existing_term->total_count + 1;
+				$total_count = $existing_term->total_count + 1;
 
-                $success = $wpdb->query( $wpdb->prepare(
-                    "UPDATE `$mwtsa->terms_table_name`
+				$success = $wpdb->query( $wpdb->prepare(
+					"UPDATE `$mwtsa->terms_table_name`
 					SET total_count = %d
 					WHERE term = %s
 					LIMIT 1
 					", $total_count, $term
-                ) );
+				) );
 
-                if ( $success ) {
-                    $term_id = $existing_term->id;
-                }
-            }
+				if ( $success ) {
+					$term_id = $existing_term->id;
+				}
+			}
 
-            //2. add term timestamp + posts_count - ON term_id
-            if ( ! empty( $term_id ) ) {
+			do_action( 'mwtsa_after_term_save', $term, $term_id, ! empty( $existing_term ) );
 
-                if ( ! empty ( $exclude_doubled_search_for ) ) {
-                    $current_user_cookie['search'][ $term_id ] = time();
-                    MWTSA_Cookies::set_cookie_value( $current_user_cookie, ( 86400 * 7 ) );
-                }
+			//2. add term timestamp + posts_count - ON term_id
+			if ( ! empty( $term_id ) ) {
 
-                $success = $wpdb->query( $wpdb->prepare(
-                    "INSERT INTO `$mwtsa->history_table_name` (`term_id`, `datetime`, `count_posts`, `country`, `user_id`)
+				$history_term_id = null;
+
+				if ( ! empty ( $exclude_doubled_search_for ) ) {
+					$current_user_cookie['search'][ $term_id ] = time();
+					MWTSA_Cookies::set_cookie_value( $current_user_cookie, ( 86400 * 7 ) );
+				}
+
+				$success = $wpdb->query( $wpdb->prepare(
+					"INSERT INTO `$mwtsa->history_table_name` (`term_id`, `datetime`, `count_posts`, `country`, `user_id`)
 					VALUES (%d, UTC_TIMESTAMP(), %d, %s, %d)",
-                    $term_id,
-                    $found_posts,
-                    $country,
-                    $user_id
-                ) );
-            }
+					$term_id,
+					$found_posts,
+					$country,
+					$user_id
+				) );
 
-            return $success;
-        }
-    }
+				if ( $success ) {
+					$history_term_id = $wpdb->insert_id;
+				}
+
+				do_action( 'mwtsa_after_history_term_save', $history_term_id, $term_id, $found_posts, $country, $user_id );
+			}
+
+			return $success;
+		}
+	}
 }

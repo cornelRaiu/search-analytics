@@ -38,27 +38,13 @@
           }
 
           datepickers.datepicker({
-            dateFormat: mwtsa_admin_obj.date_format,
+            dateFormat: 'yy-mm-dd',
             maxDate: dayOffset,
             defaultDate: siteTime,
             showButtonPanel: true,
-            closeText: 'Clear',
+            closeText: 'Close',
             numberOfMonths: 2,
-            beforeShow: function () {
-              $(this).prop('disabled', true);
-            },
-            onClose: function () {
-              $(this).prop('disabled', false);
-
-              var event = arguments.callee.caller.caller.arguments[0];
-
-              if ($(event.delegateTarget).hasClass('ui-datepicker-close')) {
-                $(this).val('');
-              }
-            }
           });
-
-          datepickers.datepicker('widget').addClass('stream-datepicker');
         }
 
         from.on('change', function () {

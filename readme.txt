@@ -2,9 +2,9 @@
 Contributors: cornel.raiu
 Tags: search, analytics, statistics, history
 Requires at least: 4.4.0
-Tested up to: 6.0.1
+Tested up to: 6.1.1
 Requires PHP: 5.6
-Stable tag: 1.4.3
+Stable tag: 1.4.4
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -72,6 +72,15 @@ Before uninstalling, you should go to the plugin's settings page and check the "
 You can use the [Support Forum](https://wordpress.org/support/plugin/search-analytics) or open new issues on the GitHub repository: [WP Search Analytics](https://github.com/cornelRaiu/search-analytics).
 
 == Changelog ==
+= 1.4.4 =
+* Bugfix: Date filters not working if the browser is set in a language different from English
+* Feature: Add setting: "Show results dates as UTC", default: true
+* Feature: Make dates in the results list show as UTC by default.
+* Feature: Add 6 more filters and 2 actions for developers to be able to extend the plugin. An overview post will be published here: [Search Analytics: Filters Reference](https://www.cornelraiu.com/search-analytics-filters-reference/)
+* Optimization: Security improvements and general code optimization
+* Optimization: Updates to the settings page
+* Deprecations: Deprecated the `mwt_wp_date_format_to_js_datepicker_format()` helper function
+
 = 1.4.3 =
 * Bugfix: Make sure that shortcode **mwtsa_display_latest_searches** displays unique terms
 * Feature: Add more parameters to some filters. An overview post will be published here: [Search Analytics: Filters Reference](https://www.cornelraiu.com/search-analytics-filters-reference/)
@@ -250,5 +259,5 @@ You can use the [Support Forum](https://wordpress.org/support/plugin/search-anal
 
 == Upgrade Notice ==
 
-= 1.4.3 Hotfix =
-Added some more parameters to filters and fixed duplicate results in the `mwtsa_display_latest_searches` shortcode
+= 1.4.4 Hotfix =
+Fixed date filters and added more ways to extend the plugin
