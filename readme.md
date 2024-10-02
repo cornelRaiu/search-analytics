@@ -74,6 +74,4 @@ After the installation and activation is complete you should visit the plugin's 
 
 For now, you can use the [Support Forum](https://wordpress.org/support/plugin/search-analytics) and the issues section of this repository. I will be adding a feature request/voting system to the [plugin page on my website](https://www.cornelraiu.com/mwt-search-analytics/) soon so everything will be kept in there.
 
-Also, you can visit the plugin's [Trello Board](https://trello.com/b/MvIWInjW). This should give you an overview on my plans regarding this plugin.
-
 Furthermore, in case you are a developer, you can submit pull requests for bug fixes or ideas you implemented. Thank you very much for doing it.

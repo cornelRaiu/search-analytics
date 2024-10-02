@@ -1,5 +1,5 @@
 <?php
-defined("ABSPATH") || exit;
+defined( "ABSPATH" ) || exit;
 
 if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 
@@ -28,7 +28,7 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 
 			if ( $result_count === 0 ) {
 				$args = array(
-					'posts_per_page' => -1,
+					'posts_per_page' => - 1,
 					'post_status'    => 'publish',
 					'post_type'      => 'any',
 					'offset'         => 0,
@@ -204,7 +204,7 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 				$success = $wpdb->query( $wpdb->prepare(
 					"INSERT INTO `$mwtsa->terms_table_name` (`term`, `total_count`)
 					VALUES (%s, %d)",
-					$term,
+					sanitize_text_field( $term ),
 					1
 				) );
 

@@ -1,5 +1,5 @@
 <?php
-defined("ABSPATH") || exit;
+defined( "ABSPATH" ) || exit;
 
 if ( ! class_exists( 'MWTSA_Display_Search_Stats_Shortcode' ) ) {
 	class MWTSA_Display_Search_Stats_Shortcode {
@@ -85,11 +85,11 @@ if ( ! class_exists( 'MWTSA_Display_Search_Stats_Shortcode' ) ) {
 
 			ob_start();
 			?>
-            <div class="<?php echo $atts['wrapper_class'] ?>">
+            <div class="<?php echo esc_attr( $atts['wrapper_class'] ) ?>">
                 <ul>
 					<?php if ( count( $data['most_searched'] ) > 0 ) : ?>
                         <li>
-                            <p><?php echo $atts['most_searched_label'] ?></p>
+                            <p><?php echo esc_html( $atts['most_searched_label'] ) ?></p>
                             <ul>
 								<?php foreach ( $data['most_searched'] as $term ) :
 									echo apply_filters(
@@ -97,7 +97,7 @@ if ( ! class_exists( 'MWTSA_Display_Search_Stats_Shortcode' ) ) {
 										sprintf(
 											'<li>%s</li>',
 											esc_attr( $term['term'] )
-			                            ),
+										),
 										$atts,
 										'most_searched',
 										$term
@@ -108,7 +108,7 @@ if ( ! class_exists( 'MWTSA_Display_Search_Stats_Shortcode' ) ) {
 					<?php endif; ?>
 					<?php if ( count( $data['user_searches'] ) > 0 ) : ?>
                         <li>
-                            <p><?php echo $atts['user_searches_label'] ?></p>
+                            <p><?php echo esc_html( $atts['user_searches_label'] ) ?></p>
                             <ul>
 								<?php foreach ( $data['user_searches'] as $term ) :
 									echo apply_filters(

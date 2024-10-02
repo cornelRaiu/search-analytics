@@ -1,23 +1,23 @@
-=== WP Search Analytics ===
+=== Search Analytics for WP ===
 Contributors: cornel.raiu
 Tags: search, analytics, statistics, history
 Requires at least: 4.4.0
-Tested up to: 6.1.1
+Tested up to: 6.6.2
 Requires PHP: 5.6
-Stable tag: 1.4.5
+Stable tag: 1.4.12
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
-WP Search Analytics will store and display the search terms used on your website. No third-party service is used!
+Search Analytics for WP will store and display the search terms used on your website. No third-party service is used!
 
 == Description ==
-WP Search Analytics will keep history of the search terms used by your users and group them in a set of statistics including the number of posts resulted from that search term.
+Search Analytics for WP will keep history of the search terms used by your users and group them in a set of statistics including the number of posts resulted from that search term.
 
 It can easily aid you in finding what your users are really searching for on your website and make sure you provide exactly what they need.
 
-Help and/or ideas are greatly appreciated! You can contribute to the GitHub repository: [WP Search Analytics](https://github.com/cornelRaiu/search-analytics)
+Help and/or ideas are greatly appreciated! You can contribute to the GitHub repository: [Search Analytics for WP](https://github.com/cornelRaiu/search-analytics)
 
-**NOTE: WP Search Analytics stores all the statistics in your WordPress database. No info is sent to third-party services!**
+**NOTE: Search Analytics for WP stores all the statistics in your WordPress database. No info is sent to third-party services!**
 
 = Features =
 * Record all the search queries made using the **standard WordPress search form**.
@@ -36,7 +36,7 @@ Help and/or ideas are greatly appreciated! You can contribute to the GitHub repo
 * Display search statistics on the front of your website using shortcodes
 
 == Installation ==
-WP Search Analytics can be installed via the WordPress Automatic Plugin Install page in the admin panel.
+Search Analytics for WP can be installed via the WordPress Automatic Plugin Install page in the admin panel.
 It can also be downloaded from the WordPress Plugin Directory and installed manually.
 
 After the installation and activation is complete you should visit the plugin's settings page ( Settings -> MWT: Search Analytics ) to make sure it is properly configured for your needs.
@@ -55,7 +55,7 @@ After the installation and activation is complete you should visit the plugin's 
 
 = The search history on my website is not being saved =
 
-The plugin works with the standard WordPress search functionality by default. However, if you need to you can add custom search queries in the plugin's settings or, why not, programmatically add searches to the plugin's database tables to be displayed in the admin panel. For other requirements, please use the [Support Forum](https://wordpress.org/support/plugin/search-analytics) or open new issues on the GitHub repository: [WP Search Analytics](https://github.com/cornelRaiu/search-analytics).
+The plugin works with the standard WordPress search functionality by default. However, if you need to you can add custom search queries in the plugin's settings or, why not, programmatically add searches to the plugin's database tables to be displayed in the admin panel. For other requirements, please use the [Support Forum](https://wordpress.org/support/plugin/search-analytics) or open new issues on the GitHub repository: [Search Analytics for WP](https://github.com/cornelRaiu/search-analytics).
 
 = The shortcode is not displaying the stats in widgets
 
@@ -67,11 +67,39 @@ For enabling the shortcodes in widgets you need to add the following code in you
 
 Before uninstalling, you should go to the plugin's settings page and check the "Remove plugin tables on uninstall" setting. After doing that, deactivating the plugin should also remove all tables from the database.
 
-= Where can I make feature requests or report bugs? =
+= Where can I make feature requests or report non-security related bugs? =
 
-You can use the [Support Forum](https://wordpress.org/support/plugin/search-analytics) or open new issues on the GitHub repository: [WP Search Analytics](https://github.com/cornelRaiu/search-analytics).
+You can use the [Support Forum](https://wordpress.org/support/plugin/search-analytics) or open new issues on the GitHub repository: [Search Analytics for WP](https://github.com/cornelRaiu/search-analytics).
+
+= Where do I report security bugs?
+
+Please report security bugs found in the source code of the Search Analytics for WP plugin through the [Patchstack Vulnerability Disclosure Program](https://patchstack.com/database/vdp/search-analytics). The Patchstack team will assist you with verification, CVE assignment, and notify me, the developer of Search Analytics for WP.
 
 == Changelog ==
+= 1.4.12 =
+* Others: Security improvements and general code optimization. Fixed Reflected Cross-Site Scripting vulnerability reported by [vgo0](https://www.wordfence.com/threat-intel/vulnerabilities/researchers/dale-mavers)
+
+= 1.4.11 =
+* Optimization: Security improvements and general code optimization. Fixed Reflected Cross-Site Scripting vulnerability reported by [vgo0](https://www.wordfence.com/threat-intel/vulnerabilities/researchers/dale-mavers)
+
+= 1.4.10 =
+* Optimization: Security improvements and general code optimization. Fixed Broken Access Control vulnerability reported by [Abdi Pranata](https://patchstack.com/database/researcher/92634a85-0e66-4059-aff6-1de1c49d0964). Thank you for the responsible disclosure!
+* Optimization: **Compatibility with WP 6.6.x**
+
+= 1.4.9 =
+* Bugfix: Fixed warnings showing on specific combination of filters and grouping. Reported [here](https://wordpress.org/support/topic/bug-undefined-array-key-count/). Thank you [@sadesades](https://profiles.wordpress.org/sadesades/) for the detailed report!
+
+= 1.4.8 =
+* Optimization: (ENCORE) Security improvements and general code optimization. Fixed [this vulnerability](https://www.wordfence.com/threat-intel/vulnerabilities/wordpress-plugins/search-analytics/wp-search-analytics-146-reflected-cross-site-scripting-via-render-stats-page)
+* Optimization: adjust some translations
+
+= 1.4.7 =
+* Optimization: Security improvements and general code optimization. Fixed [this vulnerability](https://www.wordfence.com/threat-intel/vulnerabilities/wordpress-plugins/search-analytics/wp-search-analytics-146-reflected-cross-site-scripting-via-render-stats-page)
+
+= 1.4.6 =
+* Optimization: Security improvements and general code optimization. Fixed [this vulnerability](https://www.wordfence.com/threat-intel/vulnerabilities/wordpress-plugins/search-analytics/wp-search-analytics-145-authenticated-administrator-stored-cross-site-scripting)
+* Bugfix: Charts not working after changing interval or chart type
+
 = 1.4.5 =
 * Bugfix: Fix PHP Compatibility issue: PHP 5.6 - 7.2
 
@@ -79,27 +107,27 @@ You can use the [Support Forum](https://wordpress.org/support/plugin/search-anal
 * Bugfix: Date filters not working if the browser is set in a language different from English
 * Feature: Add setting: "Show results dates as UTC", default: true
 * Feature: Make dates in the results list show as UTC by default.
-* Feature: Add 6 more filters and 2 actions for developers to be able to extend the plugin. An overview post will be published here: [WP Search Analytics: Filters Reference](https://www.cornelraiu.com/search-analytics-filters-reference/)
+* Feature: Add 6 more filters and 2 actions for developers to be able to extend the plugin. An overview post will be published here: [Search Analytics for WP: Filters Reference](https://www.cornelraiu.com/search-analytics-filters-reference/)
 * Optimization: Security improvements and general code optimization
 * Optimization: Updates to the settings page
 * Deprecations: Deprecated the `mwt_wp_date_format_to_js_datepicker_format()` helper function
 
 = 1.4.3 =
 * Bugfix: Make sure that shortcode **mwtsa_display_latest_searches** displays unique terms
-* Feature: Add more parameters to some filters. An overview post will be published here: [WP Search Analytics: Filters Reference](https://www.cornelraiu.com/search-analytics-filters-reference/)
+* Feature: Add more parameters to some filters. An overview post will be published here: [Search Analytics for WP: Filters Reference](https://www.cornelraiu.com/search-analytics-filters-reference/)
 
 = 1.4.2 Hotfix =
 * Bugfix: fix default filters in the results view
 
 = 1.4.1 =
 * Feature: Add shortcode **mwtsa_display_latest_searches** for displaying the latest searches on the frontend of the website
-* Feature: Add 3 more filters for developers to be able to extend the plugin. An overview post will be published here: [WP Search Analytics: Filters Reference](https://www.cornelraiu.com/search-analytics-filters-reference/)
+* Feature: Add 3 more filters for developers to be able to extend the plugin. An overview post will be published here: [Search Analytics for WP: Filters Reference](https://www.cornelraiu.com/search-analytics-filters-reference/)
 * Optimization: Security improvements and general code optimization
 * Others: Add link to the complete changelog
 
 = 1.4.0 =
 * Feature: Add REST API search support
-* Feature: Add 9 filters for developers to be able to extend the plugin. An overview post will be published here: [WP Search Analytics: Filters Reference](https://www.cornelraiu.com/search-analytics-filters-reference/)
+* Feature: Add 9 filters for developers to be able to extend the plugin. An overview post will be published here: [Search Analytics for WP: Filters Reference](https://www.cornelraiu.com/search-analytics-filters-reference/)
 * Optimization: Add the search term to the **mwtsa_extra_exclude_conditions** filter
 * Optimization: Check for minimum PHP and WP versions when activating the plugin
 * Optimization: **Compatibility with WP versions up to 6.0.1**
@@ -262,5 +290,5 @@ You can use the [Support Forum](https://wordpress.org/support/plugin/search-anal
 
 == Upgrade Notice ==
 
-= 1.4.5 =
-Fixed a PHP compatibility issue on PHP 5.6 - 7.2
+= 1.4.12 =
+Rename plugin to "Search Analytics for WP"

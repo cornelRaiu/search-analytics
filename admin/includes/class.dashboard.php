@@ -37,7 +37,7 @@ if ( ! class_exists( 'MWTSA_Dashboard' ) ) {
             ) );
 
             if ( empty( $search_results ) ) {
-                _e( 'No search statistics found', 'search-analytics' );
+				esc_html_e( 'No search statistics found', 'search-analytics' );
 
                 return;
             }
@@ -47,19 +47,19 @@ if ( ! class_exists( 'MWTSA_Dashboard' ) ) {
 
             echo '<ul class="mwtsa-stats-widget-wrapper">';
 
-            echo '<li><span class="stats-list-label">' . __( "Total Searches:", 'search-analytics' ) . '</span>';
+			echo '<li><span class="stats-list-label">' . esc_html__( "Total Searches:", 'search-analytics' ) . '</span>';
             echo '<span class="stats-list-value">' . absint( $total_searches ) . '</span></li>';
 
-            echo '<li><span class="stats-list-label">' . __( "Most Searched Term:", 'search-analytics' ) . '</span>';
+			echo '<li><span class="stats-list-label">' . esc_html__( "Most Searched Term:", 'search-analytics' ) . '</span>';
             echo '<span class="stats-list-value">' . esc_attr( $most_searched_term['term'] ) . '</span></li>';
 
-            echo '<li><span class="stats-list-label">' . __( "Most Searched Term Count:", 'search-analytics' ) . '</span>';
+			echo '<li><span class="stats-list-label">' . esc_html__( "Most Searched Term Count:", 'search-analytics' ) . '</span>';
             echo '<span class="stats-list-value">' . absint( $most_searched_term['count'] ) . '</span></li>';
 
-            echo '<li><span class="stats-list-label">' . __( "Last Searched Term:", 'search-analytics' ) . '</span>';
+			echo '<li><span class="stats-list-label">' . esc_html__( "Last Searched Term:", 'search-analytics' ) . '</span>';
             echo '<span class="stats-list-value">' . esc_attr( $last_search_term['term'] ) . '</span></li>';
 
-            echo '<li><span class="stats-list-label">' . __( "Last Searched Date:", 'search-analytics' ) . '</span>';
+			echo '<li><span class="stats-list-label">' . esc_html__( "Last Searched Date:", 'search-analytics' ) . '</span>';
             echo '<span class="stats-list-value">' . esc_attr( $last_search_term['last_search_date'] ) . '</span></li>';
 
             echo '</ul>';

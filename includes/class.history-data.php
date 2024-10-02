@@ -1,5 +1,5 @@
 <?php
-defined("ABSPATH") || exit;
+defined( "ABSPATH" ) || exit;
 
 if ( ! class_exists( 'MWTSA_History_Data' ) ) {
 
@@ -66,8 +66,8 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
 				'search_str'      => sanitize_text_field( $search_str ),
 				'only_no_results' => $only_no_results,
 				'group'           => $group,
-				'date_since'      => ( isset( $_REQUEST['date_from'] ) ) ? $_REQUEST['date_from'] : '',
-				'date_until'      => ( isset( $_REQUEST['date_to'] ) ) ? $_REQUEST['date_to'] : '',
+				'date_since'      => ( isset( $_REQUEST['date_from'] ) ) ? sanitize_text_field( $_REQUEST['date_from'] ) : '',
+				'date_until'      => ( isset( $_REQUEST['date_to'] ) ) ? sanitize_text_field( $_REQUEST['date_to'] ) : '',
 				'user'            => $user
 			);
 
@@ -78,7 +78,7 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
 
 			global $wpdb, $mwtsa;
 
-			//make sure db is up to date
+			//make sure db is up-to-date
 			MWTSA_Install::activate_single_site();
 
 			$default_args = array(
@@ -108,13 +108,13 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
 			$where = 'WHERE 1=1';
 
 			if ( ! empty( $args['user'] ) ) {
-				$where .= $wpdb->prepare( " AND user_id = %d", $args['user'] );
+				$where .= $wpdb->prepare( " AND user_id = %d", (int) $args['user'] );
 			}
 
 			if ( empty( $args['date_since'] ) && empty( $args['date_until'] ) ) {
 				if ( $args['unit'] != '' ) {
 					// $args['since'] and $args['unit'] are already clean at this point
-					$where .= " AND DATE_SUB( CURDATE(), INTERVAL {$args['since']} {$args['unit']} ) <= h.datetime" ;
+					$where .= " AND DATE_SUB( CURDATE(), INTERVAL {$args['since']} {$args['unit']} ) <= h.datetime";
 				}
 			} else {
 				$since = ( empty( $args['date_since'] ) ) ? time() : strtotime( $args['date_since'] );
@@ -125,7 +125,7 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
 					$since = date( 'Y-m-d H:i:s', $since );
 					$until = date( 'Y-m-d H:i:s', $until );
 
-					$where .= $wpdb->prepare(" AND ( h.datetime BETWEEN %s AND %s )", $since, $until );
+					$where .= $wpdb->prepare( " AND ( h.datetime BETWEEN %s AND %s )", $since, $until );
 				}
 			}
 
@@ -141,7 +141,7 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
 				$group_by = '';
 
 				if ( $args['search_str'] != '' ) {
-					$where .= $wpdb->prepare(" AND t.term LIKE '%%%s%%'", $wpdb->esc_like( $args['search_str'] ));
+					$where .= $wpdb->prepare( " AND t.term LIKE '%%%s%%'", $wpdb->esc_like( $args['search_str'] ) );
 				}
 
 				if ( ! $args['return_only_last'] ) {
@@ -274,11 +274,14 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
 				list( $_dates, $results[] ) = $this->get_results_for_chart( $args );
 
 				foreach ( $dates as $k => &$date ) {
-					$date = $_dates[ $k ] . __( ' vs ' ) . $date;
+					$date = sprintf( esc_attr__( '%s vs %s', 'search-analytics' ), $_dates[ $k ], $date );
 				}
 			}
 
-			return array( $dates, $results );
+			return array(
+				'dates'    => $dates,
+				'searches' => $results
+			);
 		}
 
 		public function get_results_for_chart( $args ) {

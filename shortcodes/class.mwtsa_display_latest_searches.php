@@ -1,5 +1,5 @@
 <?php
-defined("ABSPATH") || exit;
+defined( "ABSPATH" ) || exit;
 
 if ( ! class_exists( 'MWTSA_Display_Latest_Searches_Shortcode' ) ) {
 	class MWTSA_Display_Latest_Searches_Shortcode {
@@ -14,12 +14,12 @@ if ( ! class_exists( 'MWTSA_Display_Latest_Searches_Shortcode' ) ) {
 
 		public static function render( $atts ) {
 			$atts = shortcode_atts( array(
-				'unit'                            => 'week',
-				'amount'                          => 1,
-				'count'                           => 10,
-				'only_with_results'               => true,
-				'wrapper_class'                   => 'mwtsa-latest-searches',
-				'label'                           =>  ''
+				'unit'              => 'week',
+				'amount'            => 1,
+				'count'             => 10,
+				'only_with_results' => true,
+				'wrapper_class'     => 'mwtsa-latest-searches',
+				'label'             => ''
 			), $atts, 'mwtsa_display_latest_searches' );
 
 			$atts['only_with_results'] = filter_var( $atts['only_with_results'], FILTER_VALIDATE_BOOLEAN );
@@ -49,9 +49,9 @@ if ( ! class_exists( 'MWTSA_Display_Latest_Searches_Shortcode' ) ) {
 
 			ob_start();
 			?>
-            <div class="<?php echo $atts['wrapper_class'] ?>">
+            <div class="<?php echo esc_attr( $atts['wrapper_class'] ) ?>">
 				<?php if ( count( $search_results ) > 0 ) : ?>
-                    <p><?php echo $atts['label'] ?></p>
+                    <p><?php echo esc_html( $atts['label'] ) ?></p>
                     <ul>
 						<?php foreach ( $search_results as $term ) :
 							echo apply_filters(

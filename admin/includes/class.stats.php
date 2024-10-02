@@ -1,5 +1,5 @@
 <?php
-defined("ABSPATH") || exit;
+defined( "ABSPATH" ) || exit;
 
 if ( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
 
@@ -38,21 +38,21 @@ if ( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
 
 			if ( isset( $_REQUEST['mwtsa-export-csv'] ) ) {
 				$columns = array(
-					__( 'Term ID', 'search-analytics' ),
-					__( 'Term', 'search-analytics' ),
-					__( 'Searches', 'search-analytics' ),
-					__( 'Average Results', 'search-analytics' ),
-					__( 'Last Search Date', 'search-analytics' )
+					esc_attr__( 'Term ID', 'search-analytics' ),
+					esc_attr__( 'Term', 'search-analytics' ),
+					esc_attr__( 'Searches', 'search-analytics' ),
+					esc_attr__( 'Average Results', 'search-analytics' ),
+					esc_attr__( 'Last Search Date', 'search-analytics' )
 				);
 
 				if ( ! empty( $_REQUEST['search-term'] ) ) {
 					$columns = array(
-						__( 'Average Results', 'search-analytics' ),
-						__( 'Date and Time', 'search-analytics' )
+						esc_attr__( 'Average Results', 'search-analytics' ),
+						esc_attr__( 'Date and Time', 'search-analytics' )
 					);
 
 					if ( ! empty( $_REQUEST['grouped_view'] ) ) {
-						$columns[] = __( 'Searches', 'search-analytics' );
+						$columns[] = esc_attr__( 'Searches', 'search-analytics' );
 					}
 				}
 
@@ -113,7 +113,7 @@ if ( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
 			}
 
 			if ( ! empty( MWTSA_Options::get_option( 'mwtsa_save_search_by_user' ) ) ) {
-				wp_register_style( 'select2css', '//cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css', false, '4.0.13');
+				wp_register_style( 'select2css', '//cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css', false, '4.0.13' );
 
 				wp_enqueue_script( 'select2', '//cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js', array( 'jquery' ), '4.0.13', true );
 			}
@@ -133,7 +133,7 @@ if ( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
 			global $mwtsa;
 
 			$stats_table = ! empty( $_REQUEST['search-term'] ) ? new MWTSA_Term_Stats_Table() : new MWTSA_Stats_Table();
-			$is_delete = ! empty( $_REQUEST['action'] ) && 'delete' === $_REQUEST['action'];
+			$is_delete   = ! empty( $_REQUEST['action'] ) && 'delete' === $_REQUEST['action'];
 
 			?>
             <div class="wrap mwtsa-wrapper">
@@ -145,22 +145,22 @@ if ( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
 							<?php if ( ! $is_delete ) : ?>
                                 <div class="mwtsa-filters-groups-wrapper">
                                     <div>
-                                        <span class="views-label"><?php _e( 'Time filters:', 'search-analytics' ) ?></span>
+                                        <span class="views-label"><?php esc_html_e( 'Time filters:', 'search-analytics' ) ?></span>
 										<?php $stats_table->display_time_views(); ?>
                                     </div>
                                     <div>
-                                        <span class="views-label"><?php _e( 'Results filters:', 'search-analytics' ) ?></span>
+                                        <span class="views-label"><?php esc_html_e( 'Results filters:', 'search-analytics' ) ?></span>
 										<?php $stats_table->display_results_views(); ?>
                                     </div>
 
 									<?php if ( ! empty( $_REQUEST['search-term'] ) ) : ?>
                                         <div>
-                                            <span class="views-label"><?php _e( 'Group By:', 'search-analytics' ) ?></span>
+                                            <span class="views-label"><?php esc_html_e( 'Group By:', 'search-analytics' ) ?></span>
 											<?php $stats_table->display_group_views(); ?>
                                         </div>
 									<?php else : ?>
                                         <div>
-                                            <span class="views-label"><?php _e( 'Group By:', 'search-analytics' ) ?></span>
+                                            <span class="views-label"><?php esc_html_e( 'Group By:', 'search-analytics' ) ?></span>
 											<?php $stats_table->display_results_grouping(); ?>
                                         </div>
 									<?php endif; ?>
@@ -171,22 +171,22 @@ if ( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
                             <form method="get">
                                 <input type="hidden" name="page" value="<?php echo $stats_table->get_this_screen() ?>">
 								<?php if ( isset ( $_REQUEST['date_from'] ) ): ?>
-                                    <input type="hidden" name="date_from" value="<?php echo $_REQUEST['date_from'] ?>">
+                                    <input type="hidden" name="date_from" value="<?php echo esc_attr( $_REQUEST['date_from'] ) ?>">
 								<?php endif; ?>
 								<?php if ( isset ( $_REQUEST['date_to'] ) ): ?>
-                                    <input type="hidden" name="date_to" value="<?php echo $_REQUEST['date_to'] ?>">
+                                    <input type="hidden" name="date_to" value="<?php echo esc_attr( $_REQUEST['date_to'] ) ?>">
 								<?php endif; ?>
 								<?php if ( isset ( $_REQUEST['period_view'] ) ): ?>
-                                    <input type="hidden" name="period_view" value="<?php echo $_REQUEST['period_view'] ?>">
+                                    <input type="hidden" name="period_view" value="<?php echo (int) $_REQUEST['period_view'] ?>">
 								<?php endif; ?>
 								<?php if ( isset ( $_REQUEST['results_view'] ) ): ?>
-                                    <input type="hidden" name="results_view" value="<?php echo $_REQUEST['results_view'] ?>">
+                                    <input type="hidden" name="results_view" value="<?php echo (int) $_REQUEST['results_view'] ?>">
 								<?php endif; ?>
 								<?php if ( isset ( $_REQUEST['grouped_view'] ) ): ?>
-                                    <input type="hidden" name="grouped_view" value="<?php echo $_REQUEST['grouped_view'] ?>">
+                                    <input type="hidden" name="grouped_view" value="<?php echo (int) $_REQUEST['grouped_view'] ?>">
 								<?php endif; ?>
 								<?php if ( ! empty ( $_REQUEST['search-term'] ) ): ?>
-                                    <input type="hidden" name="search-term" value="<?php echo $_REQUEST['search-term'] ?>">
+                                    <input type="hidden" name="search-term" value="<?php echo (int) $_REQUEST['search-term'] ?>">
 								<?php endif; ?>
 								<?php
 								$stats_table->display_search_box();
@@ -200,25 +200,25 @@ if ( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
                     </div>
                     <div class="mwtsa-col-2">
                         <div class="col-content">
-                            <h2><?php _e( 'Search Analytics', 'search-analytics' ) ?></h2>
+                            <h2><?php esc_html_e( 'Search Analytics', 'search-analytics' ) ?></h2>
 
-                            <h3><?php _e( 'Changelog', 'search-analytics' ) ?></h3>
+                            <h3><?php esc_html_e( 'Changelog', 'search-analytics' ) ?></h3>
 
-                            <p><?php echo sprintf( __( 'New in version %s', 'search-analytics' ), $mwtsa->version ); ?></p>
+                            <p><?php printf( esc_attr__( 'New in version %s', 'search-analytics' ), $mwtsa->version ); ?></p>
                             <ul class="changelog-list">
-                                <li>Bugfix: Fix PHP Compatibility issue: PHP 5.6 - 7.2</li>
+                                <li>Optimization: Security improvements and general code optimization. Fixed Reflected Cross-Site Scripting vulnerability reported by <a href="https://www.wordfence.com/threat-intel/vulnerabilities/researchers/dale-mavers" target="_blank">vgo0</a>. Thank you for the research!</li>
                             </ul>
-                            <p><a href="https://www.cornelraiu.com/mwt-search-analytics-changelog/" target="_blank">Click here to check the complete log</a></p>
-                            <h3><?php _e( 'Useful Links', 'search-analytics' ) ?></h3>
+                            <p><a href="https://www.cornelraiu.com/mwt-search-analytics-changelog/" target="_blank"><?php esc_html_e( 'Click here to check the complete log', 'search-analytics' ) ?></a></p>
+                            <h3><?php esc_html_e( 'Useful Links', 'search-analytics' ) ?></h3>
                             <ul>
                                 <li>
-                                    <a href="options-general.php?page=search-analytics"><?php _e( 'Settings Page', 'search-analytics' ) ?></a>
+                                    <a href="options-general.php?page=search-analytics"><?php esc_html_e( 'Settings Page', 'search-analytics' ) ?></a>
                                 </li>
                                 <li>
-                                    <a href="<?php echo MWTSA_WORDPRESS_URL ?>" target="_blank"><?php _e( 'Support Forum', 'search-analytics' ) ?></a>
+                                    <a href="<?php echo MWTSA_WORDPRESS_URL ?>" target="_blank"><?php esc_html_e( 'Support Forum', 'search-analytics' ) ?></a>
                                 </li>
                                 <li style="font-weight: bold">
-                                    <a href="<?php echo MWTSA_WORDPRESS_URL ?>/reviews/#new-post" target="_blank"><?php _e( 'Rate and review Search Analytics', 'search-analytics' ) ?></a>
+                                    <a href="<?php echo MWTSA_WORDPRESS_URL ?>/reviews/#new-post" target="_blank"><?php esc_html_e( 'Rate and review Search Analytics', 'search-analytics' ) ?></a>
                                 </li>
                             </ul>
                         </div>

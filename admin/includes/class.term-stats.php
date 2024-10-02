@@ -1,5 +1,5 @@
 <?php
-defined("ABSPATH") || exit;
+defined( "ABSPATH" ) || exit;
 
 if ( ! class_exists( 'WP_List_Table' ) ) {
 	require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
@@ -17,7 +17,7 @@ if ( ! class_exists( 'MWTSA_Term_Stats_Table' ) ) :
 		public $is_grouped = false;
 
 		public function __construct( $args = [] ) {
-			$this->term_id   = absint( $_REQUEST['search-term'] );
+			$this->term_id   = (int) $_REQUEST['search-term'];
 			$this->term_data = $this->get_term_data();
 
 			if ( ! empty( $_REQUEST['grouped_view'] ) ) {
@@ -26,7 +26,7 @@ if ( ! class_exists( 'MWTSA_Term_Stats_Table' ) ) :
 
 			$title = ( ! empty( $_REQUEST['action'] ) && 'delete' == $_REQUEST['action'] ) ?
 				__( 'Terms Deleted', 'search-analytics' ) :
-				__( 'Term `' . $this->term_data['term'] . '` Search Statistics', 'search-analytics' );
+				sprintf( __( 'Term `%s` Search Statistics', 'search-analytics' ), esc_attr( $this->term_data['term'] ) );
 
 			parent::__construct( [
 				'title' => $title,
@@ -46,7 +46,7 @@ if ( ! class_exists( 'MWTSA_Term_Stats_Table' ) ) :
 
 		public function get_columns() {
 			$columns = array(
-				'results'   => __( 'Average no. of results', 'search-analytics' )
+				'results' => __( 'Average no. of results', 'search-analytics' )
 			);
 
 			$show_dates_as_utc = (bool) MWTSA_Options::get_option( 'mwtsa_show_dates_as_utc' );
@@ -79,7 +79,7 @@ if ( ! class_exists( 'MWTSA_Term_Stats_Table' ) ) :
 		}
 
 		private function get_date_format() {
-			$current_group_view = ( ! empty( $_REQUEST['grouped_view'] ) ? $_REQUEST['grouped_view'] : 0 );
+			$current_group_view = ( ! empty( $_REQUEST['grouped_view'] ) ? (int) $_REQUEST['grouped_view'] : 0 );
 
 			$date_parts = array(
 				get_option( 'date_format' ),
@@ -88,11 +88,11 @@ if ( ! class_exists( 'MWTSA_Term_Stats_Table' ) ) :
 
 			$glue = ' ';
 
-			if ( $current_group_view == 1 ) {
+			if ( $current_group_view === 1 ) {
 				$date_parts = array(
 					get_option( 'date_format' )
 				);
-			} elseif ( $current_group_view == 2 ) {
+			} elseif ( $current_group_view === 2 ) {
 				$date_parts = array(
 					'h:00 a',
 					'h:59 a'
@@ -119,7 +119,7 @@ if ( ! class_exists( 'MWTSA_Term_Stats_Table' ) ) :
 					$output = number_format( (float) $item['results_count'], 2, '.', '' );
 					break;
 				case 'searches':
-					$output = $item['count'];
+					$output = (int) $item['count'];
 					break;
 			}
 
@@ -131,14 +131,15 @@ if ( ! class_exists( 'MWTSA_Term_Stats_Table' ) ) :
 			$order   = ( ! empty( $_GET['order'] ) ) ? $_GET['order'] : 'desc';
 
 			switch ( $orderby ) {
-				case 'date_time':
-					$orderby = 'datetime';
-					break;
 				case 'results':
 					$orderby = 'results_count';
 					break;
 				case 'searches':
 					$orderby = 'count';
+					break;
+				case 'date_time':
+				default:
+					$orderby = 'datetime';
 					break;
 			}
 
@@ -153,19 +154,19 @@ if ( ! class_exists( 'MWTSA_Term_Stats_Table' ) ) :
 
 		public function display_group_views() {
 			$views   = array();
-			$current = ( ! empty( $_REQUEST['grouped_view'] ) ? $_REQUEST['grouped_view'] : 0 );
+			$current = ! empty( $_REQUEST['grouped_view'] ) ? (int) $_REQUEST['grouped_view'] : 0;
 
-			$class    = ( $current == 0 ) ? ' class="current"' : '';
 			$this_url = remove_query_arg( 'grouped_view' );
-			$views[0] = "<a href='$this_url' $class >" . __( 'Not grouped', 'search-analytics' ) . "</a>";
+			$class    = ( $current === 0 ) ? ' class="current"' : '';
+			$views[0] = sprintf( "<a href='%s' %s>%s</a>",  esc_url( $this_url ), $class, esc_attr__( 'Not grouped', 'search-analytics' ) );
 
 			$this_url = add_query_arg( 'grouped_view', 1 );
-			$class    = ( $current == 1 ) ? ' class="current"' : '';
-			$views[1] = "<a href='$this_url' $class >" . __( 'By date', 'search-analytics' ) . "</a>";
+			$class    = ( $current === 1 ) ? ' class="current"' : '';
+			$views[1] = sprintf( "<a href='%s' %s>%s</a>",  esc_url( $this_url ), $class, esc_attr__( 'By date', 'search-analytics' ) );
 
 			$this_url = add_query_arg( 'grouped_view', 2 );
-			$class    = ( $current == 2 ) ? ' class="current"' : '';
-			$views[2] = "<a href='$this_url' $class >" . __( 'By hour', 'search-analytics' ) . "</a>";
+			$class    = ( $current === 2 ) ? ' class="current"' : '';
+			$views[2] = sprintf( "<a href='%s' %s>%s</a>",  esc_url( $this_url ), $class, esc_attr__( 'By hour', 'search-analytics' ) );
 
 			$this->format_views_list( $views );
 		}

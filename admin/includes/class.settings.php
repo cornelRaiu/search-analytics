@@ -36,7 +36,19 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 
 		public function mwtsa_settings_init() {
 
-			register_setting( 'mwtsa_general_options', MWTSAI()->main_option_name );
+			register_setting( 'mwtsa_general_options', MWTSAI()->main_option_name, array(
+				'type'              => 'string',
+				'sanitize_callback' => function ( $values ) {
+
+					return array_map( function ( $value ) {
+						if ( is_array( $value ) ) {
+							return array_map( 'sanitize_text_field', $value );
+						}
+
+						return sanitize_text_field( $value );
+					}, $values );
+				},
+			) );
 
 			add_settings_section(
 				'mwtsa_general_options_section',
@@ -206,7 +218,8 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 			}
 
 			?>
-            <input type="number" min="0" name="mwtsa_settings[mwtsa_exclude_doubled_search_for_interval]" value="<?php echo $this->existing_options['mwtsa_exclude_doubled_search_for_interval'] ?>"/>
+			<input type="number" min="0" name="mwtsa_settings[mwtsa_exclude_doubled_search_for_interval]"
+			       value="<?php echo (int) $this->existing_options['mwtsa_exclude_doubled_search_for_interval'] ?>"/>
             <span><?php _e( '( Note: set to 0 or leave empty to disable it )', 'search-analytics' ) ?></span>
             <br/>
             <strong><?php _e( 'Note: this will set a cookie in the browser of the user who made any kind of search on the website.<br />This needs to be treated by the site\'s GDPR terms in case it\'s value is a number larger than 0<br />The cookie name is: ', 'search-analytics' ) ?><i><?php echo $mwtsa->cookie_name ?></i></strong>
@@ -220,7 +233,9 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 
 			$admin_ip = isset( $_SERVER['HTTP_CLIENT_IP'] ) ? $_SERVER['HTTP_CLIENT_IP'] : ( isset( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'] );
 			?>
-            <input type="text" name="mwtsa_settings[mwtsa_exclude_searches_from_ip_addresses]" value="<?php echo $this->existing_options['mwtsa_exclude_searches_from_ip_addresses'] ?>" placeholder="eg. 127.0.0.1"/> <span><?php _e( '( Note: separate IP values by comma )', 'search-analytics' ) ?></span>
+			<input type="text" name="mwtsa_settings[mwtsa_exclude_searches_from_ip_addresses]"
+			       value="<?php esc_attr_e( $this->existing_options['mwtsa_exclude_searches_from_ip_addresses'] ) ?>" placeholder="eg. 127.0.0.1"/>
+			<span><?php _e( '( Note: separate IP values by comma )', 'search-analytics' ) ?></span>
             <br/>
 
             <strong><?php _e( 'Your IP address is: ' . $admin_ip, 'search-analytics' ) ?></strong>
@@ -233,7 +248,8 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 				$this->existing_options['mwtsa_minimum_characters'] = 0;
 			}
 			?>
-            <input type="number" min="0" name="mwtsa_settings[mwtsa_minimum_characters]" value="<?php echo $this->existing_options['mwtsa_minimum_characters'] ?>"/>
+			<input type="number" min="0" name="mwtsa_settings[mwtsa_minimum_characters]"
+			       value="<?php echo (int) $this->existing_options['mwtsa_minimum_characters'] ?>"/>
             <span><?php _e( '( Note: set to 0 or leave empty to disable it )', 'search-analytics' ) ?></span>
             <br/>
 			<?php
@@ -246,7 +262,8 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 			}
 
 			?>
-            <input type="text" name="mwtsa_settings[mwtsa_exclude_if_string_contains]" value="<?php echo $this->existing_options['mwtsa_exclude_if_string_contains']; ?>" placeholder="eg. text, another one"/>
+			<input type="text" name="mwtsa_settings[mwtsa_exclude_if_string_contains]"
+			       value="<?php esc_attr_e( $this->existing_options['mwtsa_exclude_if_string_contains'] ); ?>" placeholder="eg. text, another one"/>
             <span><?php _e( '( Note: enter comma (,) separated strings )', 'search-analytics' ) ?></span>
 			<?php
 		}
@@ -258,7 +275,8 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 			}
 
 			?>
-            <input type="text" name="mwtsa_settings[mwtsa_custom_search_url_params]" value="<?php echo $this->existing_options['mwtsa_custom_search_url_params']; ?>" placeholder="eg. wpv_post_search"/>
+			<input type="text" name="mwtsa_settings[mwtsa_custom_search_url_params]"
+			       value="<?php esc_attr_e( $this->existing_options['mwtsa_custom_search_url_params'] ); ?>" placeholder="eg. wpv_post_search"/>
             <span><?php _e( '( Note: enter comma (,) separated strings )', 'search-analytics' ) ?></span>
 			<?php
 		}
@@ -411,7 +429,7 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
             <table class="form-table erase-history-table">
                 <tbody>
                 <tr>
-                    <th scope="row">Delete all data</th>
+					<th scope="row"><?php _e( 'Delete all data', 'search-analytics' ) ?></th>
                     <td>
                         <form action="" method="post">
 							<?php wp_nonce_field( 'mwtsa-erase-data' ); ?>
@@ -423,7 +441,7 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
                     </td>
                 </tr>
                 <tr>
-                    <th scope="row">Delete data older than</th>
+					<th scope="row"><?php _e( 'Delete data older than', 'search-analytics' ) ?></th>
                     <td>
                         <form action="" method="post">
 							<?php wp_nonce_field( 'mwtsa-erase-data' ); ?>
