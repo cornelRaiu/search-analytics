@@ -3,7 +3,7 @@
 Plugin Name: Search Analytics for WP
 Plugin URI: https://www.cornelraiu.com/wordpress-plugins/mwt-search-analytics/
 Description: Search Analytics for WP will store and display the search terms used on your website. No third-party service is used!
-Version: 1.4.12
+Version: 1.4.13
 Author: Cornel Raiu
 Author URI: https://www.cornelraiu.com/
 Text Domain: search-analytics
@@ -22,7 +22,7 @@ if ( ! class_exists( 'MWTSA' ) ) {
 
 	final class MWTSA {
 
-		public $version = '1.4.12';
+		public $version = '1.4.13';
 		public $db_version = '1.1.1';
 
 		public $plugin_dir;
@@ -50,11 +50,11 @@ if ( ! class_exists( 'MWTSA' ) ) {
 		}
 
 		public function __clone() {
-			_doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'search-analytics' ), $this->version );
+			_doing_it_wrong( __FUNCTION__, esc_attr__( 'Cheatin&#8217; huh?', 'search-analytics' ), esc_attr( $this->version) );
 		}
 
 		public function __wakeup() {
-			_doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'search-analytics' ), $this->version );
+			_doing_it_wrong( __FUNCTION__, esc_attr__( 'Cheatin&#8217; huh?', 'search-analytics' ), esc_attr( $this->version ) );
 		}
 
 		public function __construct() {
@@ -83,7 +83,6 @@ if ( ! class_exists( 'MWTSA' ) ) {
 			$this->main_option_name = 'mwtsa_settings';
 		}
 
-		/** @noinspection PhpIncludeInspection */
 		public function includes() {
 			require_once( $this->includes_dir . 'helpers.php' );
 			require_once( $this->includes_dir . 'class.options.php' );

@@ -4,7 +4,7 @@ Tags: search, analytics, statistics, history
 Requires at least: 4.4.0
 Tested up to: 6.6.2
 Requires PHP: 5.6
-Stable tag: 1.4.12
+Stable tag: 1.4.13
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -76,6 +76,9 @@ You can use the [Support Forum](https://wordpress.org/support/plugin/search-anal
 Please report security bugs found in the source code of the Search Analytics for WP plugin through the [Patchstack Vulnerability Disclosure Program](https://patchstack.com/database/vdp/search-analytics). The Patchstack team will assist you with verification, CVE assignment, and notify me, the developer of Search Analytics for WP.
 
 == Changelog ==
+= 1.4.13 =
+* Others: Security improvements and general code optimization.
+
 = 1.4.12 =
 * Others: Security improvements and general code optimization. Fixed Reflected Cross-Site Scripting vulnerability reported by [vgo0](https://www.wordfence.com/threat-intel/vulnerabilities/researchers/dale-mavers)
 
@@ -290,5 +293,5 @@ Please report security bugs found in the source code of the Search Analytics for
 
 == Upgrade Notice ==
 
-= 1.4.12 =
-Rename plugin to "Search Analytics for WP"
+= 1.4.13 =
+Security improvements and general code optimization.

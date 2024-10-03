@@ -65,17 +65,18 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 		public function get_custom_search_value() {
 			$exclude_custom_search_params = MWTSA_Options::get_option( 'mwtsa_custom_search_url_params' );
 
-			$custom_search_value = '';
-			if ( ! empty( $exclude_custom_search_params ) ) {
-				$custom_search_params = array_map( 'trim', explode( ',', $exclude_custom_search_params ) );
-				foreach ( $custom_search_params as $param ) {
-					if ( ! empty( $_REQUEST[ $param ] ) ) {
-						$custom_search_value = $_REQUEST[ $param ];
-					}
+			if ( empty( $exclude_custom_search_params ) ) {
+				return '';
+			}
+
+			$custom_search_params = array_map( 'trim', explode( ',', $exclude_custom_search_params ) );
+			foreach ( $custom_search_params as $param ) {
+				if ( ! empty( $_REQUEST[ $param ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+					return sanitize_text_field( wp_unslash( $_REQUEST[ $param ] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				}
 			}
 
-			return sanitize_text_field( $custom_search_value );
+			return '';
 		}
 
 		public function process_search_term( $search_term, $count ) {
@@ -142,8 +143,9 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 
 			if ( ! empty( MWTSA_Options::get_option( 'mwtsa_save_search_country' ) ) ) {
 				//http://ip-api.com/json/24.48.0?fields=49154
-				// IP-API integration according to the documentation at http://ip-api.com/docs/api:json
-				$ip_details_get = @ file_get_contents( 'http://ip-api.com/json/' . $client_ip . '?fields=49155' );
+				// IP-API integration according to the documentation at https://ip-api.com/docs/api:json
+				$request        = wp_remote_get( 'https://ip-api.com/json/' . $client_ip . '?fields=49155' );
+				$ip_details_get = wp_remote_retrieve_body( $request );
 				if ( ! empty( $ip_details_get ) ) {
 					$ip_details = json_decode( $ip_details_get );
 
@@ -178,6 +180,7 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 			return true;
 		}
 
+		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $mwtsa->terms_table_name and $mwtsa->history_table_name are hardcoded.
 		public function save_search_term( $term, $found_posts, $country = '', $user_id = 0 ) {
 			global $wpdb, $mwtsa;
 
@@ -186,7 +189,7 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 			MWTSA_Install::activate_single_site();
 
 			//1. add/update term string
-			$existing_term = $wpdb->get_row( $wpdb->prepare(
+			$existing_term = $wpdb->get_row( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 				"SELECT *
 				FROM `$mwtsa->terms_table_name`
 				WHERE term = %s
@@ -201,7 +204,7 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 			$term_id = null;
 
 			if ( empty ( $existing_term ) ) {
-				$success = $wpdb->query( $wpdb->prepare(
+				$success = $wpdb->query( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 					"INSERT INTO `$mwtsa->terms_table_name` (`term`, `total_count`)
 					VALUES (%s, %d)",
 					sanitize_text_field( $term ),
@@ -221,7 +224,7 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 
 				$total_count = $existing_term->total_count + 1;
 
-				$success = $wpdb->query( $wpdb->prepare(
+				$success = $wpdb->query( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 					"UPDATE `$mwtsa->terms_table_name`
 					SET total_count = %d
 					WHERE term = %s
@@ -246,7 +249,7 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 					MWTSA_Cookies::set_cookie_value( $current_user_cookie, ( 86400 * 7 ) );
 				}
 
-				$success = $wpdb->query( $wpdb->prepare(
+				$success = $wpdb->query( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 					"INSERT INTO `$mwtsa->history_table_name` (`term_id`, `datetime`, `count_posts`, `country`, `user_id`)
 					VALUES (%d, UTC_TIMESTAMP(), %d, %s, %d)",
 					$term_id,
@@ -264,5 +267,6 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 
 			return $success;
 		}
+		// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 	}
 }

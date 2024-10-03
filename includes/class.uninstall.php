@@ -18,7 +18,7 @@ if ( ! class_exists( 'MWTSA_Uninstall' ) ) {
                 if ( function_exists( 'get_sites' ) ) {
                     $site_ids = get_sites( array( 'fields' => 'ids' ) );
                 } else {
-                    $site_ids = $wpdb->get_col( "SELECT blog_id FROM $wpdb->blogs;" );
+                    $site_ids = $wpdb->get_col( "SELECT blog_id FROM $wpdb->blogs;" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
                 }
 
                 // Uninstall the plugin for all these sites.
@@ -37,12 +37,10 @@ if ( ! class_exists( 'MWTSA_Uninstall' ) ) {
             global $wpdb, $mwtsa;
 
             $table_name = $wpdb->prefix . $mwtsa->history_table_name_no_prefix;
-            $sql        = "DROP TABLE IF EXISTS $table_name";
-            $wpdb->query( $sql );
+            $wpdb->query( "DROP TABLE IF EXISTS $table_name" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.SchemaChange
 
             $table_name = $wpdb->prefix . $mwtsa->terms_table_name_no_prefix;
-            $sql        = "DROP TABLE IF EXISTS $table_name";
-            $wpdb->query( $sql );
+            $wpdb->query( "DROP TABLE IF EXISTS $table_name" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.SchemaChange
 
             delete_option( "mwtsa_db_version" );
         }

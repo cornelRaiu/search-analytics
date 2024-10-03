@@ -26,7 +26,7 @@ if ( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
 			add_action( "load-$this->view", array( $this, 'add_screen_options' ) );
 			add_filter( 'set-screen-option', array( $this, 'set_screen_options' ), 10, 3 );
 
-			if ( empty( $_REQUEST['search-term'] ) && empty ( MWTSA_Options::get_option( 'mwtsa_hide_charts' ) ) ) {
+			if ( empty( $_REQUEST['search-term'] ) && empty ( MWTSA_Options::get_option( 'mwtsa_hide_charts' ) ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				$this->charts = new MWTSA_Admin_Charts();
 			}
 
@@ -36,7 +36,7 @@ if ( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
 
 		public function mwtsa_init() {
 
-			if ( isset( $_REQUEST['mwtsa-export-csv'] ) ) {
+			if ( isset( $_REQUEST['mwtsa-export-csv'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				$columns = array(
 					esc_attr__( 'Term ID', 'search-analytics' ),
 					esc_attr__( 'Term', 'search-analytics' ),
@@ -45,13 +45,13 @@ if ( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
 					esc_attr__( 'Last Search Date', 'search-analytics' )
 				);
 
-				if ( ! empty( $_REQUEST['search-term'] ) ) {
+				if ( ! empty( $_REQUEST['search-term'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 					$columns = array(
 						esc_attr__( 'Average Results', 'search-analytics' ),
 						esc_attr__( 'Date and Time', 'search-analytics' )
 					);
 
-					if ( ! empty( $_REQUEST['grouped_view'] ) ) {
+					if ( ! empty( $_REQUEST['grouped_view'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 						$columns[] = esc_attr__( 'Searches', 'search-analytics' );
 					}
 				}
@@ -95,6 +95,7 @@ if ( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
 
 			if ( ! isset( $this->plugin_options['mwtsa_display_stats_for_role'] ) || ! empty( $accepted_user_roles ) ) {
 
+                //TODO: change __FILE__ to unique slug - https://docs.wpvip.com/php_codesniffer/warnings/#h-using-file-for-page-registration
 				add_submenu_page( 'index.php', __( 'Search Analytics', 'search-analytics' ), __( 'Search Analytics', 'search-analytics' ), $accepted_user_roles[0], __FILE__, array(
 					&$this,
 					'render_stats_page'
@@ -120,7 +121,7 @@ if ( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
 
 			wp_register_style( 'mwtsa-datepicker-ui', '//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css', array(), '1.11.2' );
 
-			wp_enqueue_script( 'mwtsa-admin-script', $mwtsa->plugin_admin_url . 'assets/js/admin.js', array(), $mwtsa->version );
+			wp_enqueue_script( 'mwtsa-admin-script', $mwtsa->plugin_admin_url . 'assets/js/admin.js', array(), $mwtsa->version, true );
 
 			wp_localize_script( 'mwtsa-admin-script', 'mwtsa_admin_obj', array(
 					'gmt_offset'  => wp_timezone()->getOffset( new DateTime() ),
@@ -129,10 +130,11 @@ if ( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
 			);
 		}
 
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended
 		public function render_stats_page() {
 			global $mwtsa;
 
-			$stats_table = ! empty( $_REQUEST['search-term'] ) ? new MWTSA_Term_Stats_Table() : new MWTSA_Stats_Table();
+			$stats_table = ! empty( $_REQUEST['search-term'] ) ? new MWTSA_Term_Stats_Table( array( 'search-term' => (int) $_REQUEST['search-term'] ) ) : new MWTSA_Stats_Table();
 			$is_delete   = ! empty( $_REQUEST['action'] ) && 'delete' === $_REQUEST['action'];
 
 			?>
@@ -141,7 +143,7 @@ if ( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
                     <div class="mwtsa-col-1">
                         <div class="col-content">
 							<?php $stats_table->load_notices(); ?>
-							<?php echo $stats_table->this_title(); ?>
+							<?php echo $stats_table->this_title();  // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- already escaped ?>
 							<?php if ( ! $is_delete ) : ?>
                                 <div class="mwtsa-filters-groups-wrapper">
                                     <div>
@@ -153,7 +155,7 @@ if ( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
 										<?php $stats_table->display_results_views(); ?>
                                     </div>
 
-									<?php if ( ! empty( $_REQUEST['search-term'] ) ) : ?>
+									<?php if ( ! empty( $_REQUEST['search-term'] ) ) :?>
                                         <div>
                                             <span class="views-label"><?php esc_html_e( 'Group By:', 'search-analytics' ) ?></span>
 											<?php $stats_table->display_group_views(); ?>
@@ -169,12 +171,12 @@ if ( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
 							<?php $stats_table->prepare_items(); ?>
 
                             <form method="get">
-                                <input type="hidden" name="page" value="<?php echo $stats_table->get_this_screen() ?>">
+                                <input type="hidden" name="page" value="<?php echo esc_attr( $stats_table->get_this_screen() ) ?>">
 								<?php if ( isset ( $_REQUEST['date_from'] ) ): ?>
-                                    <input type="hidden" name="date_from" value="<?php echo esc_attr( $_REQUEST['date_from'] ) ?>">
+                                    <input type="hidden" name="date_from" value="<?php echo esc_attr( sanitize_text_field( wp_unslash( $_REQUEST['date_from'] ) ) ) ?>">
 								<?php endif; ?>
 								<?php if ( isset ( $_REQUEST['date_to'] ) ): ?>
-                                    <input type="hidden" name="date_to" value="<?php echo esc_attr( $_REQUEST['date_to'] ) ?>">
+                                    <input type="hidden" name="date_to" value="<?php echo esc_attr( sanitize_text_field( wp_unslash( $_REQUEST['date_to'] ) ) ) ?>">
 								<?php endif; ?>
 								<?php if ( isset ( $_REQUEST['period_view'] ) ): ?>
                                     <input type="hidden" name="period_view" value="<?php echo (int) $_REQUEST['period_view'] ?>">
@@ -204,10 +206,13 @@ if ( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
 
                             <h3><?php esc_html_e( 'Changelog', 'search-analytics' ) ?></h3>
 
-                            <p><?php printf( esc_attr__( 'New in version %s', 'search-analytics' ), $mwtsa->version ); ?></p>
+                            <p><?php
+	                            /* translators: %s: Plugin version */
+                                printf( esc_attr__( 'New in version %s', 'search-analytics' ), esc_attr( $mwtsa->version ) ); ?>
+                            </p>
                             <ul class="changelog-list">
-                                <li>Optimization: Security improvements and general code optimization. Fixed Reflected Cross-Site Scripting vulnerability reported by <a href="https://www.wordfence.com/threat-intel/vulnerabilities/researchers/dale-mavers" target="_blank">vgo0</a>. Thank you for the research!</li>
-                            </ul>
+                                <li>Optimization: Security improvements and general code optimization.</li>
+							</ul>
                             <p><a href="https://www.cornelraiu.com/mwt-search-analytics-changelog/" target="_blank"><?php esc_html_e( 'Click here to check the complete log', 'search-analytics' ) ?></a></p>
                             <h3><?php esc_html_e( 'Useful Links', 'search-analytics' ) ?></h3>
                             <ul>
@@ -215,10 +220,10 @@ if ( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
                                     <a href="options-general.php?page=search-analytics"><?php esc_html_e( 'Settings Page', 'search-analytics' ) ?></a>
                                 </li>
                                 <li>
-                                    <a href="<?php echo MWTSA_WORDPRESS_URL ?>" target="_blank"><?php esc_html_e( 'Support Forum', 'search-analytics' ) ?></a>
+                                    <a href="<?php echo esc_url( MWTSA_WORDPRESS_URL ) ?>" target="_blank"><?php esc_html_e( 'Support Forum', 'search-analytics' ) ?></a>
                                 </li>
                                 <li style="font-weight: bold">
-                                    <a href="<?php echo MWTSA_WORDPRESS_URL ?>/reviews/#new-post" target="_blank"><?php esc_html_e( 'Rate and review Search Analytics', 'search-analytics' ) ?></a>
+                                    <a href="<?php echo esc_url( MWTSA_WORDPRESS_URL ) ?>/reviews/#new-post" target="_blank"><?php esc_html_e( 'Rate and review Search Analytics', 'search-analytics' ) ?></a>
                                 </li>
                             </ul>
                         </div>
@@ -227,6 +232,7 @@ if ( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
             </div>
 			<?php
 		}
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
 	}
 }
 

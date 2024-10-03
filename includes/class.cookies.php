@@ -39,11 +39,11 @@ if ( ! class_exists( 'MWTSA_Cookies' ) ) {
         }
 
         public static function get_cookie_value() {
-            return ( isset( $_COOKIE[ MWTSAI()->cookie_name ] ) ) ? json_decode( wp_unslash( $_COOKIE[ MWTSAI()->cookie_name ] ), true ) : array();
+            return ( isset( $_COOKIE[ MWTSAI()->cookie_name ] ) ) ? json_decode( sanitize_text_field( wp_unslash( $_COOKIE[ MWTSAI()->cookie_name ] ) ), true ) : array();
         }
 
         public static function set_cookie_value( $value, $expire_delay = MONTH_IN_SECONDS ) {
-            $value = json_encode( $value );
+            $value = wp_json_encode( $value );
 
             setcookie( MWTSAI()->cookie_name, $value, time() + $expire_delay, COOKIEPATH, COOKIE_DOMAIN );
         }

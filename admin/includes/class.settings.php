@@ -1,5 +1,5 @@
 <?php
-defined("ABSPATH") || exit;
+defined( "ABSPATH" ) || exit;
 
 if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 
@@ -185,8 +185,8 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 				foreach ( $roles as $role_key => $role ) :
 					?>
                     <label>
-                        <input type='checkbox' name='mwtsa_settings[mwtsa_exclude_search_for_role][]' value='<?php echo $role_key ?>' <?php checked( in_array( $role_key, $this->existing_options['mwtsa_exclude_search_for_role'] ), 1 ) ?> />
-                        <span><?php echo $role['name'] ?></span>
+                        <input type='checkbox' name='mwtsa_settings[mwtsa_exclude_search_for_role][]' value='<?php echo esc_attr( $role_key ) ?>' <?php checked( in_array( $role_key, $this->existing_options['mwtsa_exclude_search_for_role'] ), 1 ) ?> />
+                        <span><?php echo esc_attr( $role['name'] ) ?></span>
                     </label><br/>
 				<?php
 				endforeach;
@@ -205,7 +205,9 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
                 <input type='checkbox' name='mwtsa_settings[mwtsa_exclude_search_for_role_after_logout]' value='1' <?php checked( $this->existing_options['mwtsa_exclude_search_for_role_after_logout'], 1 ) ?> />
             </label>
             <br/>
-            <strong><?php _e( 'Note: this will set a cookie in the browser of the user who logged in and has one of the user roles checked above.<br />This needs to be treated by the site\'s GDPR terms in case it is active for public user roles ( e.g. Subscriber, Client )<br />The cookie name is: ', 'search-analytics' ) ?><i><?php echo $mwtsa->cookie_name ?></i></strong>
+            <strong><?php esc_attr_e( 'Note: this will set a cookie in the browser of the user who logged in and has one of the user roles checked above.<br />This needs to be treated by the site\'s GDPR terms in case it is active for public user roles ( e.g. Subscriber, Client )<br />The cookie name is: ', 'search-analytics' ) ?>
+                <i><?php echo esc_attr( $mwtsa->cookie_name ) ?></i>
+            </strong>
             <br/>
 			<?php
 		}
@@ -218,11 +220,13 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 			}
 
 			?>
-			<input type="number" min="0" name="mwtsa_settings[mwtsa_exclude_doubled_search_for_interval]"
-			       value="<?php echo (int) $this->existing_options['mwtsa_exclude_doubled_search_for_interval'] ?>"/>
-            <span><?php _e( '( Note: set to 0 or leave empty to disable it )', 'search-analytics' ) ?></span>
+            <input type="number" min="0" name="mwtsa_settings[mwtsa_exclude_doubled_search_for_interval]" value="<?php echo (int) $this->existing_options['mwtsa_exclude_doubled_search_for_interval'] ?>"/>
+            <span><?php esc_attr_e( '( Note: set to 0 or leave empty to disable it )', 'search-analytics' ) ?></span>
             <br/>
-            <strong><?php _e( 'Note: this will set a cookie in the browser of the user who made any kind of search on the website.<br />This needs to be treated by the site\'s GDPR terms in case it\'s value is a number larger than 0<br />The cookie name is: ', 'search-analytics' ) ?><i><?php echo $mwtsa->cookie_name ?></i></strong>
+            <strong>
+                <?php esc_attr_e( 'Note: this will set a cookie in the browser of the user who made any kind of search on the website.<br />This needs to be treated by the site\'s GDPR terms in case it\'s value is a number larger than 0<br />The cookie name is: ', 'search-analytics' ) ?>
+                <i><?php echo esc_attr( $mwtsa->cookie_name ) ?></i>
+            </strong>
 			<?php
 		}
 
@@ -231,14 +235,15 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 				$this->existing_options['mwtsa_exclude_searches_from_ip_addresses'] = '';
 			}
 
-			$admin_ip = isset( $_SERVER['HTTP_CLIENT_IP'] ) ? $_SERVER['HTTP_CLIENT_IP'] : ( isset( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'] );
+			$admin_ip = mwt_get_current_user_ip();
 			?>
-			<input type="text" name="mwtsa_settings[mwtsa_exclude_searches_from_ip_addresses]"
-			       value="<?php esc_attr_e( $this->existing_options['mwtsa_exclude_searches_from_ip_addresses'] ) ?>" placeholder="eg. 127.0.0.1"/>
-			<span><?php _e( '( Note: separate IP values by comma )', 'search-analytics' ) ?></span>
+            <input type="text" name="mwtsa_settings[mwtsa_exclude_searches_from_ip_addresses]" value="<?php echo esc_attr( $this->existing_options['mwtsa_exclude_searches_from_ip_addresses'] ) ?>" placeholder="eg. 127.0.0.1"/>
+            <span><?php esc_attr_e( '( Note: separate IP values by comma )', 'search-analytics' ) ?></span>
             <br/>
 
-            <strong><?php _e( 'Your IP address is: ' . $admin_ip, 'search-analytics' ) ?></strong>
+            <strong><?php
+				/* translators: %s: The user's IP Address */
+				printf( esc_attr__( 'Your IP address is: %s', 'search-analytics' ), esc_attr( $admin_ip ) ) ?></strong>
 			<?php
 		}
 
@@ -248,9 +253,8 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 				$this->existing_options['mwtsa_minimum_characters'] = 0;
 			}
 			?>
-			<input type="number" min="0" name="mwtsa_settings[mwtsa_minimum_characters]"
-			       value="<?php echo (int) $this->existing_options['mwtsa_minimum_characters'] ?>"/>
-            <span><?php _e( '( Note: set to 0 or leave empty to disable it )', 'search-analytics' ) ?></span>
+            <input type="number" min="0" name="mwtsa_settings[mwtsa_minimum_characters]" value="<?php echo (int) $this->existing_options['mwtsa_minimum_characters'] ?>"/>
+            <span><?php esc_attr_e( '( Note: set to 0 or leave empty to disable it )', 'search-analytics' ) ?></span>
             <br/>
 			<?php
 		}
@@ -262,9 +266,8 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 			}
 
 			?>
-			<input type="text" name="mwtsa_settings[mwtsa_exclude_if_string_contains]"
-			       value="<?php esc_attr_e( $this->existing_options['mwtsa_exclude_if_string_contains'] ); ?>" placeholder="eg. text, another one"/>
-            <span><?php _e( '( Note: enter comma (,) separated strings )', 'search-analytics' ) ?></span>
+            <input type="text" name="mwtsa_settings[mwtsa_exclude_if_string_contains]" value="<?php echo esc_attr( $this->existing_options['mwtsa_exclude_if_string_contains'] ); ?>" placeholder="eg. text, another one"/>
+            <span><?php esc_attr_e( '( Note: enter comma (,) separated strings )', 'search-analytics' ) ?></span>
 			<?php
 		}
 
@@ -275,14 +278,13 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 			}
 
 			?>
-			<input type="text" name="mwtsa_settings[mwtsa_custom_search_url_params]"
-			       value="<?php esc_attr_e( $this->existing_options['mwtsa_custom_search_url_params'] ); ?>" placeholder="eg. wpv_post_search"/>
-            <span><?php _e( '( Note: enter comma (,) separated strings )', 'search-analytics' ) ?></span>
+            <input type="text" name="mwtsa_settings[mwtsa_custom_search_url_params]" value="<?php echo esc_attr( $this->existing_options['mwtsa_custom_search_url_params'] ); ?>" placeholder="eg. wpv_post_search"/>
+            <span><?php esc_attr_e( '( Note: enter comma (,) separated strings )', 'search-analytics' ) ?></span>
 			<?php
 		}
 
 		public function field_display_settings_for_role_render() {
-			$roles = get_editable_roles();
+			$roles              = get_editable_roles();
 
 			if ( ! empty( $roles ) ) :
 				foreach ( $roles as $role_key => $role ) :
@@ -290,10 +292,10 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 					$is_checked = ! isset( $this->existing_options['mwtsa_display_settings_for_role'] ) || in_array( $role_key, $this->existing_options['mwtsa_display_settings_for_role'] ) || $is_readonly;
 					?>
                     <label>
-                        <input type='checkbox' name='mwtsa_settings[mwtsa_display_settings_for_role][]' value='<?php echo $role_key ?>' <?php checked( $is_checked ) ?> <?php if ( $is_readonly ) {
+                        <input type='checkbox' name='mwtsa_settings[mwtsa_display_settings_for_role][]' value='<?php echo esc_attr( $role_key ) ?>' <?php checked( $is_checked ) ?> <?php if ( $is_readonly ) {
 							echo 'onclick="return false;"';
 						} ?> />
-                        <span><?php echo $role['name'] ?></span>
+                        <span><?php echo esc_attr( $role['name'] ) ?></span>
                     </label>
                     <br/>
 				<?php
@@ -302,7 +304,7 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 		}
 
 		public function field_display_stats_for_role_render() {
-			$roles = get_editable_roles();
+			$roles              = get_editable_roles();
 
 			if ( ! empty( $roles ) ):
 				foreach ( $roles as $role_key => $role ) :
@@ -310,10 +312,10 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 					$is_checked = ! isset( $this->existing_options['mwtsa_display_stats_for_role'] ) || in_array( $role_key, $this->existing_options['mwtsa_display_stats_for_role'] ) || $is_readonly;
 					?>
                     <label>
-                        <input type='checkbox' name='mwtsa_settings[mwtsa_display_stats_for_role][]' value='<?php echo $role_key ?>' <?php checked( $is_checked ) ?> <?php if ( $is_readonly ) {
+                        <input type='checkbox' name='mwtsa_settings[mwtsa_display_stats_for_role][]' value='<?php echo esc_attr( $role_key ) ?>' <?php checked( $is_checked ) ?> <?php if ( $is_readonly ) {
 							echo 'onclick="return false;"';
 						} ?> />
-                        <span><?php echo $role['name'] ?></span>
+                        <span><?php echo esc_attr( $role['name'] ) ?></span>
                     </label>
                     <br/>
 				<?php
@@ -327,9 +329,9 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 			}
 			?>
             <label>
-                <input type="hidden" name='mwtsa_settings[mwtsa_uninstall]' value='0' />
+                <input type="hidden" name='mwtsa_settings[mwtsa_uninstall]' value='0'/>
                 <input type='checkbox' name='mwtsa_settings[mwtsa_uninstall]' value='1' <?php checked( $this->existing_options['mwtsa_uninstall'], 1 ) ?> />
-                <span><?php _e( 'Remove plugin tables on uninstall', 'search-analytics' ) ?></span>
+                <span><?php esc_attr_e( 'Remove plugin tables on uninstall', 'search-analytics' ) ?></span>
             </label>
             <br/>
 			<?php
@@ -341,9 +343,9 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 			}
 			?>
             <label>
-                <input type="hidden" name='mwtsa_settings[mwtsa_hide_charts]' value='0' />
+                <input type="hidden" name='mwtsa_settings[mwtsa_hide_charts]' value='0'/>
                 <input type='checkbox' name='mwtsa_settings[mwtsa_hide_charts]' value='1' <?php checked( $this->existing_options['mwtsa_hide_charts'], 1 ) ?> />
-                <span><?php _e( 'Hide graphical charts for representing statistics', 'search-analytics' ) ?></span>
+                <span><?php esc_attr_e( 'Hide graphical charts for representing statistics', 'search-analytics' ) ?></span>
             </label>
             <br/>
 			<?php
@@ -355,12 +357,12 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 			}
 			?>
             <label>
-                <input type="hidden" name='mwtsa_settings[mwtsa_show_dates_as_utc]' value='0' />
+                <input type="hidden" name='mwtsa_settings[mwtsa_show_dates_as_utc]' value='0'/>
                 <input type='checkbox' name='mwtsa_settings[mwtsa_show_dates_as_utc]' value='1' <?php checked( $this->existing_options['mwtsa_show_dates_as_utc'], 1 ) ?> />
-                <span><?php _e( 'Show the results dates as UTC. Uncheck this to show the dates in the website timezone.', 'search-analytics' ) ?></span>
+                <span><?php esc_attr_e( 'Show the results dates as UTC. Uncheck this to show the dates in the website timezone.', 'search-analytics' ) ?></span>
             </label>
             <br/>
-            <strong><?php _e( 'Unchecking this option might show results from adjacent days when filtering by date, depending on your website\'s timezone', 'search-analytics' ) ?></strong>
+            <strong><?php esc_attr_e( 'Unchecking this option might show results from adjacent days when filtering by date, depending on your website\'s timezone', 'search-analytics' ) ?></strong>
 			<?php
 		}
 
@@ -370,12 +372,12 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 			}
 			?>
             <label>
-                <input type="hidden" name='mwtsa_settings[mwtsa_save_search_country]' value='0' />
+                <input type="hidden" name='mwtsa_settings[mwtsa_save_search_country]' value='0'/>
                 <input type='checkbox' name='mwtsa_settings[mwtsa_save_search_country]' value='1' <?php checked( $this->existing_options['mwtsa_save_search_country'], 1 ) ?> />
-                <span><?php _e( 'Save the country from where the search was launched', 'search-analytics' ) ?></span>
+                <span><?php esc_attr_e( 'Save the country from where the search was launched', 'search-analytics' ) ?></span>
             </label>
             <br/>
-            <strong><?php _e( 'NOTE: this uses the <a href="https://ip-api.com">https://ip-api.com</a> JSON service which is limited to 150 requests per minute. In case you have more than 150 searches per minute on the website, please uncheck this checkbox. <br />In case the site\'s IP got banned, you can go here: <a href="https://ip-api.com/docs/unban">https://ip-api.com/docs/unban</a> and remove the ban.<br />A future version of Search Analytics will come with support for the PRO service of IP-API.com<br /><br />Disclaimer: I am not associated with the IP-API.com service in any way. I am just using it for providing you a way of finding out where the users search content from on your website.', 'search-analytics' ) ?></strong>
+            <strong><?php esc_attr_e( 'NOTE: this uses the <a href="https://ip-api.com">https://ip-api.com</a> JSON service which is limited to 150 requests per minute. In case you have more than 150 searches per minute on the website, please uncheck this checkbox. <br />In case the site\'s IP got banned, you can go here: <a href="https://ip-api.com/docs/unban">https://ip-api.com/docs/unban</a> and remove the ban.<br />A future version of Search Analytics will come with support for the PRO service of IP-API.com<br /><br />Disclaimer: I am not associated with the IP-API.com service in any way. I am just using it for providing you a way of finding out where the users search content from on your website.', 'search-analytics' ) ?></strong>
 			<?php
 		}
 
@@ -386,10 +388,10 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 			?>
             <label>
                 <input type='checkbox' name='mwtsa_settings[mwtsa_save_search_by_user]' value='1' <?php checked( $this->existing_options['mwtsa_save_search_by_user'], 1 ) ?> />
-                <span><?php _e( 'Save the user id of the user who launched the search', 'search-analytics' ) ?></span>
+                <span><?php esc_attr_e( 'Save the user id of the user who launched the search', 'search-analytics' ) ?></span>
             </label>
             <br/>
-            <strong><?php _e( 'Using this feature will allow you to see which of your registered users searched things on the site.', 'search-analytics' ) ?></strong>
+            <strong><?php esc_attr_e( 'Using this feature will allow you to see which of your registered users searched things on the site.', 'search-analytics' ) ?></strong>
 			<?php
 		}
 
@@ -424,30 +426,30 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 
 		function erase_history_form() {
 			?>
-            <h3><?php _e( 'Erase History', 'search-analytics' ) ?></h3>
+            <h3><?php esc_attr_e( 'Erase History', 'search-analytics' ) ?></h3>
 
             <table class="form-table erase-history-table">
                 <tbody>
                 <tr>
-					<th scope="row"><?php _e( 'Delete all data', 'search-analytics' ) ?></th>
+                    <th scope="row"><?php esc_attr_e( 'Delete all data', 'search-analytics' ) ?></th>
                     <td>
                         <form action="" method="post">
 							<?php wp_nonce_field( 'mwtsa-erase-data' ); ?>
                             <p class="submit">
-                                <input name="mwtsa_erase_data" class="button-secondary" value="<?php esc_attr_e( 'Erase All Data', 'search-analytics' ) ?>" type="submit" onclick="return confirm( '<?php _e( 'Are you sure you want to delete all data?\n\nClick `OK` to proceed.' ) ?>');"/><br/>
-                                <strong><?php _e( 'Warning! Clicking this button will delete all historical search data', 'search-analytics' ) ?></strong>
+                                <input name="mwtsa_erase_data" class="button-secondary" value="<?php esc_attr_e( 'Erase All Data', 'search-analytics' ) ?>" type="submit" onclick="return confirm( '<?php esc_attr_e( 'Are you sure you want to delete all data?\n\nClick `OK` to proceed.', 'search-analytics' ) ?>');"/><br/>
+                                <strong><?php esc_attr_e( 'Warning! Clicking this button will delete all historical search data', 'search-analytics' ) ?></strong>
                             </p>
                         </form>
                     </td>
                 </tr>
                 <tr>
-					<th scope="row"><?php _e( 'Delete data older than', 'search-analytics' ) ?></th>
+                    <th scope="row"><?php esc_attr_e( 'Delete data older than', 'search-analytics' ) ?></th>
                     <td>
                         <form action="" method="post">
 							<?php wp_nonce_field( 'mwtsa-erase-data' ); ?>
                             <p class="submit">
-                                <input type="number" name="mwtsa_data_older_than_days" value="90"/> <?php _e( 'days', 'search-analytics' ) ?> &nbsp;
-                                <input name="mwtsa_erase_old_data" class="button-secondary" value="<?php esc_attr_e( 'Erase Data', 'search-analytics' ) ?>" type="submit" onclick="return confirm( '<?php _e( 'Are you sure you want to delete the selected data?\n\nClick `OK` to proceed.' ) ?>');"/>
+                                <input type="number" name="mwtsa_data_older_than_days" value="90"/> <?php esc_attr_e( 'days', 'search-analytics' ) ?> &nbsp;
+                                <input name="mwtsa_erase_old_data" class="button-secondary" value="<?php esc_attr_e( 'Erase Data', 'search-analytics' ) ?>" type="submit" onclick="return confirm( '<?php esc_attr_e( 'Are you sure you want to delete the selected data?\n\nClick `OK` to proceed.', 'search-analytics' ) ?>');"/>
                             </p>
                         </form>
                     </td>
@@ -461,8 +463,8 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 			global $wpdb, $mwtsa;
 
 			if ( $older_than == 0 ) {
-				$wpdb->query( "TRUNCATE `$mwtsa->history_table_name`" );
-				$wpdb->query( "TRUNCATE `$mwtsa->terms_table_name`" );
+                $wpdb->query( "TRUNCATE `$mwtsa->history_table_name`" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $mwtsa->history_table_name is hardcoded.
+				$wpdb->query( "TRUNCATE `$mwtsa->terms_table_name`" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $mwtsa->terms_table_name is hardcoded.
 			} else {
 
 				try {
@@ -470,7 +472,7 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 					$_temp_date->sub( new DateInterval( 'P' . $older_than . 'D' ) );
 					$older_than_datetime = $_temp_date->format( 'Y-m-d H:i:s' );
 
-					$wpdb->query( $wpdb->prepare( "DELETE FROM `$mwtsa->history_table_name` WHERE `datetime` < %s", $older_than_datetime ) );
+					$wpdb->query( $wpdb->prepare( "DELETE FROM `$mwtsa->history_table_name` WHERE `datetime` < %s", $older_than_datetime ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $mwtsa->history_table_name is hardcoded.
 
 					//TODO: delete recorded terms that no longer have at least 1 entry in the history table ?
 				} catch ( Exception $e ) {
@@ -482,7 +484,7 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 		function data_erased_notice() {
 			?>
             <div class="notice updated mwtsa-notice is-dismissible">
-                <p><?php _e( 'Historical data successfully erased!', 'search-analytics' ); ?></p>
+                <p><?php esc_attr_e( 'Historical data successfully erased!', 'search-analytics' ); ?></p>
             </div>
 			<?php
 		}

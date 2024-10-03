@@ -5,8 +5,8 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
 
 	class MWTSA_History_Data {
 
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended
 		public function get_terms_history_data() {
-
 			$since           = 1;
 			$time_unit       = '';
 			$only_no_results = false;
@@ -55,7 +55,7 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
 				}
 			}
 
-			$search_str = empty( $_REQUEST['search-term'] ) && isset( $_REQUEST['s'] ) ? $_REQUEST['s'] : '';
+			$search_str = empty( $_REQUEST['search-term'] ) && isset( $_REQUEST['s'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['s'] ) ) : '';
 
 			$user = isset( $_REQUEST['filter-user'] ) ? (int) $_REQUEST['filter-user'] : 0;
 
@@ -63,16 +63,17 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
 				'since'           => $since,
 				'unit'            => $time_unit,
 				'min_results'     => $min_results,
-				'search_str'      => sanitize_text_field( $search_str ),
+				'search_str'      => $search_str,
 				'only_no_results' => $only_no_results,
 				'group'           => $group,
-				'date_since'      => ( isset( $_REQUEST['date_from'] ) ) ? sanitize_text_field( $_REQUEST['date_from'] ) : '',
-				'date_until'      => ( isset( $_REQUEST['date_to'] ) ) ? sanitize_text_field( $_REQUEST['date_to'] ) : '',
+				'date_since'      => ( isset( $_REQUEST['date_from'] ) ) ? sanitize_text_field( wp_unslash( $_REQUEST['date_from'] ) ) : '',
+				'date_until'      => ( isset( $_REQUEST['date_to'] ) ) ? sanitize_text_field( wp_unslash( $_REQUEST['date_to'] ) ) : '',
 				'user'            => $user
 			);
 
 			return $this->run_terms_history_data_query( $args );
 		}
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
 
 		public function run_terms_history_data_query( $args ) {
 
@@ -122,8 +123,8 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
 
 				// make sure the strtotime call did not return false
 				if ( $since && $until ) {
-					$since = date( 'Y-m-d H:i:s', $since );
-					$until = date( 'Y-m-d H:i:s', $until );
+					$since = date( 'Y-m-d H:i:s', $since ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
+					$until = date( 'Y-m-d H:i:s', $until ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
 
 					$where .= $wpdb->prepare( " AND ( h.datetime BETWEEN %s AND %s )", $since, $until );
 				}
@@ -136,12 +137,12 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
 				$limit = " LIMIT $count";
 			}
 
-			if ( empty( $_REQUEST['search-term'] ) && in_array( $args['group'], array( 'term_id', 'no_group' ) ) ) {
+			if ( empty( $_REQUEST['search-term'] ) && in_array( $args['group'], array( 'term_id', 'no_group' ) ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				$having   = '';
 				$group_by = '';
 
 				if ( $args['search_str'] != '' ) {
-					$where .= $wpdb->prepare( " AND t.term LIKE '%%%s%%'", $wpdb->esc_like( $args['search_str'] ) );
+					$where .= $wpdb->prepare( " AND t.term LIKE %s", $wpdb->esc_like( $args['search_str'] ) . '%' );
 				}
 
 				if ( ! $args['return_only_last'] ) {
@@ -206,8 +207,8 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
 				}
 			} else {
 
-				if ( ! empty( $_REQUEST['search-term'] ) ) {
-					$where .= $wpdb->prepare( " AND t.id = %d", (int) $_REQUEST['search-term'] );
+				if ( ! empty( $_REQUEST['search-term'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+					$where .= $wpdb->prepare( " AND t.id = %d", (int) $_REQUEST['search-term'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				}
 
 				if ( $args['only_no_results'] ) {
@@ -220,10 +221,10 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
 				$group_by          = '';
 				$grouped_view      = '';
 
-				if ( isset( $_REQUEST['grouped_view'] ) ) {
-					$grouped_view = $_REQUEST['grouped_view'];
+				if ( isset( $_REQUEST['grouped_view'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+					$grouped_view = sanitize_text_field( wp_unslash( $_REQUEST['grouped_view'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				} elseif ( $args['group'] != 'term_id' ) {
-					$grouped_view = $args['group'];
+					$grouped_view = sanitize_text_field( wp_unslash( $args['group'] ) );
 				}
 
 				switch ( $grouped_view ) {
@@ -250,7 +251,8 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
 			                $limit";
 			}
 
-			return $wpdb->get_results( apply_filters( 'mwtsa_run_terms_history_data_query', $query, $args ), 'ARRAY_A' );
+			//TODO: use wp_cache_get() / wp_cache_set() or wp_cache_delete().
+			return $wpdb->get_results( apply_filters( 'mwtsa_run_terms_history_data_query', $query, $args ), 'ARRAY_A' );   // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery
 		}
 
 		public function get_daily_search_count_for_period_chart( $args ) {
@@ -274,7 +276,8 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
 				list( $_dates, $results[] ) = $this->get_results_for_chart( $args );
 
 				foreach ( $dates as $k => &$date ) {
-					$date = sprintf( esc_attr__( '%s vs %s', 'search-analytics' ), $_dates[ $k ], $date );
+					/* translators: 1: Initial Date, 2: Compare Date */
+					$date = sprintf( esc_attr__( '%1$s vs %2$s', 'search-analytics' ), $_dates[ $k ], $date );
 				}
 			}
 
@@ -291,7 +294,7 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
 			$_searches = $searches = array();
 
 			foreach ( $results as $result ) {
-				$this_time               = date( $args['format'], strtotime( $result['datetime'] ) );
+				$this_time               = date( $args['format'], strtotime( $result['datetime'] ) ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date	 -- we are actually interested in the runtime timezone.
 				$_searches[ $this_time ] = $result['count'];
 			}
 

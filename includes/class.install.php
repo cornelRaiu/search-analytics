@@ -10,11 +10,13 @@ if ( ! class_exists( 'MWTSA_Install' ) ) {
 
 			if ( version_compare( PHP_VERSION, '5.6', '<' ) ) {
 				deactivate_plugins( plugin_basename( __FILE__ ) );
+				/* translators: %s: PHP version */
 				wp_die( sprintf( esc_html__( 'Search Analytics for WP cannot be activated. The plugin requires PHP %s or higher', 'search-analytics' ), '5.6' ) );
 			}
 
 			if ( version_compare( $wp_version, '4.4', '<' ) ) {
 				deactivate_plugins( plugin_basename( __FILE__ ) );
+				/* translators: %s: WordPress version */
 				wp_die( sprintf( esc_html__( 'Search Analytics for WP cannot be activated. The plugin requires WordPress %s or higher', 'search-analytics' ), '4.4' ) );
 			}
 
@@ -24,7 +26,7 @@ if ( ! class_exists( 'MWTSA_Install' ) ) {
 					$site_ids = get_sites( array( 'fields' => 'ids', 'network_id' => get_current_network_id() ) );
 				} else {
 					//fallback for WP < 4.6
-					$site_ids = $wpdb->get_col( "SELECT blog_id FROM $wpdb->blogs WHERE site_id = $wpdb->siteid;" );
+					$site_ids = $wpdb->get_col( "SELECT blog_id FROM $wpdb->blogs WHERE site_id = $wpdb->siteid;" ); // phpcs:ignore  WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 				}
 
 				foreach ( $site_ids as $site_id ) {

@@ -54,7 +54,7 @@ if ( ! class_exists( 'MWTSA_Display_Latest_Searches_Shortcode' ) ) {
                     <p><?php echo esc_html( $atts['label'] ) ?></p>
                     <ul>
 						<?php foreach ( $search_results as $term ) :
-							echo apply_filters(
+							echo apply_filters( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 								'mwtsa_display_latest_searches_shortcode_list_item_output',
 								sprintf(
 									'<li>%s</li>',

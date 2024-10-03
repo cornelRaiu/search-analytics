@@ -92,7 +92,7 @@ if ( ! class_exists( 'MWTSA_Display_Search_Stats_Shortcode' ) ) {
                             <p><?php echo esc_html( $atts['most_searched_label'] ) ?></p>
                             <ul>
 								<?php foreach ( $data['most_searched'] as $term ) :
-									echo apply_filters(
+									echo apply_filters(// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 										'mwtsa_display_search_stats_shortcode_list_item_output',
 										sprintf(
 											'<li>%s</li>',
@@ -108,10 +108,10 @@ if ( ! class_exists( 'MWTSA_Display_Search_Stats_Shortcode' ) ) {
 					<?php endif; ?>
 					<?php if ( count( $data['user_searches'] ) > 0 ) : ?>
                         <li>
-                            <p><?php echo esc_html( $atts['user_searches_label'] ) ?></p>
+                            <p><?php echo esc_attr( $atts['user_searches_label'] ) ?></p>
                             <ul>
 								<?php foreach ( $data['user_searches'] as $term ) :
-									echo apply_filters(
+									echo apply_filters( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 										'mwtsa_display_search_stats_shortcode_list_item_output',
 										sprintf(
 											'<li>%s</li>',

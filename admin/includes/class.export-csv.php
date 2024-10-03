@@ -12,7 +12,6 @@ if ( ! class_exists( 'MWTSA_Export_CSV' ) ) {
             }
 
             if ( empty( $filename ) ) {
-
                 $filename = apply_filters( 'mwtsa_export_filename', 'export-' . md5( 'export-' . microtime( true ) ) . '.csv' );
             }
 

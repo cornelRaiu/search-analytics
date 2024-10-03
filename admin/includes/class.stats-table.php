@@ -13,9 +13,8 @@ if ( ! class_exists( 'MWTSA_Stats_Table' ) ) :
 	class MWTSA_Stats_Table extends WP_List_Table {
 
 		public function __construct( $args = array() ) {
-
 			parent::__construct( [
-				'title' => ( isset( $args['title'] ) ) ? esc_attr( $args['title'] ) : esc_attr__( 'Search Statistics', 'search-analytics' ),
+				'title' => isset( $args['title'] ) ? esc_attr( $args['title'] ) : esc_attr__( 'Search Statistics', 'search-analytics' ),
 				'ajax'  => isset( $args['ajax'] ) && $args['ajax']
 			] );
 		}
@@ -25,7 +24,7 @@ if ( ! class_exists( 'MWTSA_Stats_Table' ) ) :
 		}
 
 		public function get_this_screen() {
-			return 'search-analytics/admin/includes/class.stats';
+			return 'search-analytics/admin/includes/class.stats.php';
 		}
 
 		public function display_tablenav( $which ) {
@@ -51,7 +50,7 @@ if ( ! class_exists( 'MWTSA_Stats_Table' ) ) :
 
 
 		public function this_title() {
-			return '<h2>' . $this->_args['title'] . '</h2>';
+			return '<h2>' . esc_attr( $this->_args['title'] ) . '</h2>';
 		}
 
 		public function get_columns() {
@@ -62,7 +61,7 @@ if ( ! class_exists( 'MWTSA_Stats_Table' ) ) :
 				'results'  => __( 'Average no. of results', 'search-analytics' ),
 			);
 
-			if ( isset( $_REQUEST['grouped_view'] ) && (int) $_REQUEST['grouped_view'] === 1 ) {
+			if ( isset( $_REQUEST['grouped_view'] ) && (int) $_REQUEST['grouped_view'] === 1 ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				unset( $columns['searches'] );
 
 				$columns['results']          = __( 'No. of results', 'search-analytics' );
@@ -97,7 +96,7 @@ if ( ! class_exists( 'MWTSA_Stats_Table' ) ) :
 				'last_search_date'     => array( 'last_search_date', false )
 			);
 
-			if ( isset( $_REQUEST['grouped_view'] ) && (int) $_REQUEST['grouped_view'] === 1 ) {
+			if ( isset( $_REQUEST['grouped_view'] ) && (int) $_REQUEST['grouped_view'] === 1 ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				unset( $sortable_columns['searches'] );
 			}
 
@@ -108,12 +107,13 @@ if ( ! class_exists( 'MWTSA_Stats_Table' ) ) :
 		 * @deprecated deprecated since version 1.3.6. WIll be removed in version 2.0.0
 		 */
 		public function column_term( $item ) {
+			$page    = isset( $_REQUEST['page'] ) ? sanitize_text_field( $_REQUEST['page'] ) : ''; //phpcs:ignore WordPress.Security.NonceVerification.Recommended,WordPress.Security.ValidatedSanitizedInput.MissingUnslash -- we actually need slashes here - for now
 			$actions = array(
-				'delete' => sprintf( '<a href="?page=%s&action=%s&search-term=%d">' . esc_attr__( 'Delete', 'search-analytics' ) . '</a>', esc_attr( $_REQUEST['page'] ), 'delete', (int) $item['id'] ),
-				'view'   => sprintf( '<a href="?page=%s&search-term=%d">' . esc_attr__( 'View Details', 'search-analytics' ) . '</a>', esc_attr( $_REQUEST['page'] ), (int) $item['id'] )
+				'delete' => sprintf( '<a href="?page=%s&action=%s&search-term=%d">' . esc_attr__( 'Delete', 'search-analytics' ) . '</a>', esc_attr( $page ), 'delete', (int) $item['id'] ),
+				'view'   => sprintf( '<a href="?page=%s&search-term=%d">' . esc_attr__( 'View Details', 'search-analytics' ) . '</a>', esc_attr( $page ), (int) $item['id'] )
 			);
 
-			return sprintf( '<a href="?page=%1$s&search-term=%2$d">%3$s</a> %4$s', esc_attr( $_REQUEST['page'] ), (int) $item['id'], esc_attr( $item['term'] ), $this->row_actions( $actions ) );
+			return sprintf( '<a href="?page=%1$s&search-term=%2$d">%3$s</a> %4$s', esc_attr( $page ), (int) $item['id'], esc_attr( $item['term'] ), $this->row_actions( $actions ) );
 		}
 
 		public function column_cb( $item ) {
@@ -128,6 +128,7 @@ if ( ! class_exists( 'MWTSA_Stats_Table' ) ) :
 			);
 		}
 
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended
 		function process_bulk_action() {
 			global $wpdb, $mwtsa;
 
@@ -136,15 +137,15 @@ if ( ! class_exists( 'MWTSA_Stats_Table' ) ) :
 				$terms_to_delete    = array_map( 'absint', (array) $_GET['search-term'] );
 				$terms_placeholders = implode( ',', array_fill( 0, count( $terms_to_delete ), '%d' ) );
 
-				$wpdb->query(
+				$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 					$wpdb->prepare(
-						"DELETE FROM $mwtsa->terms_table_name WHERE id IN ($terms_placeholders)",
+						"DELETE FROM $mwtsa->terms_table_name WHERE id IN ($terms_placeholders)", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
 						$terms_to_delete
 					)
 				);
-				$wpdb->query(
+				$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 					$wpdb->prepare(
-						"DELETE FROM $mwtsa->history_table_name WHERE term_id IN ($terms_placeholders)",
+						"DELETE FROM $mwtsa->history_table_name WHERE term_id IN ($terms_placeholders)", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
 						$terms_to_delete
 					)
 				);
@@ -162,13 +163,15 @@ if ( ! class_exists( 'MWTSA_Stats_Table' ) ) :
 			}
 
 		}
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
 
 		public function column_default( $item, $column_name ) {
 			$output = esc_attr__( 'N/A Yet', 'search-analytics' );
 
 			switch ( $column_name ) {
 				case 'term':
-					$output = sprintf( '<a href="?page=%s&search-term=%s">%s</a>', esc_attr( $_REQUEST['page'] ), (int) $item['id'], esc_attr( $item['term'] ) );
+					$page   = isset( $_REQUEST['page'] ) ? sanitize_text_field( $_REQUEST['page'] ) : ''; //phpcs:ignore WordPress.Security.NonceVerification.Recommended,WordPress.Security.ValidatedSanitizedInput.MissingUnslash -- we actually need slashes here - for now
+					$output = sprintf( '<a href="?page=%s&search-term=%s">%s</a>', esc_attr( $page ), (int) $item['id'], esc_attr( $item['term'] ) );
 					break;
 				case 'searches':
 					$output = (int) $item['count'];
@@ -219,7 +222,7 @@ if ( ! class_exists( 'MWTSA_Stats_Table' ) ) :
 					break;
 			}
 
-			echo apply_filters( 'mwtsa_stats_table_column_output', $output, $column_name, $item );
+			echo apply_filters( 'mwtsa_stats_table_column_output', $output, $column_name, $item ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 
 		public function paginate_results() {
@@ -266,8 +269,8 @@ if ( ! class_exists( 'MWTSA_Stats_Table' ) ) :
 		}
 
 		public function usort_reorder( $a, $b ) {
-			$orderby = ( ! empty( $_GET['orderby'] ) ) ? $_GET['orderby'] : 'last_search_date';
-			$order   = ( ! empty( $_GET['order'] ) ) ? $_GET['order'] : 'desc';
+			$orderby = ( ! empty( $_GET['orderby'] ) ) ? sanitize_text_field( wp_unslash( $_GET['orderby'] ) ) : 'last_search_date'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$order   = ( ! empty( $_GET['order'] ) ) ? sanitize_text_field( wp_unslash( $_GET['order'] ) ) : 'desc'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 			switch ( $orderby ) {
 				case 'term':
@@ -307,7 +310,7 @@ if ( ! class_exists( 'MWTSA_Stats_Table' ) ) :
 				$filters_str .= sprintf( '&nbsp; <input type="submit" name="mwtsa-export-csv" class="button" value="%s" />', esc_attr__( 'Export Data', 'search-analytics' ) );
 				$filters_str .= '</div>';
 
-				echo $filters_str;
+				echo $filters_str; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- the whole output is properly escaped at this point
 			}
 		}
 
@@ -316,8 +319,8 @@ if ( ! class_exists( 'MWTSA_Stats_Table' ) ) :
 			wp_enqueue_style( 'mwtsa-datepicker-ui' );
 			wp_enqueue_script( 'jquery-ui-datepicker' );
 
-			$date_from = isset( $_REQUEST['date_from'] ) ? $_REQUEST['date_from'] : '';
-			$date_to   = isset( $_REQUEST['date_to'] ) ? $_REQUEST['date_to'] : '';
+			$date_from = isset( $_REQUEST['date_from'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['date_from'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$date_to   = isset( $_REQUEST['date_to'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['date_to'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 			ob_start();
 			?>
@@ -335,9 +338,9 @@ if ( ! class_exists( 'MWTSA_Stats_Table' ) ) :
 			global $wpdb, $mwtsa;
 			wp_enqueue_style( 'select2css' );
 
-			$selected_user = isset( $_REQUEST['filter-user'] ) ? (int) $_REQUEST['filter-user'] : 0;
+			$selected_user = isset( $_REQUEST['filter-user'] ) ? (int) $_REQUEST['filter-user'] : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
-			$users_with_searches = $wpdb->get_results( "SELECT `ID`, `user_nicename` FROM $wpdb->users WHERE `ID` IN ( SELECT DISTINCT(`user_id`) FROM {$mwtsa->history_table_name})" );
+			$users_with_searches = $wpdb->get_results( "SELECT `ID`, `user_nicename` FROM $wpdb->users WHERE `ID` IN ( SELECT DISTINCT(`user_id`) FROM {$mwtsa->history_table_name})" );  // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
 			if ( empty( $users_with_searches ) ) {
 				return '';
@@ -348,7 +351,7 @@ if ( ! class_exists( 'MWTSA_Stats_Table' ) ) :
             <select class="select2-select" name="filter-user">
                 <option value=""><?php esc_attr_e( 'Filter by user ...', 'search-analytics' ) ?></option>
 				<?php foreach ( $users_with_searches as $user ) :
-					printf( "<option value='%d' %s>%s</option>", (int) $user->ID, selected((int) $user->ID, $selected_user, false), esc_attr( $user->user_nicename ) );
+					printf( "<option value='%d' %s>%s</option>", (int) $user->ID, selected( (int) $user->ID, $selected_user, false ), esc_attr( $user->user_nicename ) );
 				endforeach; ?>
             </select>
 			<?php
@@ -357,61 +360,61 @@ if ( ! class_exists( 'MWTSA_Stats_Table' ) ) :
 
 		public function display_time_views() {
 			$views   = [];
-			$current = isset( $_REQUEST['period_view'] ) ? (int) $_REQUEST['period_view'] : 3;
+			$current = isset( $_REQUEST['period_view'] ) ? (int) $_REQUEST['period_view'] : 3; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 			$this_url = add_query_arg( 'period_view', 0 );
 			$class    = ( $current === 0 ) ? ' class="current"' : '';
-			$views[0] = sprintf( "<a href='%s' %s>%s</a>",  esc_url( $this_url ), $class, esc_attr__( 'Last 24 hours', 'search-analytics' ) );
+			$views[0] = sprintf( "<a href='%s' %s>%s</a>", esc_url( $this_url ), $class, esc_attr__( 'Last 24 hours', 'search-analytics' ) );
 
 			$this_url = add_query_arg( 'period_view', 1 );
 			$class    = ( $current === 1 ) ? ' class="current"' : '';
-			$views[1] = sprintf( "<a href='%s' %s>%s</a>",  esc_url( $this_url ), $class, esc_attr__( 'Last week', 'search-analytics' ) );
+			$views[1] = sprintf( "<a href='%s' %s>%s</a>", esc_url( $this_url ), $class, esc_attr__( 'Last week', 'search-analytics' ) );
 
 			$this_url = add_query_arg( 'period_view', 2 );
 			$class    = ( $current === 2 ) ? ' class="current"' : '';
-			$views[2] = sprintf( "<a href='%s' %s>%s</a>",  esc_url( $this_url ), $class, esc_attr__( 'Last month', 'search-analytics' ) );
+			$views[2] = sprintf( "<a href='%s' %s>%s</a>", esc_url( $this_url ), $class, esc_attr__( 'Last month', 'search-analytics' ) );
 
 			$this_url = remove_query_arg( 'period_view' );
 			$class    = ( $current === 3 ) ? ' class="current"' : '';
-			$views[3] = sprintf( "<a href='%s' %s>%s</a>",  esc_url( $this_url ), $class, esc_attr__( 'All time', 'search-analytics' ) );
+			$views[3] = sprintf( "<a href='%s' %s>%s</a>", esc_url( $this_url ), $class, esc_attr__( 'All time', 'search-analytics' ) );
 
 			$this->format_views_list( $views );
 		}
 
 		public function display_results_views() {
 			$views   = array();
-			$current = ! empty( $_REQUEST['results_view'] ) ? (int) $_REQUEST['results_view'] : 0;
+			$current = ! empty( $_REQUEST['results_view'] ) ? (int) $_REQUEST['results_view'] : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 			$class    = ( $current === 0 ) ? ' class="current"' : '';
 			$this_url = remove_query_arg( 'results_view' );
-			$views[0] = sprintf( "<a href='%s' %s>%s</a>",  esc_url( $this_url ), $class, esc_attr__( 'All', 'search-analytics' ) );
+			$views[0] = sprintf( "<a href='%s' %s>%s</a>", esc_url( $this_url ), $class, esc_attr__( 'All', 'search-analytics' ) );
 
 			$class    = ( $current === 1 ) ? ' class="current"' : '';
 			$this_url = add_query_arg( 'results_view', 1 );
-			$views[1] = sprintf( "<a href='%s' %s>%s</a>",  esc_url( $this_url ), $class, esc_attr__( 'Only With Results', 'search-analytics' ) );
+			$views[1] = sprintf( "<a href='%s' %s>%s</a>", esc_url( $this_url ), $class, esc_attr__( 'Only With Results', 'search-analytics' ) );
 
 			$this_url = add_query_arg( 'results_view', 2 );
 			$class    = ( $current === 2 ) ? ' class="current"' : '';
-			$views[2] = sprintf( "<a href='%s' %s>%s</a>",  esc_url( $this_url ), $class, esc_attr__( 'Only Without Results', 'search-analytics' ) );
+			$views[2] = sprintf( "<a href='%s' %s>%s</a>", esc_url( $this_url ), $class, esc_attr__( 'Only Without Results', 'search-analytics' ) );
 
 			$this->format_views_list( $views );
 		}
 
 		public function display_results_grouping() {
 			$views   = array();
-			$current = ! empty( $_REQUEST['grouped_view'] ) ? (int) $_REQUEST['grouped_view'] : 0;
+			$current = ! empty( $_REQUEST['grouped_view'] ) ? (int) $_REQUEST['grouped_view'] : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 			$this_url = remove_query_arg( 'grouped_view' );
 			$this_url = remove_query_arg( 'orderby', $this_url );
 			$this_url = remove_query_arg( 'order', $this_url );
 			$class    = ( $current === 0 ) ? ' class="current"' : '';
-			$views[0] = sprintf( "<a href='%s' %s>%s</a>",  esc_url( $this_url ), $class, esc_attr__( 'Term', 'search-analytics' ) );
+			$views[0] = sprintf( "<a href='%s' %s>%s</a>", esc_url( $this_url ), $class, esc_attr__( 'Term', 'search-analytics' ) );
 
 			$this_url = add_query_arg( 'grouped_view', 1 );
 			$this_url = remove_query_arg( 'orderby', $this_url );
 			$this_url = remove_query_arg( 'order', $this_url );
 			$class    = ( $current === 1 ) ? ' class="current"' : '';
-			$views[1] = sprintf( "<a href='%s' %s>%s</a>",  esc_url( $this_url ), $class, esc_attr__( 'No Group', 'search-analytics' ) );
+			$views[1] = sprintf( "<a href='%s' %s>%s</a>", esc_url( $this_url ), $class, esc_attr__( 'No Group', 'search-analytics' ) );
 
 			$this->format_views_list( $views );
 		}
@@ -422,14 +425,14 @@ if ( ! class_exists( 'MWTSA_Stats_Table' ) ) :
 
 			echo "<ul class='subsubsub'>\n";
 			foreach ( $views as $class => $view ) {
-				$views[ $class ] = "\t<li class='$class'>$view";
+				$views[ $class ] = "\t<li class='$class'>" . $view;
 			}
-			echo implode( " |</li>\n", $views ) . "</li>\n";
+			echo implode( " |</li>\n", $views ) . "</li>\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- everything is already escaped at this point
 			echo "</ul>";
 		}
 
 		public function load_notices() {
-			if ( isset( $_GET['result'] ) && $_GET['result'] === 'deleted' ) {
+			if ( isset( $_GET['result'] ) && $_GET['result'] === 'deleted' ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				?>
                 <div class="notice updated mwtsa-notice is-dismissible">
                     <p><?php esc_attr_e( 'Search term(s) successfully deleted', 'search-analytics' ); ?></p>
