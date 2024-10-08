@@ -134,8 +134,8 @@ if ( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
 		public function render_stats_page() {
 			global $mwtsa;
 
-			$stats_table = ! empty( $_REQUEST['search-term'] ) ? new MWTSA_Term_Stats_Table( array( 'search-term' => (int) $_REQUEST['search-term'] ) ) : new MWTSA_Stats_Table();
 			$is_delete   = ! empty( $_REQUEST['action'] ) && 'delete' === $_REQUEST['action'];
+			$stats_table = ! empty( $_REQUEST['search-term'] ) && ! $is_delete ? new MWTSA_Term_Stats_Table( array( 'search-term' => (int) $_REQUEST['search-term'] ) ) : new MWTSA_Stats_Table();
 
 			?>
             <div class="wrap mwtsa-wrapper">
@@ -211,7 +211,7 @@ if ( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
                                 printf( esc_attr__( 'New in version %s', 'search-analytics' ), esc_attr( $mwtsa->version ) ); ?>
                             </p>
                             <ul class="changelog-list">
-                                <li>Optimization: Security improvements and general code optimization.</li>
+                                <li>Bugfix: Fix bulk deletion not working.</li>
 							</ul>
                             <p><a href="https://www.cornelraiu.com/mwt-search-analytics-changelog/" target="_blank"><?php esc_html_e( 'Click here to check the complete log', 'search-analytics' ) ?></a></p>
                             <h3><?php esc_html_e( 'Useful Links', 'search-analytics' ) ?></h3>
