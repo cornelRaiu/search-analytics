@@ -11,7 +11,7 @@ if ( ! class_exists( 'MWTSA_Dashboard' ) ) {
 		}
 
 		public function init() {
-			$this_user_role      = mwt_get_current_user_roles();
+			$this_user_role      = mwtsa_get_current_user_roles();
 			$plugin_options      = MWTSA_Options::get_options();
 			$accepted_user_roles = array_values( array_intersect( $this_user_role, $plugin_options['mwtsa_display_stats_for_role'] ) );
 
@@ -52,44 +52,50 @@ if ( ! class_exists( 'MWTSA_Dashboard' ) ) {
 			echo '<span class="stats-list-value">' . absint( $total_searches ) . '</span></li>';
 
 			echo '<li><span class="stats-list-label">' . esc_html__( "Most Searched Term:", 'search-analytics' ) . '</span>';
-			echo '<span class="stats-list-value">' . esc_attr( $most_searched_term['term'] ) . '</span></li>';
+			echo '<span class="stats-list-value">' . esc_html( $most_searched_term['term'] ) . '</span></li>';
 
 			echo '<li><span class="stats-list-label">' . esc_html__( "Most Searched Term Count:", 'search-analytics' ) . '</span>';
-			echo '<span class="stats-list-value">' . absint( $most_searched_term['count'] ) . '</span></li>';
+			echo '<span class="stats-list-value">' . ((int) $most_searched_term['count']) . '</span></li>';
 
 			echo '<li><span class="stats-list-label">' . esc_html__( "Last Searched Term:", 'search-analytics' ) . '</span>';
-			echo '<span class="stats-list-value">' . esc_attr( $last_search_term['term'] ) . '</span></li>';
+			echo '<span class="stats-list-value">' . esc_html( $last_search_term['term'] ) . '</span></li>';
 
 			echo '<li><span class="stats-list-label">' . esc_html__( "Last Searched Date:", 'search-analytics' ) . '</span>';
-			echo '<span class="stats-list-value">' . esc_attr( $last_search_term['last_search_date'] ) . '</span></li>';
+			echo '<span class="stats-list-value">' . esc_html( $last_search_term['last_search_date'] ) . '</span></li>';
 
 			echo '</ul>';
+
+			$stats_url = admin_url( 'admin.php?page=mwtsa-search-analytics' );
+
+			echo '<a href="' . esc_url( $stats_url ) . '" class="button button-secondary mwtsa-widget-stats-link">' . esc_html__( 'View all stats', 'search-analytics' ) . '</a>';
 		}
 
 		public static function add_plugin_meta_links( $meta_fields, $file ) {
-			if ( $file == 'search-analytics/mwt-search-analytics.php' ) {
+            if ( $file !== 'search-analytics/mwt-search-analytics.php' ) {
+                return $meta_fields;
+            }
 
-				$meta_fields[] = "<a href='" . MWTSA_WORDPRESS_URL . "' target='_blank'>" . esc_html__( 'Support Forum', 'search-analytics' ) . "</a>";
-				$svg           = "<svg xmlns='http://www.w3.org/2000/svg' width='15' height='15' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='feather feather-star'><polygon points='12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2'/></svg>";
+            $meta_fields[] = "<a href='" . MWTSA_WORDPRESS_SUPPORT_URL . "' target='_blank'>" . esc_html__( 'Support Forum', 'search-analytics' ) . "</a>";
+            $svg           = "<svg xmlns='http://www.w3.org/2000/svg' width='15' height='15' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='feather feather-star'><polygon points='12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2'/></svg>";
 
-				$stars = '<i class="mwtsa-rate-stars">';
+            $stars = '<i class="mwtsa-rate-stars">';
 
-				for ( $i = 1; $i <= 5; $i ++ ) {
-					$stars .= '<a href="' . MWTSA_WORDPRESS_URL . '/reviews/?rate=' . $i . '#new-post" target="_blank">' . $svg . '</a>';
-				}
+            for ( $i = 1; $i <= 5; $i ++ ) {
+                $stars .= '<a href="' . MWTSA_WORDPRESS_SUPPORT_URL . '/reviews/?rate=' . $i . '#new-post" target="_blank">' . $svg . '</a>';
+            }
 
-				$stars .= '</i>';
+            $stars .= '</i>';
 
-				$meta_fields[] = $stars;
+            $meta_fields[] = $stars;
 
-				echo "<style>"
-				     . ".mwtsa-rate-stars{display:inline-block;color:#ffb900;position:relative;top:3px;}"
-				     . ".mwtsa-rate-stars a {color:#ffb900;}"
-				     . ".mwtsa-rate-stars a svg{fill:#ffb900;}"
-				     . ".mwtsa-rate-stars a:hover svg{fill:#ffb900}"
-				     . ".mwtsa-rate-stars a:hover ~ a svg {fill:none;}"
-				     . "</style>";
-			}
+            echo "<style>"
+                 . ".mwtsa-rate-stars{display:inline-block;color:#ffb900;position:relative;top:3px;}"
+                 . ".mwtsa-rate-stars a {color:#ffb900;}"
+                 . ".mwtsa-rate-stars a svg{fill:#ffb900;}"
+                 . ".mwtsa-rate-stars a:hover svg{fill:#ffb900}"
+                 . ".mwtsa-rate-stars a:hover ~ a svg {fill:none;}"
+                 . "</style>";
+
 
 			return $meta_fields;
 		}

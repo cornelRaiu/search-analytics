@@ -16,7 +16,7 @@ if ( ! class_exists( 'MWTSA_Admin_Charts' ) ) {
 
 		public function load_admin_assets( $hook ) {
 
-			if ( $hook == 'dashboard_page_search-analytics/admin/includes/class.stats' ) {
+			if ( $hook == 'dashboard_page_mwtsa-search-analytics' ) {
 				wp_enqueue_script( 'mwtsa-chart-bundle-script', MWTSAI()->plugin_admin_url . 'assets/js/chart.bundle.min.js', array( 'jquery' ), MWTSAI()->version, true );
 
 				wp_enqueue_script( 'mwtsa-chart-controller-script', MWTSAI()->plugin_admin_url . 'assets/js/chart-controller.js', array( 'mwtsa-chart-bundle-script' ), MWTSAI()->version, true );
@@ -35,56 +35,56 @@ if ( ! class_exists( 'MWTSA_Admin_Charts' ) ) {
 		}
 
 		public function render_stats_chart() {
-			if ( empty( $_REQUEST['search-term'] ) && empty ( MWTSA_Options::get_option( 'mwtsa_hide_charts' ) ) ) : // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-				$default_line_style = MWTSA_Options::get_option( 'chart_default_line_style' );
-				$default_range = MWTSA_Options::get_option( 'chart_default_range' );
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+            if ( ! empty( $_REQUEST['search-term'] ) || ! empty( MWTSA_Options::get_option( 'mwtsa_hide_charts' ) ) ) {
+                return;
+            }
 
-				$line_options = array(
-					'basic'   => __( 'Basic Line', 'search-analytics' ),
-					'stepped' => __( 'Stepped Line', 'search-analytics' )
-				);
+            $default_line_style = MWTSA_Options::get_option( 'chart_default_line_style' );
+            $default_range = MWTSA_Options::get_option( 'chart_default_range' );
 
-				$range_options = array(
-					'2w'  => __( '2 Weeks', 'search-analytics' ),
-					'2wc' => __( '2 Weeks Comparison', 'search-analytics' ),
-					'1m'  => __( '1 Month', 'search-analytics' ),
-					'1mc' => __( '1 Month Comparison', 'search-analytics' )
-				);
-				?>
-                <div class="col-content">
+            $line_options = array(
+                'basic'   => __( 'Basic Line', 'search-analytics' ),
+                'stepped' => __( 'Stepped Line', 'search-analytics' )
+            );
 
-                    <h2><?php esc_html_e( "Search Results Charts", 'search-analytics' ) ?></h2>
-                    <div class="mwtsa-chart-options">
-                        <label for="chart-type">
-                            <select id="chart-type" onchange="loadCharts()">
-								<?php foreach ( $line_options as $value => $label ) : ?>
-                                    <option value="<?php echo esc_attr( $value ) ?>" <?php selected( $value, $default_line_style ) ?>><?php echo esc_html( $label ) ?></option>
-								<?php endforeach; ?>
-                            </select>
-                        </label>
-                        <label for="chart-ranges">
-                            <select id="chart-ranges" onchange="loadCharts()">
-								<?php foreach ( $range_options as $value => $label ) : ?>
-                                    <option value="<?php echo esc_attr( $value ) ?>" <?php selected( $value, $default_range ) ?>><?php echo esc_html( $label ) ?></option>
-								<?php endforeach; ?>
-                            </select>
-                        </label>
-                        <span onclick="saveAsDefault()" class="button"><?php esc_html_e( 'Save as default', 'search-analytics' ) ?></span>
-                    </div>
+            $range_options = array(
+                '2w'  => __( '2 Weeks', 'search-analytics' ),
+                '2wc' => __( '2 Weeks Comparison', 'search-analytics' ),
+                '1m'  => __( '1 Month', 'search-analytics' ),
+                '1mc' => __( '1 Month Comparison', 'search-analytics' )
+            );
+            ?>
+            <div class="col-content">
 
-                    <div id="chart-content">
-                        <canvas id="mwtsa-stats-chart" width="400" height="100"></canvas>
-                    </div>
+                <h2><?php esc_html_e( "Search Results Charts", 'search-analytics' ) ?></h2>
+                <div class="mwtsa-chart-options">
+                    <label for="chart-type">
+                        <select id="chart-type" onchange="loadCharts()">
+                            <?php foreach ( $line_options as $value => $label ) : ?>
+                                <option value="<?php echo esc_attr( $value ) ?>" <?php selected( $value, $default_line_style ) ?>><?php echo esc_html( $label ) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </label>
+                    <label for="chart-ranges">
+                        <select id="chart-ranges" onchange="loadCharts()">
+                            <?php foreach ( $range_options as $value => $label ) : ?>
+                                <option value="<?php echo esc_attr( $value ) ?>" <?php selected( $value, $default_range ) ?>><?php echo esc_html( $label ) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </label>
+                    <span onclick="saveAsDefault()" class="button"><?php esc_html_e( 'Save as default', 'search-analytics' ) ?></span>
                 </div>
-			<?php endif;
+
+                <div id="chart-content">
+                    <canvas id="mwtsa-stats-chart" width="400" height="100"></canvas>
+                </div>
+            </div>
+            <?php
 		}
 
 		public function render_chart_data() {
-            $nonce = isset( $_REQUEST['nonce'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['nonce'] ) ) : '';
-
-			if ( empty( $nonce ) || ! wp_verify_nonce( $nonce, $this->nonce_action ) ) {
-				wp_send_json_error( 'Bad Request!' );
-			}
+            check_ajax_referer( $this->nonce_action );
 
 			$ranges = ! empty( $_REQUEST['chart_ranges'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['chart_ranges'] ) ) : '2w';
 
@@ -125,11 +125,7 @@ if ( ! class_exists( 'MWTSA_Admin_Charts' ) ) {
 		}
 
 		public function save_default_chart_settings() {
-			$nonce = isset( $_REQUEST['nonce'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['nonce'] ) ) : '';
-
-			if ( empty( $nonce ) || ! wp_verify_nonce( $nonce, $this->nonce_action ) ) {
-				wp_send_json_error( 'Bad Request!' );
-			}
+			check_ajax_referer( $this->nonce_action );
 
 			if ( empty( $_POST['line_style'] ) || empty( $_POST['chart_ranges'] ) ) {
 				wp_send_json_error( 'Bad Request!' );

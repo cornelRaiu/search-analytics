@@ -82,7 +82,7 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 		public function process_search_term( $search_term, $count ) {
 
 			$exclude_search_for_roles = MWTSA_Options::get_option( 'mwtsa_exclude_search_for_role' );
-			$current_user_roles       = mwt_get_current_user_roles();
+			$current_user_roles       = mwtsa_get_current_user_roles();
 
 			$exclude_search_for_roles_after_logout = MWTSA_Options::get_option( 'mwtsa_exclude_search_for_role_after_logout' );
 
@@ -104,7 +104,7 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 
 			$exclude_search_for_ips = MWTSA_Options::get_option( 'mwtsa_exclude_searches_from_ip_addresses' );
 
-			$client_ip = mwt_get_current_user_ip();
+			$client_ip = mwtsa_get_current_user_ip();
 
 			if ( ! empty( $exclude_search_for_ips ) ) {
 				$ips_list     = array();
@@ -126,7 +126,11 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 			$exclude_if_contains = MWTSA_Options::get_option( 'mwtsa_exclude_if_string_contains' );
 
 			if ( ! empty( $exclude_if_contains ) ) {
-				$match_against = array_map( 'trim', explode( ',', $exclude_if_contains ) );
+				$match_against = array_map( function ($excluded_string) {
+					$excluded_string = trim( $excluded_string );
+
+					return preg_quote( $excluded_string, '/' );
+				}, explode( ',', $exclude_if_contains ) );
 
 				preg_match( '/(' . implode( '|', $match_against ) . ')/i', $search_term, $matches );
 
@@ -144,12 +148,13 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 			if ( ! empty( MWTSA_Options::get_option( 'mwtsa_save_search_country' ) ) ) {
 				//http://ip-api.com/json/24.48.0?fields=49154
 				// IP-API integration according to the documentation at http://ip-api.com/docs/api:json
+                // non-pro works with http only!
 				$request        = wp_remote_get( 'http://ip-api.com/json/' . $client_ip . '?fields=49155' );
 				$ip_details_get = wp_remote_retrieve_body( $request );
 				if ( ! empty( $ip_details_get ) ) {
 					$ip_details = json_decode( $ip_details_get );
 
-					if ( $ip_details->status != 'fail' ) {
+					if ( $ip_details && ! empty( $ip_details->status ) && $ip_details->status !== 'fail' ) {
 						$country = strtolower( $ip_details->countryCode );
 					}
 				}
@@ -180,18 +185,20 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 			return true;
 		}
 
-		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $mwtsa->terms_table_name and $mwtsa->history_table_name are hardcoded.
+		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter -- MWTSAI()->terms_table_name and MWTSAI()->history_table_name are hardcoded.
 		public function save_search_term( $term, $found_posts, $country = '', $user_id = 0 ) {
-			global $wpdb, $mwtsa;
+			global $wpdb;
 
 			//make sure db is up to date
 			// TODO: move this away
 			MWTSA_Install::activate_single_site();
 
+            $instance = MWTSAI();
+
 			//1. add/update term string
 			$existing_term = $wpdb->get_row( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 				"SELECT *
-				FROM `$mwtsa->terms_table_name`
+				FROM `$instance->terms_table_name`
 				WHERE term = %s
 				LIMIT 1
 				", $term
@@ -205,7 +212,7 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 
 			if ( empty ( $existing_term ) ) {
 				$success = $wpdb->query( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
-					"INSERT INTO `$mwtsa->terms_table_name` (`term`, `total_count`)
+					"INSERT INTO `$instance->terms_table_name` (`term`, `total_count`)
 					VALUES (%s, %d)",
 					sanitize_text_field( $term ),
 					1
@@ -225,7 +232,7 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 				$total_count = $existing_term->total_count + 1;
 
 				$success = $wpdb->query( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
-					"UPDATE `$mwtsa->terms_table_name`
+					"UPDATE `$instance->terms_table_name`
 					SET total_count = %d
 					WHERE term = %s
 					LIMIT 1
@@ -250,7 +257,7 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 				}
 
 				$success = $wpdb->query( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
-					"INSERT INTO `$mwtsa->history_table_name` (`term_id`, `datetime`, `count_posts`, `country`, `user_id`)
+					"INSERT INTO `$instance->history_table_name` (`term_id`, `datetime`, `count_posts`, `country`, `user_id`)
 					VALUES (%d, UTC_TIMESTAMP(), %d, %s, %d)",
 					$term_id,
 					$found_posts,
@@ -263,10 +270,12 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 				}
 
 				do_action( 'mwtsa_after_history_term_save', $history_term_id, $term_id, $found_posts, $country, $user_id );
+
+				wp_cache_set( 'last_changed', microtime(), 'mwtsa' );
 			}
 
 			return $success;
 		}
-		// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 	}
 }

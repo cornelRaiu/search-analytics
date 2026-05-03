@@ -3,7 +3,7 @@
 Plugin Name: Search Analytics for WP
 Plugin URI: https://www.cornelraiu.com/wordpress-plugins/mwt-search-analytics/
 Description: Search Analytics for WP will store and display the search terms used on your website. No third-party service is used!
-Version: 1.4.15
+Version: 1.5.0
 Author: Cornel Raiu
 Author URI: https://www.cornelraiu.com/
 Text Domain: search-analytics
@@ -14,15 +14,19 @@ License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
 defined("ABSPATH") || exit;
 
+if ( ! defined( 'MWTSA_WORDPRESS_SUPPORT_URL' ) ) {
+	define( 'MWTSA_WORDPRESS_SUPPORT_URL', 'https://wordpress.org/support/plugin/search-analytics' );
+}
+
 if ( ! defined( 'MWTSA_WORDPRESS_URL' ) ) {
-	define( 'MWTSA_WORDPRESS_URL', 'https://wordpress.org/support/plugin/search-analytics' );
+    define('MWTSA_WORDPRESS_URL', 'https://wordpress.org/plugin/search-analytics');
 }
 
 if ( ! class_exists( 'MWTSA' ) ) {
 
 	final class MWTSA {
 
-		public $version = '1.4.15';
+		public $version = '1.5.0';
 		public $db_version = '1.1.1';
 
 		public $plugin_dir;
@@ -102,7 +106,6 @@ if ( ! class_exists( 'MWTSA' ) ) {
 		}
 
 		public function add_actions_and_filters() {
-			add_action( 'init', array( $this, 'load_plugin_textdomain' ) );
 			add_action( 'init', array( 'MWTSA_Cookies', 'clear_expired_search_history' ) );
 
 			add_action( 'init', array( 'MWTSA_Display_Search_Stats_Shortcode', 'init' ) );
@@ -119,24 +122,22 @@ if ( ! class_exists( 'MWTSA' ) ) {
 
 			add_action( 'wp_insert_site', array( 'MWTSA_Install', 'activation' ) );
 			add_action( 'wp_login', array( 'MWTSA_Cookies', 'set_is_excluded_cookie_if_needed' ), 10, 2 );
-
-		}
-
-		public function load_plugin_textdomain() {
-			load_plugin_textdomain( 'search-analytics', false, $this->plugin_dir . 'languages/' );
 		}
 	}
 
 }
 
+if ( ! function_exists( 'MWTSAI' ) ) {
+    function MWTSAI() { //MWTSA Main Instance
+        return MWTSA::instance();
+    }
+}
+
 if ( class_exists( 'MWTSA' ) ) {
-	$mwtsa = new MWTSA();
+    $GLOBALS['mwtsa'] = MWTSAI(); // Added for backwards compatibility
+
 	register_activation_hook( __FILE__, array( 'MWTSA_Install', 'activation' ) );
 	register_deactivation_hook( __FILE__, array( 'MWTSA_Uninstall', 'deactivation' ) );
 }
 
-if ( ! function_exists( 'MWTSAI' ) ) {
-	function MWTSAI() { //MWTSA Main Instance
-		return MWTSA::instance();
-	}
-}
+

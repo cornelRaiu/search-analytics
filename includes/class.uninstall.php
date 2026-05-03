@@ -34,13 +34,13 @@ if ( ! class_exists( 'MWTSA_Uninstall' ) ) {
 
 
         public static function deactivate_single_site() {
-            global $wpdb, $mwtsa;
+            global $wpdb;
 
-            $table_name = $wpdb->prefix . $mwtsa->history_table_name_no_prefix;
-            $wpdb->query( "DROP TABLE IF EXISTS $table_name" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.SchemaChange
+            $table_name = $wpdb->prefix . MWTSAI()->history_table_name_no_prefix;
+            $wpdb->query( "DROP TABLE IF EXISTS $table_name" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.SchemaChange,PluginCheck.Security.DirectDB.UnescapedDBParameter
 
-            $table_name = $wpdb->prefix . $mwtsa->terms_table_name_no_prefix;
-            $wpdb->query( "DROP TABLE IF EXISTS $table_name" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.SchemaChange
+            $table_name = $wpdb->prefix . MWTSAI()->terms_table_name_no_prefix;
+            $wpdb->query( "DROP TABLE IF EXISTS $table_name" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.SchemaChange,PluginCheck.Security.DirectDB.UnescapedDBParameter
 
             delete_option( "mwtsa_db_version" );
         }

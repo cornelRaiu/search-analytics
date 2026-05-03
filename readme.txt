@@ -2,9 +2,9 @@
 Contributors: cornel.raiu
 Tags: search, analytics, statistics, history
 Requires at least: 4.4.0
-Tested up to: 6.8.1
+Tested up to: 6.9
 Requires PHP: 5.6
-Stable tag: 1.4.15
+Stable tag: 1.5.0
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -65,7 +65,7 @@ For enabling the shortcodes in widgets you need to add the following code in you
 
 = The history was not deleted when I deactivated the plugin =
 
-Before uninstalling, you should go to the plugin's settings page and check the "Remove plugin tables on uninstall" setting. After doing that, deactivating the plugin should also remove all tables from the database.
+Before uninstalling, you should go to the plugin's settings page and check the "Remove plugin tables on deactivate" setting. After doing that, deactivating the plugin should also remove all tables from the database.
 
 = Where can I make feature requests or report non-security related bugs? =
 
@@ -76,7 +76,25 @@ You can use the [Support Forum](https://wordpress.org/support/plugin/search-anal
 Please report security bugs found in the source code of the Search Analytics for WP plugin through the [Patchstack Vulnerability Disclosure Program](https://patchstack.com/database/vdp/search-analytics). The Patchstack team will assist you with verification, CVE assignment, and notify me, the developer of Search Analytics for WP.
 
 == Changelog ==
-= 1.4.14 =
+= 1.5.0 =
+* **Structure:** Changed the main page from `wp-admin/index.php?page=search-analytics%2Fadmin%2Fincludes%2Fclass.stats.php` to `wp-admin/admin.php?page=mwtsa-search-analytics`. A proper redirect was added to the old route
+* **Structure:** Changed the settings page from `wp-admin/options-general.php?page=search-analytics` to `wp-admin/admin.php?page=mwtsa-search-analytics-settings`. A proper redirect was added to the old route
+* **Structure:** Added a new way to access the plugin main page as a section on the sidebar.
+* Bugfix: Fix a possible crash in case ip-api.com did not return a valid response
+* Bugfix: Fix potential IP spoofing when running a search with save country on
+* Feature: Added `mwtsa_run_terms_history_data_query_args` filter for changing the args before history data gets queried
+* Feature: Added a link to the statistics page on the dashboard widget
+* Optimization: Security improvements and general code optimization. Fixed Cross-Site Request Forgery (CSRF) vulnerability
+* Optimization: Performance improvements
+* Optimization: Added the select2 and jQuery UI Smoothness theme as assets in the plugin
+* Optimization: Deprecated the global `$mwtsa`. It will be removed in a later version. Use the `MWTSAI()` to get the instance
+* Deprecations: Deprecated the helper functions with `mwt_` prefix and renamed them to the proper prefix `mwtsa_` to prevent possible collisions
+* Deprecations: Deprecated the `mwtsa_run_terms_history_data_query` filter. It could be used by bad actors to modify the query and pass a not sanitized query through
+
+= 1.4.16 =
+* Bugfix: Fix bug related to exclude keywords setting, reported [here](https://wordpress.org/support/topic/there-has-been-a-critical-error-on-this-website-422/). Thank you [@luislu](https://wordpress.org/support/users/luislu/) for the report!
+
+= 1.4.15 =
 * Bugfix: Fix country not being saved, reported [here](https://wordpress.org/support/topic/country-data-unavailable/). Thank you [@mikeeiler](https://wordpress.org/support/users/mikeeiler/) for the report!
 
 = 1.4.14 =
@@ -299,5 +317,5 @@ Please report security bugs found in the source code of the Search Analytics for
 
 == Upgrade Notice ==
 
-= 1.4.15 =
-Fix country not being saved
+= 1.4.16 =
+Fix bug related to exclude keywords setting
