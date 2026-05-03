@@ -143,8 +143,8 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 
 			if ( ! empty( MWTSA_Options::get_option( 'mwtsa_save_search_country' ) ) ) {
 				//http://ip-api.com/json/24.48.0?fields=49154
-				// IP-API integration according to the documentation at https://ip-api.com/docs/api:json
-				$request        = wp_remote_get( 'https://ip-api.com/json/' . $client_ip . '?fields=49155' );
+				// IP-API integration according to the documentation at http://ip-api.com/docs/api:json
+				$request        = wp_remote_get( 'http://ip-api.com/json/' . $client_ip . '?fields=49155' );
 				$ip_details_get = wp_remote_retrieve_body( $request );
 				if ( ! empty( $ip_details_get ) ) {
 					$ip_details = json_decode( $ip_details_get );

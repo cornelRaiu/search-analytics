@@ -2,9 +2,9 @@
 Contributors: cornel.raiu
 Tags: search, analytics, statistics, history
 Requires at least: 4.4.0
-Tested up to: 6.6.2
+Tested up to: 6.8.1
 Requires PHP: 5.6
-Stable tag: 1.4.14
+Stable tag: 1.4.15
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -77,13 +77,16 @@ Please report security bugs found in the source code of the Search Analytics for
 
 == Changelog ==
 = 1.4.14 =
+* Bugfix: Fix country not being saved, reported [here](https://wordpress.org/support/topic/country-data-unavailable/). Thank you [@mikeeiler](https://wordpress.org/support/users/mikeeiler/) for the report!
+
+= 1.4.14 =
 * Bugfix: Fix bulk deletion not working.
 
 = 1.4.13 =
 * Optimization: Security improvements and general code optimization.
 
 = 1.4.12 =
-* Optimization: Security improvements and general code optimization. Fixed Reflected Cross-Site Scripting vulnerability reported by [vgo0](https://www.wordfence.com/threat-intel/vulnerabilities/researchers/dale-mavers)
+* Others: Rename plugin to "Search Analytics for WP"
 
 = 1.4.11 =
 * Optimization: Security improvements and general code optimization. Fixed Reflected Cross-Site Scripting vulnerability reported by [vgo0](https://www.wordfence.com/threat-intel/vulnerabilities/researchers/dale-mavers)
@@ -296,5 +299,5 @@ Please report security bugs found in the source code of the Search Analytics for
 
 == Upgrade Notice ==
 
-= 1.4.14 =
-Fix bulk deletion not working
+= 1.4.15 =
+Fix country not being saved

@@ -211,7 +211,7 @@ if ( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
                                 printf( esc_attr__( 'New in version %s', 'search-analytics' ), esc_attr( $mwtsa->version ) ); ?>
                             </p>
                             <ul class="changelog-list">
-                                <li>Bugfix: Fix bulk deletion not working.</li>
+								<li>Bugfix: Fix country not being saved.</li>
 							</ul>
                             <p><a href="https://www.cornelraiu.com/mwt-search-analytics-changelog/" target="_blank"><?php esc_html_e( 'Click here to check the complete log', 'search-analytics' ) ?></a></p>
                             <h3><?php esc_html_e( 'Useful Links', 'search-analytics' ) ?></h3>
