@@ -317,5 +317,5 @@ Please report security bugs found in the source code of the Search Analytics for
 
 == Upgrade Notice ==
 
-= 1.4.16 =
-Fix bug related to exclude keywords setting
+= 1.5.0 =
+Fix a few security issues, change the way the statistics page is accessed, and make some performance improvements
