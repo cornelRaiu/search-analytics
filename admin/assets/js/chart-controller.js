@@ -47,7 +47,7 @@
 
   _.loadCharts = function () {
     const data = {
-      'nonce': mwtsa_chart_obj.nonce,
+      '_ajax_nonce': mwtsa_chart_obj.nonce,
       'action': 'render_chart_data',
       'chart_ranges': $('#chart-ranges').val()
     };
@@ -63,7 +63,7 @@
 
   _.saveAsDefault = function () {
     const data = {
-      'nonce': mwtsa_chart_obj.nonce,
+      '_ajax_nonce': mwtsa_chart_obj.nonce,
       'action': 'save_default_chart_settings',
       'line_style': $('#chart-type').val(),
       'chart_ranges': $('#chart-ranges').val()

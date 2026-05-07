@@ -40,9 +40,15 @@ if ( ! class_exists( 'MWTSA_Term_Stats_Table' ) ) :
 		}
 
 		public function get_term_data() {
-			global $wpdb, $mwtsa;
+			global $wpdb;
 
-			return $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $mwtsa->terms_table_name WHERE id = %d", (int) $this->term_id ), 'ARRAY_A' );  // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $mwtsa->terms_table_name is hardcoded.
+            $instance = MWTSAI();
+
+
+			return $wpdb->get_row(// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,PluginCheck.Security.DirectDB.UnescapedDBParameter -- table name is hardcoded.
+                $wpdb->prepare( "SELECT * FROM $instance->terms_table_name WHERE id = %d", (int) $this->term_id ), //phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+                'ARRAY_A'
+            );
 		}
 
 		public function display_search_box() {
@@ -118,7 +124,7 @@ if ( ! class_exists( 'MWTSA_Term_Stats_Table' ) ) :
 					$output = date_i18n( $this->get_date_format(), strtotime( $item['datetime'] ) );
 					break;
 				case 'date_time':
-					$output = date_i18n( $this->get_date_format(), strtotime( $item['datetime'] ) + wp_timezone()->getOffset( new DateTime( $item['datetime'] ) ) );
+					$output = date_i18n( $this->get_date_format(), strtotime( $item['datetime'] ) + mwtsa_wp_timezone()->getOffset( new DateTime( $item['datetime'] ) ) );
 					break;
 				case 'results':
 					$output = number_format( (float) $item['results_count'], 2, '.', '' );
@@ -157,7 +163,11 @@ if ( ! class_exists( 'MWTSA_Term_Stats_Table' ) ) :
 			return array();
 		}
 
-		public function display_group_views() {
+        /**
+         * @noinspection HtmlUnknownTarget
+         * @noinspection HtmlUnknownAttribute
+         */
+        public function display_group_views() {
 			$views   = array();
 			$current = ! empty( $_REQUEST['grouped_view'] ) ? (int) $_REQUEST['grouped_view'] : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 

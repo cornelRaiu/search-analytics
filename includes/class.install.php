@@ -5,6 +5,7 @@ if ( ! class_exists( 'MWTSA_Install' ) ) {
 
 	class MWTSA_Install {
 
+        //TODO: check if multisite works correctly.
 		public static function activation( $network_wide ) {
 			global $wpdb, $wp_version;
 
@@ -40,18 +41,24 @@ if ( ! class_exists( 'MWTSA_Install' ) ) {
 		}
 
 		public static function activate_single_site() {
+			static $activated = array();
+			$blog_id = get_current_blog_id();
+			if ( isset( $activated[ $blog_id ] ) ) {
+				return;
+			}
+			$activated[ $blog_id ] = true;
 			self::setup_db_tables();
 			self::update_options();
 		}
 
 		public static function setup_db_tables() {
-			global $wpdb, $mwtsa;
+			global $wpdb;
 
-			$mwtsa = MWTSAI();
+			$instance = MWTSAI();
 
 			$current_db_version = get_option( 'mwtsa_db_version' );
 
-			if ( ! empty( $current_db_version ) && $current_db_version == $mwtsa->db_version ) {
+			if ( ! empty( $current_db_version ) && $current_db_version == $instance->db_version ) {
 				return;
 			}
 
@@ -59,7 +66,7 @@ if ( ! class_exists( 'MWTSA_Install' ) ) {
 			$charset_collate = $wpdb->get_charset_collate();
 
 			// Search terms Table
-			$table_name = $wpdb->prefix . $mwtsa->terms_table_name_no_prefix;
+			$table_name = $wpdb->prefix . $instance->terms_table_name_no_prefix;
 			self::register_table( $table_name );
 
 			$sql = "CREATE TABLE $table_name (
@@ -70,7 +77,7 @@ if ( ! class_exists( 'MWTSA_Install' ) ) {
 			) $charset_collate;";
 
 			// Search History table
-			$table_name = $wpdb->prefix . $mwtsa->history_table_name_no_prefix;
+			$table_name = $wpdb->prefix . $instance->history_table_name_no_prefix;
 			self::register_table( $table_name );
 
 			$sql .= "CREATE TABLE $table_name (
@@ -85,7 +92,7 @@ if ( ! class_exists( 'MWTSA_Install' ) ) {
 
 			dbDelta( $sql );
 
-			update_option( 'mwtsa_db_version', $mwtsa->db_version );
+			update_option( 'mwtsa_db_version', $instance->db_version );
 		}
 
 		public static function register_table( $table_name ) {

@@ -30,7 +30,7 @@ if ( ! class_exists( 'MWTSA_Export_CSV' ) ) {
                 fputcsv( $stream, $result );
             }
 
-            fclose( $stream );
+            fclose( $stream ); // phpcs:ignore
             exit();
         }
     }

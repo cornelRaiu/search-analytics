@@ -120,7 +120,7 @@ msgid "Your IP address is: "
 msgstr ""
 
 #: admin/includes/class.settings.php:190
-msgid "Remove plugin tables on uninstall"
+msgid "Remove plugin tables on deactivate"
 msgstr ""
 
 #: admin/includes/class.settings.php:199

@@ -77,10 +77,12 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
 
 		public function run_terms_history_data_query( $args ) {
 
-			global $wpdb, $mwtsa;
+			global $wpdb;
 
-			//make sure db is up-to-date
+			//make sure db is up to date
 			MWTSA_Install::activate_single_site();
+
+            $instance = MWTSAI();
 
 			$default_args = array(
 				'since'            => 1,
@@ -96,7 +98,8 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
 				'count'            => -1
 			);
 
-			$args = array_merge( $default_args, $args );
+			$args = wp_parse_args( $args, $default_args );
+			$args = apply_filters( 'mwtsa_run_terms_history_data_query_args', $args );
 
 			$args['since'] = (int) $args['since'];
 
@@ -190,8 +193,8 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
 					$order_by = apply_filters( 'mwtsa_run_terms_history_order_by', $order_by, $args );
 
 					$query = "SELECT t.id, t.term, $count $results_count_col, $datetime as last_search_date $country $user_id
-		                FROM $mwtsa->terms_table_name as t
-		                JOIN $mwtsa->history_table_name as h ON t.id = h.term_id
+		                FROM $instance->terms_table_name as t
+		                JOIN $instance->history_table_name as h ON t.id = h.term_id
 		                $where
 		                $group_by
 		                $having
@@ -199,8 +202,8 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
 		                $limit";
 				} else {
 					$query = "SELECT t.id, t.term, h.count_posts, `datetime` as last_search_date
-			                FROM $mwtsa->terms_table_name as t
-			                JOIN $mwtsa->history_table_name as h ON t.id = h.term_id
+			                FROM $instance->terms_table_name as t
+			                JOIN $instance->history_table_name as h ON t.id = h.term_id
 			                $where
 			                ORDER BY `datetime` DESC
 			                LIMIT 1";
@@ -243,16 +246,31 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
 				}
 
 				$query = "SELECT h.count_posts as results_count, `datetime` $additional_fields
-			                FROM $mwtsa->terms_table_name as t
-			                JOIN $mwtsa->history_table_name as h ON t.id = h.term_id
+			                FROM $instance->terms_table_name as t
+			                JOIN $instance->history_table_name as h ON t.id = h.term_id
 			                $where
 			                $group_by
 			                ORDER BY `datetime` DESC, results_count DESC
 			                $limit";
 			}
 
-			//TODO: use wp_cache_get() / wp_cache_set() or wp_cache_delete().
-			return $wpdb->get_results( apply_filters( 'mwtsa_run_terms_history_data_query', $query, $args ), 'ARRAY_A' );   // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery
+			apply_filters_deprecated(
+				'mwtsa_run_terms_history_data_query',
+				array( $query, $args ),
+				'1.5.0',
+				'mwtsa_run_terms_history_data_query_args',
+				'Modifying the raw SQL query is unsafe. Use the mwtsa_run_terms_history_data_query_args filter to modify query arguments instead.'
+			);
+
+			$cache_key = md5( $query ) . wp_cache_get_last_changed( 'mwtsa' );
+			$results    = wp_cache_get( $cache_key, 'mwtsa' );
+
+			if ( false === $results ) {
+				$results = $wpdb->get_results( $query, 'ARRAY_A' ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery, PluginCheck.Security.DirectDB.UnescapedDBParameter
+				wp_cache_set( $cache_key, $results, 'mwtsa' );
+			}
+
+			return $results;
 		}
 
 		public function get_daily_search_count_for_period_chart( $args ) {
@@ -265,7 +283,7 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
 				'compare' => false
 			);
 
-			$args = array_merge( $default_args, $args );
+			$args = wp_parse_args( $args, $default_args );
 
 			$results = array();
 
@@ -288,7 +306,7 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
 		}
 
 		public function get_results_for_chart( $args ) {
-			$dates   = mwt_create_date_range( '-' . $args['since'] . ' ' . $args['unit'], '', $args['format'] );
+		$dates   = mwtsa_create_date_range( '-' . $args['since'] . ' ' . $args['unit'], '', $args['format'] );
 			$results = $this->run_terms_history_data_query( $args );
 
 			$_searches = $searches = array();
