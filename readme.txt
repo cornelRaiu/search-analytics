@@ -1,45 +1,75 @@
-=== Search Analytics for WP ===
+=== Search Analytics for WP - Site Search Tracking ===
 Contributors: cornel.raiu
-Tags: search, analytics, statistics, history
-Requires at least: 4.4.0
-Tested up to: 6.9
+Tags: search analytics, site search, search, statistics, history
+Requires at least: 4.7
+Tested up to: 7.1
 Requires PHP: 5.6
-Stable tag: 1.5.0
+Stable tag: 1.6.0
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
-Search Analytics for WP will store and display the search terms used on your website. No third-party service is used!
+See what visitors search for on your site and which searches come up empty. Popular search terms and statistics, stored in your own database.
 
 == Description ==
-Search Analytics for WP will keep history of the search terms used by your users and group them in a set of statistics including the number of posts resulted from that search term.
 
-It can easily aid you in finding what your users are really searching for on your website and make sure you provide exactly what they need.
+Search Analytics for WP logs what visitors search for on your WordPress site and how many results each search returned. You see which search terms are popular and which came up empty. Everything is stored in your own database.
 
-Help and/or ideas are greatly appreciated! You can contribute to the GitHub repository: [Search Analytics for WP](https://github.com/cornelRaiu/search-analytics)
+Your site search shows what people came for, in their words rather than yours. Say "opening hours" got 41 searches last month and **zero results every time**. Either the page is missing or it says "business hours". The no-results filter lists every gap like that.
 
-**NOTE: Search Analytics for WP stores all the statistics in your WordPress database. No info is sent to third-party services!**
+= What your search log tells you =
 
-= Features =
-* Record all the search queries made using the **standard WordPress search form**.
-* Exclude searches made by **users with certain user roles** or **with certain IP addresses**
-* Exclude duplicate searches made **in certain conditions**
-* Choose which user roles are allowed to see the statistics
-* Filter statistics by **time periods, with/without results, strings/substrings**
-* View each term **individual statistics**
-* **Export data** in the current view to CSV
-* Easily **delete certain search terms** from history
-* Easily **erase all history from the database** in case a reset is needed
-* Easily **erase history older than** in case a general cleanup is needed
-* Dashboard widget for a quick glance over your last week's search stats
-* **Multisite compatible**
-* Country Geolocation
-* Display search statistics on the front of your website using shortcodes
+**What to write next.** Searches with no results are topics people expect to find on your site. Sorted by number of searches, they become a to-do list with the most requested topics on top. On a blog, that's your next post. In a help center, it's the answer people keep missing.
+
+**Which pages people can't find.** Sometimes the page exists and visitors still search for it. If "contact" or "shipping" shows up week after week, the link is probably too hard to spot.
+
+In a WooCommerce shop, every product search is saved with the number of products it found. A run of searches for a brand or size you don't carry is **demand you'd otherwise never hear about**.
+
+Often the lesson is simply vocabulary. Visitors type "couch" when your store says "sofa". Their search terms are **the words to use** in your titles and menus.
+
+= Key features =
+
+* Records searches from your normal WordPress search, including theme search boxes and the **WooCommerce product search**.
+* Also covers wpForo forum searches and custom URL parameters you add, such as Toolset's `wpv_post_search`, including REST API requests that use them.
+* **AJAX live search** can be recorded too, with one line of code (see For developers).
+* Every search term in a sortable table, with the number of searches, average results and last search date.
+* Time filters from the last 24 hours to all time, or any date range you pick.
+* A **no-results filter** that shows only the searches that found nothing.
+* Each term's history by date or by hour, plus a "No Group" view that lists every search in order.
+* A daily chart compared with the previous period, and a dashboard widget with last week's numbers.
+* **CSV export** of whatever view you're on.
+* Keep **your own searches** out, even after you log out. You can also skip repeat searches, listed IP addresses, very short terms and words you block.
+* Optional country and logged-in user for each search, both off by default.
+* Two shortcodes to show **popular or recent searches** on your site.
+* Separate role access for viewing the statistics and changing the settings.
+* Works on multisite, with separate data for each site, and is translation-ready.
+
+= Getting started =
+
+Recording starts as soon as you activate the plugin. Run a search on your site, then open Search Analytics in the admin menu to see it.
+
+One setting is worth changing on day one: **exclude your own role**, so your test searches don't count. The FAQ below covers the rest, from WooCommerce to live search.
+
+= Privacy =
+
+There's no account to create and no API key. **Nothing is sent anywhere unless you turn on "Save Search Country"**, which is off by default. It sends visitors' IP addresses to ip-api.com or ip2c.org to look up the country (see External services below).
+
+IP addresses are never saved with the searches, and no cookies are set unless you use one of two optional settings. The FAQ lists exactly what is stored.
+
+= For developers =
+
+To record searches from your own code, such as an AJAX live search, call `mwtsa_process_search_term( $term, $result_count )`. It runs the same exclusion checks as a normal search and returns whether the search was saved.
+
+Filters: `mwtsa_do_not_save_search`, `mwtsa_exclude_term`, `mwtsa_extra_exclude_conditions`, `mwtsa_result_count`, `mwtsa_export_filename`, plus filters on the shortcode output. Actions: `mwtsa_after_term_save`, `mwtsa_after_history_term_save`. The code is on [GitHub](https://github.com/cornelRaiu/search-analytics).
+
+= Support =
+
+Questions and ideas are welcome in the [support forum](https://wordpress.org/support/plugin/search-analytics). If the plugin is useful to you, a review helps other site owners find it.
 
 == Installation ==
 Search Analytics for WP can be installed via the WordPress Automatic Plugin Install page in the admin panel.
 It can also be downloaded from the WordPress Plugin Directory and installed manually.
 
-After the installation and activation is complete you should visit the plugin's settings page ( Settings -> MWT: Search Analytics ) to make sure it is properly configured for your needs.
+After the installation and activation is complete you should visit the plugin's settings page ( Search Analytics -> Settings ) to make sure it is properly configured for your needs.
 
 == Screenshots ==
 
@@ -53,29 +83,148 @@ After the installation and activation is complete you should visit the plugin's 
 
 == Frequently Asked Questions ==
 
-= The search history on my website is not being saved =
+= Does it work with WooCommerce product search? =
 
-The plugin works with the standard WordPress search functionality by default. However, if you need to you can add custom search queries in the plugin's settings or, why not, programmatically add searches to the plugin's database tables to be displayed in the admin panel. For other requirements, please use the [Support Forum](https://wordpress.org/support/plugin/search-analytics) or open new issues on the GitHub repository: [Search Analytics for WP](https://github.com/cornelRaiu/search-analytics).
+Yes. WooCommerce's product search box opens the normal search results page, so each product search is recorded with the number of products it found, just like a blog search. A live search that only shows results in a dropdown needs a line of code (see "Why aren't some searches being recorded?" below).
 
-= The shortcode is not displaying the stats in widgets
+= How do I find searches that returned no results? =
 
-For enabling the shortcodes in widgets you need to add the following code in your child theme's `functions.php` file:
+On the Search Analytics page, click "Only Without Results" and pick a time range. Then sort by "No. of Searches" to put the most common dead ends first.
 
-`add_filter( 'widget_text', 'do_shortcode' );`
+= Can I keep my own searches out of the statistics? =
 
-= The history was not deleted when I deactivated the plugin =
+Yes. In the settings, choose the roles to ignore under "Ignore search queries for these user roles", for example Administrator and Editor. To keep ignoring those users after they log out, also tick "Ignore search queries for the above user roles even after the user has logged out". This sets a cookie in their browser when they log in. You can list IP addresses to ignore too, like your office's.
 
-Before uninstalling, you should go to the plugin's settings page and check the "Remove plugin tables on deactivate" setting. After doing that, deactivating the plugin should also remove all tables from the database.
+= Why aren't some searches being recorded? =
+
+The plugin records searches that load your site's search results page (the `?s=` address). If one is missing, check these:
+
+* Ignored roles, IP addresses, the minimum length, blocked words and the repeat-search interval all skip searches on purpose. If your own role is ignored, test in a private browser window.
+* Opening page 2 of the results or the search feed doesn't count as a new search.
+* If your search form uses its own URL parameter instead of `s`, add it under "Add custom search parameters for recording the searches".
+* A live search that shows results without loading the search results page has to record its searches itself. Call this from the code that handles it, once per finished search rather than on every keystroke:
+
+`if ( function_exists( 'mwtsa_process_search_term' ) ) { mwtsa_process_search_term( $term, $result_count ); }`
+
+`mwtsa_process_search_term()` applies the same settings as a normal search. For anything else, ask on the [Support Forum](https://wordpress.org/support/plugin/search-analytics).
+
+= Will it slow down my site? =
+
+Only searches do any work. Each search is saved with a few small database queries. Other pages only check whether they are a search, and the plugin loads no scripts or styles on the front end.
+
+With "Save Search Country" on, the first search from a new IP address waits for the country lookup, which gives up after 2 seconds. The result is then cached for a day.
+
+The history table grows with every search and nothing is deleted automatically. To trim it, use "Delete data older than" in the Erase History section of the settings.
+
+= Does it store personal data or send it anywhere? =
+
+Here is everything it keeps and shares, so you can check it against the GDPR or your local rules:
+
+* Each search is saved with the term, the date and time, and the number of results. IP addresses are not saved.
+* Search terms are whatever visitors type, which now and then includes a name or an email address. You can delete any term from the statistics page.
+* "Save Search Country" (off by default) adds the visitor's country. To find it, the visitor's IP address is sent to ip-api.com or ip2c.org (see External services), and the country is cached for a day under a hash of the IP address.
+* "Save Search By User" (off by default) links logged-in users' searches to their accounts.
+* A cookie is only set if you use the repeat-search interval or the "even after the user has logged out" option. It holds the IDs of recently searched terms and when they were searched, or a flag that the user's role is ignored.
+* You can erase all data, or everything older than a number of days, from the settings at any time.
+
+= Can I export the search data? =
+
+Yes. The "Export Data" button on the statistics page downloads what you're looking at as a CSV file, with the same time range, filters and grouping.
+
+= Can I show popular searches on my site? =
+
+Yes, with two shortcodes:
+
+* `[mwtsa_display_search_stats]` lists the most searched terms, plus the visitor's own recent searches if they're logged in and "Save Search By User" is on.
+* `[mwtsa_display_latest_searches]` lists the most recent search terms.
+
+Both hide terms with no results by default and take options for the period, the number of terms and the labels. For example, `[mwtsa_display_latest_searches unit="month" count="5"]` shows the five most recent terms from the past month.
+
+In a widget area, use the Shortcode block, or the Text widget on WordPress 4.9 and later. On 4.7 and 4.8, add `add_filter( 'widget_text', 'do_shortcode' );` to your child theme's `functions.php`.
+
+= Does deactivating the plugin delete my search data? =
+
+No. Deactivating the plugin always keeps the search history. To remove it, check "Delete all search data and settings when the plugin is deleted" on the plugin's settings page, then delete the plugin from the Plugins screen. On multisite, each site's data is only removed if that site has the setting checked.
 
 = Where can I make feature requests or report non-security related bugs? =
 
 You can use the [Support Forum](https://wordpress.org/support/plugin/search-analytics) or open new issues on the GitHub repository: [Search Analytics for WP](https://github.com/cornelRaiu/search-analytics).
 
-= Where do I report security bugs?
+= Where do I report security bugs? =
 
 Please report security bugs found in the source code of the Search Analytics for WP plugin through the [Patchstack Vulnerability Disclosure Program](https://patchstack.com/database/vdp/search-analytics). The Patchstack team will assist you with verification, CVE assignment, and notify me, the developer of Search Analytics for WP.
 
+== External services ==
+
+Search Analytics for WP can look up the country each search was made from. This only happens when the "Save Search Country" setting is enabled; it is off by default.
+
+When a search is recorded, the visitor's IP address is sent to the service chosen in the "Country lookup service" setting. Each IP address is looked up at most once per day, and private or reserved addresses are never sent.
+
+= IP-API (ip-api.com) =
+
+The default service. The IP address is sent over HTTP, as the free service does not support HTTPS. The free service only allows non-commercial use and 45 requests per minute.
+
+Terms of service and privacy policy: [https://ip-api.com/docs/legal](https://ip-api.com/docs/legal)
+
+= ip2c.org =
+
+The IP address is sent over HTTPS. The service is free (LGPL) and allows around 10 requests per second. It only supports IPv4 addresses, so searches from IPv6 addresses are saved without a country.
+
+Service terms and privacy policy: [https://about.ip2c.org](https://about.ip2c.org)
+
+== Credits ==
+
+Country flags on Windows use the "Twemoji Country Flags" font from [country-flag-emoji-polyfill](https://github.com/talkjs/country-flag-emoji-polyfill) by TalkJS (MIT license). The flag artwork comes from [Twemoji](https://github.com/twitter/twemoji) and is licensed under [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/). The font and polyfill are bundled with the plugin and loaded from your own site.
+
 == Changelog ==
+= 1.6.0 =
+
+**Structure:**
+
+* Search data is now only removed when the plugin is deleted and the setting is checked, never on deactivation. The setting is now called "Delete all search data and settings when the plugin is deleted"
+* The minimum WordPress version is now 4.7 (1.5.0 already needed it)
+
+**Features:**
+
+* The country lookup can use ip2c.org (HTTPS, IPv4 only) instead of ip-api.com. Choose it under "Country lookup service"; ip-api.com stays the default
+* The new `mwtsa_process_search_term()` function records searches from your own code, such as an AJAX live search, with the same checks as a normal search
+
+**Bugfixes:**
+
+* The statistics charts were not loading since 1.5.0
+* The charts and the "By date" view grouped searches by day of the month, merging e.g. 26 August with 26 September. Comparison periods overlapped by a day and the charts showed an extra day
+* On multisite, deactivating the plugin on one site with "Remove plugin tables on deactivate" checked removed the search data of every site in the network. New sites now get their tables reliably, and deleting a site removes its search data
+* A trailing comma in "Exclude search in case it contains certain substring" excluded every search. Matching now also works for non-English text
+* "Last 24 hours", "Last week" and "Last month" now cover exactly that period instead of starting at midnight
+* Loading the second page of search results or the search feed no longer counts as a new search
+* Terms with leading or repeated spaces, or longer than 100 characters, got a new row on every search
+* The minimum characters setting now counts characters instead of bytes
+* The CSV export headers were wrong in the "No Group" view
+* Saving the settings reset the chart defaults
+* Deleting terms, and the old Dashboard and Settings menu entries, left a half-rendered page instead of redirecting
+* The roles allowed on the settings page could not save it, and the roles allowed on the statistics page could not export
+* The erase confirmation was skipped in translations containing an apostrophe
+
+**Security:**
+
+* CSV exports no longer let search terms run as spreadsheet formulas
+* The tracking cookie is validated (a malformed cookie made every request fail) and is now HttpOnly and SameSite
+* Every action now checks the user's role, including the chart requests and erasing the history
+
+**Optimizations:**
+
+* Countries are shown with flag emoji instead of 249 bundled flag images (about 1 MB). Browsers that can't draw flag emoji, such as Chrome and Edge on Windows, load a small flag font bundled with the plugin
+* Added database indexes to the search history and search terms tables. Database upgrades now run from the admin, never during a visitor's search
+* The country lookup only runs for recorded searches, is cached per IP for a day and times out after 2 seconds
+* The tracking cookie is no longer re-sent on every page, which kept pages out of full-page caches
+* Searches through the REST API are counted without loading every matching post
+* The plugin's stylesheet only loads on its own screens
+
+**Deprecations:**
+
+* The `mwtsa_stats_table_*` and `mwtsa_term_stats_table_*` filters are deprecated. Search Analytics 2.0 replaces the statistics screens and they will no longer run there
+
+
 = 1.5.0 =
 * **Structure:** Changed the main page from `wp-admin/index.php?page=search-analytics%2Fadmin%2Fincludes%2Fclass.stats.php` to `wp-admin/admin.php?page=mwtsa-search-analytics`. A proper redirect was added to the old route
 * **Structure:** Changed the settings page from `wp-admin/options-general.php?page=search-analytics` to `wp-admin/admin.php?page=mwtsa-search-analytics-settings`. A proper redirect was added to the old route
@@ -316,6 +465,9 @@ Please report security bugs found in the source code of the Search Analytics for
 * Initial Release
 
 == Upgrade Notice ==
+
+= 1.6.0 =
+Fixes the charts, a multisite bug that could delete other sites' search data, and several counting errors. Search data is now only removed when you delete the plugin. Database indexes are added on your next admin page load.
 
 = 1.5.0 =
 Fix a few security issues, change the way the statistics page is accessed, and make some performance improvements

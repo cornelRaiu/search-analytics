@@ -18,7 +18,10 @@
 
 .mwtsa-wrapper .date-interval { display: inline-flex; align-items: center }
 
-.mwtsa-wrapper .column-country div { display: flex; align-items: flex-end; }
+.mwtsa-wrapper .column-country div { display: flex; align-items: center; }
+
+/* "Twemoji Country Flags" only exists when the flag polyfill registered it (Windows); other browsers skip it. */
+.mwtsa-flag { font-family: "Twemoji Country Flags", "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif; }
 
 .mwtsa-stats-widget-wrapper .stats-list-label { width: 40%; display: inline-block; font-weight: bold; }
 

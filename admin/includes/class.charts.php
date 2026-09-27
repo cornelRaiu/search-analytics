@@ -8,30 +8,24 @@ if ( ! class_exists( 'MWTSA_Admin_Charts' ) ) {
 		private $nonce_action = 'mwtsa_chart_nonce';
 
 		public function __construct() {
-			add_action( 'admin_enqueue_scripts', array( $this, 'load_admin_assets' ) );
-
 			add_action( 'wp_ajax_render_chart_data', array( $this, 'render_chart_data' ) );
 			add_action( 'wp_ajax_save_default_chart_settings', array( $this, 'save_default_chart_settings' ) );
 		}
 
-		public function load_admin_assets( $hook ) {
+		public function load_admin_assets() {
+			wp_enqueue_script( 'mwtsa-chart-bundle-script', MWTSAI()->plugin_admin_url . 'assets/js/chart.bundle.min.js', array( 'jquery' ), MWTSAI()->version, true );
 
-			if ( $hook == 'dashboard_page_mwtsa-search-analytics' ) {
-				wp_enqueue_script( 'mwtsa-chart-bundle-script', MWTSAI()->plugin_admin_url . 'assets/js/chart.bundle.min.js', array( 'jquery' ), MWTSAI()->version, true );
+			wp_enqueue_script( 'mwtsa-chart-controller-script', MWTSAI()->plugin_admin_url . 'assets/js/chart-controller.js', array( 'mwtsa-chart-bundle-script' ), MWTSAI()->version, true );
 
-				wp_enqueue_script( 'mwtsa-chart-controller-script', MWTSAI()->plugin_admin_url . 'assets/js/chart-controller.js', array( 'mwtsa-chart-bundle-script' ), MWTSAI()->version, true );
-
-				wp_localize_script( 'mwtsa-chart-controller-script', 'mwtsa_chart_obj', array(
-						'ajax_url' => admin_url( 'admin-ajax.php' ),
-						'nonce'    => wp_create_nonce( $this->nonce_action ),
-						'strings'  => array(
-							'currentPeriod'  => __( 'Current Period', 'search-analytics' ),
-							'previousPeriod' => __( 'Previous Period', 'search-analytics' ),
-						)
+			wp_localize_script( 'mwtsa-chart-controller-script', 'mwtsa_chart_obj', array(
+					'ajax_url' => admin_url( 'admin-ajax.php' ),
+					'nonce'    => wp_create_nonce( $this->nonce_action ),
+					'strings'  => array(
+						'currentPeriod'  => __( 'Current Period', 'search-analytics' ),
+						'previousPeriod' => __( 'Previous Period', 'search-analytics' ),
 					)
-				);
-			}
-
+				)
+			);
 		}
 
 		public function render_stats_chart() {
@@ -86,6 +80,10 @@ if ( ! class_exists( 'MWTSA_Admin_Charts' ) ) {
 		public function render_chart_data() {
             check_ajax_referer( $this->nonce_action );
 
+			if ( ! mwtsa_current_user_can_view_stats() ) {
+				wp_send_json_error( 'Forbidden', 403 );
+			}
+
 			$ranges = ! empty( $_REQUEST['chart_ranges'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['chart_ranges'] ) ) : '2w';
 
 			switch ( $ranges ) {
@@ -126,6 +124,10 @@ if ( ! class_exists( 'MWTSA_Admin_Charts' ) ) {
 
 		public function save_default_chart_settings() {
 			check_ajax_referer( $this->nonce_action );
+
+			if ( ! mwtsa_current_user_can_view_stats() ) {
+				wp_send_json_error( 'Forbidden', 403 );
+			}
 
 			if ( empty( $_POST['line_style'] ) || empty( $_POST['chart_ranges'] ) ) {
 				wp_send_json_error( 'Bad Request!' );

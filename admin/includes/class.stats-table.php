@@ -89,7 +89,12 @@ if ( ! class_exists( 'MWTSA_Stats_Table' ) ) :
 				$columns['last_search_date'] = __( 'Last search date', 'search-analytics' );
 			}
 
-			return apply_filters( 'mwtsa_stats_table_columns', $columns );
+			// The checkboxes only serve the bulk delete action.
+			if ( ! mwtsa_current_user_can_manage_settings() ) {
+				unset( $columns['cb'] );
+			}
+
+			return mwtsa_apply_list_table_filter( 'mwtsa_stats_table_columns', $columns );
 		}
 
 		public function get_sortable_columns() {
@@ -105,7 +110,7 @@ if ( ! class_exists( 'MWTSA_Stats_Table' ) ) :
 				unset( $sortable_columns['searches'] );
 			}
 
-			return apply_filters( 'mwtsa_stats_table_sortable_columns', $sortable_columns );
+			return mwtsa_apply_list_table_filter( 'mwtsa_stats_table_sortable_columns', $sortable_columns );
 		}
 
 		/**
@@ -114,20 +119,23 @@ if ( ! class_exists( 'MWTSA_Stats_Table' ) ) :
 		public function column_term( $item ) {
 			$page    = isset( $_REQUEST['page'] ) ? sanitize_text_field( $_REQUEST['page'] ) : ''; //phpcs:ignore WordPress.Security.NonceVerification.Recommended,WordPress.Security.ValidatedSanitizedInput.MissingUnslash -- we actually need slashes here - for now
 
-            $delete_url = wp_nonce_url(
-                add_query_arg(
-                    array( 'page' => $page, 'action' => 'delete', 'search-term' => (int) $item['id'] ),
-                    admin_url( 'admin.php' )
-                ),
-                'mwtsa_delete_term_' . (int) $item['id']
-            );
-
             $view_url = $this->get_view_url($page, $item['id']);
 
-			$actions = array(
-				'delete' => '<a href="' . esc_url( $delete_url ) . '">' . esc_attr__( 'Delete', 'search-analytics' ) . '</a>',
-				'view'   => '<a href="' . esc_url( $view_url ) . '">' . esc_attr__( 'View Details', 'search-analytics' ) . '</a>'
-			);
+			$actions = array();
+
+			if ( mwtsa_current_user_can_manage_settings() ) {
+				$delete_url = wp_nonce_url(
+					add_query_arg(
+						array( 'page' => $page, 'action' => 'delete', 'search-term' => (int) $item['id'] ),
+						admin_url( 'admin.php' )
+					),
+					'mwtsa_delete_term_' . (int) $item['id']
+				);
+
+				$actions['delete'] = '<a href="' . esc_url( $delete_url ) . '">' . esc_attr__( 'Delete', 'search-analytics' ) . '</a>';
+			}
+
+			$actions['view'] = '<a href="' . esc_url( $view_url ) . '">' . esc_attr__( 'View Details', 'search-analytics' ) . '</a>';
 
             /** @noinspection HtmlUnknownTarget */
             return sprintf( '<a href="%1$s">%2$s</a> %3$s', esc_url( $view_url ), esc_attr( $item['term'] ), $this->row_actions( $actions ) );
@@ -140,6 +148,10 @@ if ( ! class_exists( 'MWTSA_Stats_Table' ) ) :
 		}
 
 		protected function get_bulk_actions() {
+			if ( ! mwtsa_current_user_can_manage_settings() ) {
+				return array();
+			}
+
 			return array(
 				'delete' => __( 'Delete', 'search-analytics' )
 			);
@@ -159,7 +171,7 @@ if ( ! class_exists( 'MWTSA_Stats_Table' ) ) :
                 return;
             }
 
-            if ( ! current_user_can( 'manage_options' ) ) {
+            if ( ! mwtsa_current_user_can_manage_settings() ) {
                 wp_die( esc_html__( 'You are not allowed to delete search terms.', 'search-analytics' ), 403 );
             }
 
@@ -192,7 +204,7 @@ if ( ! class_exists( 'MWTSA_Stats_Table' ) ) :
 
             wp_cache_set( 'last_changed', microtime(), 'mwtsa' );
 
-            wp_safe_redirect( add_query_arg( 'result', 'deleted', remove_query_arg( array( 'action', 'search-term' ) ) ) );
+            wp_safe_redirect( add_query_arg( 'result', 'deleted', remove_query_arg( array( 'action', 'action2', 'search-term', '_wpnonce', '_wp_http_referer' ) ) ) );
 
             exit;
 		}
@@ -236,7 +248,7 @@ if ( ! class_exists( 'MWTSA_Stats_Table' ) ) :
 						$country_name = strtoupper( $item_country );
 					}
 
-					$output = '<div><img src="' . esc_url( MWTSAI()->plugin_admin_url . 'assets/images/flags/' . $item_country . '.png' ) . '" alt="' . esc_attr( $country_name ) . '" />&nbsp;<span>' . esc_html( ucwords( $country_name ) ) . '</span></div>';
+					$output = '<div><span class="mwtsa-flag" aria-hidden="true">' . esc_html( mwtsa_country_flag_emoji( $item_country ) ) . '</span>&nbsp;<span>' . esc_html( ucwords( $country_name ) ) . '</span></div>';
 
 					break;
 				case 'user':
@@ -257,7 +269,7 @@ if ( ! class_exists( 'MWTSA_Stats_Table' ) ) :
 					break;
 			}
 
-			echo apply_filters( 'mwtsa_stats_table_column_output', $output, $column_name, $item ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			echo mwtsa_apply_list_table_filter( 'mwtsa_stats_table_column_output', $output, $column_name, $item ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 
 		public function paginate_results() {
@@ -290,8 +302,6 @@ if ( ! class_exists( 'MWTSA_Stats_Table' ) ) :
 			$sortable              = $this->get_sortable_columns();
 			$this->_column_headers = array( $columns, $hidden, $sortable );
 
-			$this->process_bulk_action();
-
 			$this->get_items();
 
 			$this->sort_items();
@@ -299,33 +309,45 @@ if ( ! class_exists( 'MWTSA_Stats_Table' ) ) :
 			$this->paginate_results();
 		}
 
+		protected $sort_column = 'last_search_date';
+		protected $sort_order  = 'desc';
+
 		public function sort_items() {
+			// Read the requested order once, not on every comparison.
+			$this->set_sort_args();
+
 			usort( $this->items, array( &$this, 'usort_reorder' ) );
 		}
 
-		public function usort_reorder( $a, $b ) {
-			$orderby = ( ! empty( $_GET['orderby'] ) ) ? sanitize_text_field( wp_unslash( $_GET['orderby'] ) ) : 'last_search_date'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			$order   = ( ! empty( $_GET['order'] ) ) ? sanitize_text_field( wp_unslash( $_GET['order'] ) ) : 'desc'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		protected function set_sort_args() {
+			$orderby = ( ! empty( $_GET['orderby'] ) ) ? sanitize_key( wp_unslash( $_GET['orderby'] ) ) : 'last_search_date'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$order   = ( ! empty( $_GET['order'] ) ) ? sanitize_key( wp_unslash( $_GET['order'] ) ) : 'desc'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 			switch ( $orderby ) {
 				case 'term':
-					$orderby = 'term';
+					$this->sort_column = 'term';
 					break;
 				case 'searches':
-					$orderby = 'count';
+					$this->sort_column = 'count';
 					break;
 				case 'results':
-					$orderby = 'results_count';
+					$this->sort_column = 'results_count';
 					break;
 				case 'last_search_date':
 				default:
-					$orderby = 'last_search_date';
+					$this->sort_column = 'last_search_date';
 					break;
 			}
 
-			$result = strnatcmp( $a[ $orderby ], $b[ $orderby ] );
+			$this->sort_order = ( 'asc' === $order ) ? 'asc' : 'desc';
+		}
 
-			return ( $order === 'asc' ) ? $result : - $result;
+		public function usort_reorder( $a, $b ) {
+			$a_value = isset( $a[ $this->sort_column ] ) ? (string) $a[ $this->sort_column ] : '';
+			$b_value = isset( $b[ $this->sort_column ] ) ? (string) $b[ $this->sort_column ] : '';
+			$result  = strnatcmp( $a_value, $b_value );
+
+			return ( 'asc' === $this->sort_order ) ? $result : - $result;
 		}
 
 		public function get_items() {
@@ -500,29 +522,45 @@ if ( ! class_exists( 'MWTSA_Stats_Table' ) ) :
                 return;
             }
 
-            if ( ! current_user_can( 'manage_options' ) ) {
+            if ( ! mwtsa_current_user_can_view_stats() ) {
                 wp_die( esc_html__( 'You are not allowed to export data.', 'search-analytics' ), 403 );
             }
 
             check_admin_referer( 'bulk-' . $this->_args['plural'] );
 
-            $columns = array(
-                    esc_attr__( 'Term ID', 'search-analytics' ),
-                    esc_attr__( 'Term', 'search-analytics' ),
-                    esc_attr__( 'Searches', 'search-analytics' ),
-                    esc_attr__( 'Average Results', 'search-analytics' ),
-                    esc_attr__( 'Last Search Date', 'search-analytics' )
-            );
-
+            // The headers follow the columns get_terms_history_data() returns for the current view. CSV is not HTML,
+            // so they are not HTML-escaped.
             if ( ! empty( $_REQUEST['search-term'] ) ) {
-                $columns = array(
-                        esc_attr__( 'Average Results', 'search-analytics' ),
-                        esc_attr__( 'Date and Time', 'search-analytics' )
-                );
-
                 if ( ! empty( $_REQUEST['grouped_view'] ) ) {
-                    $columns[] = esc_attr__( 'Searches', 'search-analytics' );
+                    $columns = array(
+                            __( 'Average Results', 'search-analytics' ),
+                            __( 'Date and Time', 'search-analytics' ),
+                            __( 'Searches', 'search-analytics' )
+                    );
+                } else {
+                    $columns = array(
+                            __( 'No. of results', 'search-analytics' ),
+                            __( 'Date and Time', 'search-analytics' )
+                    );
                 }
+            } elseif ( ! empty( $_REQUEST['grouped_view'] ) ) {
+                // "No Group" returns one row per search, including its country and user.
+                $columns = array(
+                        __( 'Term ID', 'search-analytics' ),
+                        __( 'Term', 'search-analytics' ),
+                        __( 'No. of results', 'search-analytics' ),
+                        __( 'Search Date', 'search-analytics' ),
+                        __( 'Country', 'search-analytics' ),
+                        __( 'User ID', 'search-analytics' )
+                );
+            } else {
+                $columns = array(
+                        __( 'Term ID', 'search-analytics' ),
+                        __( 'Term', 'search-analytics' ),
+                        __( 'Searches', 'search-analytics' ),
+                        __( 'Average Results', 'search-analytics' ),
+                        __( 'Last Search Date', 'search-analytics' )
+                );
             }
 
             $export_csv = new MWTSA_Export_CSV();

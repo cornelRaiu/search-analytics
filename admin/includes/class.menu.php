@@ -66,7 +66,7 @@ if ( ! class_exists( 'MWTSA_Admin_Menu' ) ) {
 
 			// Backward-compat: keep the old Dashboard entry visible and redirect to new location
 			if ( ! empty( $stats_roles ) ) {
-				add_submenu_page(
+				$old_stats_hook = add_submenu_page(
 					'index.php',
 					__( 'Search Analytics', 'search-analytics' ),
 					__( 'Search Analytics', 'search-analytics' ),
@@ -74,17 +74,26 @@ if ( ! class_exists( 'MWTSA_Admin_Menu' ) ) {
 					'mwtsa-search-analytics-old',
 					array( $this, 'redirect_to_stats' )
 				);
+
+				// Redirect on load: the page callback runs after the admin header has been sent.
+				if ( $old_stats_hook ) {
+					add_action( "load-{$old_stats_hook}", array( $this, 'redirect_to_stats' ) );
+				}
 			}
 
 			// Backward-compat: keep the old Settings entry visible and redirect to new location
 			if ( ! empty( $settings_roles ) ) {
-				add_options_page(
+				$old_settings_hook = add_options_page(
 					__( 'MWT: Search Analytics', 'search-analytics' ),
 					__( 'MWT: Search Analytics', 'search-analytics' ),
 					$settings_roles[0],
 					'mwtsa-search-analytics-settings-old',
 					array( $this, 'redirect_to_settings' )
 				);
+
+				if ( $old_settings_hook ) {
+					add_action( "load-{$old_settings_hook}", array( $this, 'redirect_to_settings' ) );
+				}
 			}
 		}
 

@@ -8,8 +8,16 @@ if ( ! class_exists( 'MWTSA_Options' ) ) {
 		public static $option_name = 'mwtsa_settings';
 		public static $existing_options = array();
 
+		// The site the cached options belong to, so switch_to_blog() never serves another site's settings.
+		private static $options_blog_id = 0;
+
 		public static function init_options() {
+			self::$options_blog_id  = get_current_blog_id();
 			self::$existing_options = get_option( self::$option_name, array() );
+
+			if ( ! is_array( self::$existing_options ) ) {
+				self::$existing_options = array();
+			}
 
 			$options = array(
 				'mwtsa_display_stats_for_role'               => [
@@ -18,6 +26,7 @@ if ( ! class_exists( 'MWTSA_Options' ) ) {
 				'mwtsa_exclude_search_for_role'              => [],
 				'mwtsa_exclude_search_for_role_after_logout' => 0,
 				'mwtsa_save_search_country'                  => 0,
+				'mwtsa_geolocation_provider'                 => 'ip-api',
 				'mwtsa_save_search_by_user'                  => 0,
 				'mwtsa_exclude_doubled_search_for_interval'  => 0,
 				'mwtsa_exclude_searches_from_ip_addresses'   => '',
@@ -53,10 +62,14 @@ if ( ! class_exists( 'MWTSA_Options' ) ) {
 			}
 		}
 
-		public static function get_options() {
-			if ( empty( self::$existing_options ) ) {
+		private static function maybe_init_options() {
+			if ( empty( self::$existing_options ) || self::$options_blog_id !== get_current_blog_id() ) {
 				self::init_options();
 			}
+		}
+
+		public static function get_options() {
+			self::maybe_init_options();
 
 			self::sanitize_options();
 
@@ -64,9 +77,7 @@ if ( ! class_exists( 'MWTSA_Options' ) ) {
 		}
 
 		public static function get_option( $name ) {
-			if ( empty( self::$existing_options ) ) {
-				self::init_options();
-			}
+			self::maybe_init_options();
 
 			return ( isset( self::$existing_options[ $name ] ) ) ? self::$existing_options[ $name ] : false;
 		}

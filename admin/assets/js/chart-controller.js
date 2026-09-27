@@ -1,11 +1,21 @@
 (function (_, $) {
 
+  let chart = null;
+
   const initCharts = function (dates, searches) {
     const lineStyle = $('#chart-type').val();
     const ctx = document.getElementById('mwtsa-stats-chart').getContext('2d');
-    const stepSize = Math.ceil(Math.max(searches[0]) / 15);
+    const values = [].concat.apply([], searches.map(function (dataSet) {
+      return Object.values(dataSet);
+    }));
+    const stepSize = Math.max(1, Math.ceil(Math.max.apply(null, values.concat(0)) / 15));
 
-    new Chart(ctx, {
+    // Chart.js keeps drawing old instances on a reused canvas, so drop the previous one first.
+    if (chart) {
+      chart.destroy();
+    }
+
+    chart = new Chart(ctx, {
       type: 'line',
       data: {
         labels: dates,

@@ -79,8 +79,8 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
 
 			global $wpdb;
 
-			//make sure db is up to date
-			MWTSA_Install::activate_single_site();
+			// Creates the tables if they are missing; upgrading existing ones is left to the admin.
+			MWTSA_Install::activate_single_site( false );
 
             $instance = MWTSAI();
 
@@ -117,8 +117,7 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
 
 			if ( empty( $args['date_since'] ) && empty( $args['date_until'] ) ) {
 				if ( $args['unit'] != '' ) {
-					// $args['since'] and $args['unit'] are already clean at this point
-					$where .= " AND DATE_SUB( CURDATE(), INTERVAL {$args['since']} {$args['unit']} ) <= h.datetime";
+					$where .= " AND h.datetime >= UTC_TIMESTAMP() - INTERVAL {$args['since']} {$args['unit']}";
 				}
 			} else {
 				$since = ( empty( $args['date_since'] ) ) ? time() : strtotime( $args['date_since'] );
@@ -220,9 +219,9 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
 					$where .= " AND h.count_posts > 0";
 				}
 
-				$additional_fields = '';
-				$group_by          = '';
-				$grouped_view      = '';
+				$fields       = 'h.count_posts as results_count, `datetime`';
+				$group_by     = '';
+				$grouped_view = '';
 
 				if ( isset( $_REQUEST['grouped_view'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 					$grouped_view = sanitize_text_field( wp_unslash( $_REQUEST['grouped_view'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -233,7 +232,7 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
 				switch ( $grouped_view ) {
 					case 'day':
 					case 1:
-						$group_by = 'GROUP BY DAY(`datetime`)';
+						$group_by = 'GROUP BY DATE(`datetime`)';
 						break;
 					case 'hour':
 					case 2:
@@ -242,10 +241,10 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
 				}
 
 				if ( $group_by != '' ) {
-					$additional_fields = ', COUNT( h.id ) as `count`';
+					$fields = 'AVG( h.count_posts ) as results_count, MAX( `datetime` ) as `datetime`, COUNT( h.id ) as `count`';
 				}
 
-				$query = "SELECT h.count_posts as results_count, `datetime` $additional_fields
+				$query = "SELECT $fields
 			                FROM $instance->terms_table_name as t
 			                JOIN $instance->history_table_name as h ON t.id = h.term_id
 			                $where
@@ -285,42 +284,69 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
 
 			$args = wp_parse_args( $args, $default_args );
 
-			$results = array();
+			$days     = mwtsa_create_date_range( '-' . (int) $args['since'] . ' ' . $args['unit'], '', 'Y-m-d' );
+			$dates    = $this->format_chart_days( $days, $args['format'] );
+			$searches = array( $this->get_daily_search_counts( $days ) );
 
-			list( $dates, $results[] ) = $this->get_results_for_chart( $args );
-
-			if ( $args['compare'] ) {
-				$args['since'] *= 2;
-				list( $_dates, $results[] ) = $this->get_results_for_chart( $args );
+			if ( $args['compare'] && ! empty( $days ) ) {
+				// The previous period is the same number of days, ending the day before the current one starts.
+				$days_count     = count( $days );
+				$previous_days  = mwtsa_create_date_range( '-' . ( 2 * $days_count - 1 ) . ' days', '-' . $days_count . ' days', 'Y-m-d' );
+				$previous_dates = $this->format_chart_days( $previous_days, $args['format'] );
+				$searches[]     = $this->get_daily_search_counts( $previous_days );
 
 				foreach ( $dates as $k => &$date ) {
 					/* translators: 1: Initial Date, 2: Compare Date */
-					$date = sprintf( esc_attr__( '%1$s vs %2$s', 'search-analytics' ), $_dates[ $k ], $date );
+					$date = sprintf( esc_attr__( '%1$s vs %2$s', 'search-analytics' ), $previous_dates[ $k ], $date );
 				}
+				unset( $date );
 			}
 
 			return array(
 				'dates'    => $dates,
-				'searches' => $results
+				'searches' => $searches
 			);
 		}
 
 		public function get_results_for_chart( $args ) {
-		$dates   = mwtsa_create_date_range( '-' . $args['since'] . ' ' . $args['unit'], '', $args['format'] );
-			$results = $this->run_terms_history_data_query( $args );
+			$format = isset( $args['format'] ) ? $args['format'] : 'd/m';
+			$days   = mwtsa_create_date_range( '-' . (int) $args['since'] . ' ' . $args['unit'], '', 'Y-m-d' );
+			$dates  = $this->format_chart_days( $days, $format );
 
-			$_searches = $searches = array();
+			return array( $dates, array_combine( $dates, $this->get_daily_search_counts( $days ) ) );
+		}
+
+		/**
+		 * Counts the searches made on each of the given UTC days (Y-m-d), in the same order.
+		 */
+		protected function get_daily_search_counts( $days ) {
+			if ( empty( $days ) ) {
+				return array();
+			}
+
+			$results = $this->run_terms_history_data_query( array(
+				'group'      => 'day',
+				'date_since' => reset( $days ),
+				'date_until' => end( $days ),
+			) );
+
+			$counts = array_fill_keys( $days, 0 );
 
 			foreach ( $results as $result ) {
-				$this_time               = date( $args['format'], strtotime( $result['datetime'] ) ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date	 -- we are actually interested in the runtime timezone.
-				$_searches[ $this_time ] = $result['count'];
+				$day = gmdate( 'Y-m-d', strtotime( $result['datetime'] ) );
+
+				if ( isset( $counts[ $day ] ) ) {
+					$counts[ $day ] = (int) $result['count'];
+				}
 			}
 
-			foreach ( $dates as $date ) {
-				$searches[ $date ] = ( isset( $_searches[ $date ] ) ) ? $_searches[ $date ] : 0;
-			}
+			return array_values( $counts );
+		}
 
-			return array( $dates, $searches );
+		protected function format_chart_days( $days, $format ) {
+			return array_map( function ( $day ) use ( $format ) {
+				return gmdate( $format, strtotime( $day ) );
+			}, $days );
 		}
 	}
 }

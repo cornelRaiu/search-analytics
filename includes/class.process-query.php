@@ -27,20 +27,21 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 			$result_count = apply_filters( 'mwtsa_rest_api_result_count', 0, $custom_search_value );
 
 			if ( $result_count === 0 ) {
+				// Only the number of matches is needed: fetch a single ID and let the query count the rest.
 				$args = array(
-					'posts_per_page' => - 1,
-					'post_status'    => 'publish',
-					'post_type'      => 'any',
-					'offset'         => 0,
-					'fields'         => 'ids',
-					's'              => $custom_search_value,
+					'posts_per_page'      => 1,
+					'post_status'         => 'publish',
+					'post_type'           => 'any',
+					'offset'              => 0,
+					'fields'              => 'ids',
+					's'                   => $custom_search_value,
+					'suppress_filters'    => true,
+					'ignore_sticky_posts' => true,
+					'no_found_rows'       => false,
 				);
 
-				$posts = get_posts( apply_filters( 'mwtsa_rest_api_posts_count_query_args', $args ) );
-
-				if ( $posts ) {
-					$result_count = count( $posts );
-				}
+				$query        = new WP_Query( apply_filters( 'mwtsa_rest_api_posts_count_query_args', $args ) );
+				$result_count = (int) $query->found_posts;
 			}
 
 			$process->process_search_term( $custom_search_value, $result_count );
@@ -53,7 +54,10 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 
 			$custom_search_value = $process->get_custom_search_value();
 
-			if ( apply_filters( 'mwtsa_do_not_save_search', ( ! is_search() && $custom_search_value == '' ) || is_admin(), $custom_search_value ) ) {
+			// Paging through the results or loading the search feed is not a new search.
+			$do_not_save = ( ! is_search() && $custom_search_value == '' ) || is_admin() || is_paged() || is_feed();
+
+			if ( apply_filters( 'mwtsa_do_not_save_search', $do_not_save, $custom_search_value ) ) {
 				return;
 			}
 
@@ -79,7 +83,72 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 			return '';
 		}
 
+		public static function normalize_search_term( $term ) {
+			return mb_substr( sanitize_text_field( $term ), 0, 100 );
+		}
+
+		/**
+		 * Looks the visitor's country up with the selected service, at most once per IP per day (an hour after a
+		 * failed lookup), and never for private or reserved addresses.
+		 *
+		 * @return string Lowercase two-letter country code, or '' when unknown.
+		 */
+		public static function get_country_for_ip( $ip ) {
+			if ( ! filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE ) ) {
+				return '';
+			}
+
+			$use_ip2c = 'ip2c' === MWTSA_Options::get_option( 'mwtsa_geolocation_provider' );
+
+			// ip2c.org only supports IPv4. No fallback: the site owner chose which service receives the addresses.
+			if ( $use_ip2c && ! filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 ) ) {
+				return '';
+			}
+
+			$cache_key = 'mwtsa_geo_' . md5( $ip );
+			$country   = get_transient( $cache_key );
+
+			if ( false !== $country ) {
+				return $country;
+			}
+
+			$country = $use_ip2c ? self::get_ip2c_country( $ip ) : self::get_ip_api_country( $ip );
+
+			set_transient( $cache_key, $country, '' === $country ? HOUR_IN_SECONDS : DAY_IN_SECONDS );
+
+			return $country;
+		}
+
+		private static function get_ip_api_country( $ip ) {
+			// The free endpoint only works over HTTP: https://ip-api.com/docs/api:json
+			$response = wp_remote_get( 'http://ip-api.com/json/' . $ip . '?fields=49155', array( 'timeout' => 2 ) );
+			$details  = json_decode( wp_remote_retrieve_body( $response ) );
+
+			if ( $details && ! empty( $details->status ) && 'fail' !== $details->status && ! empty( $details->countryCode ) ) {
+				return self::sanitize_country_code( $details->countryCode );
+			}
+
+			return '';
+		}
+
+		private static function get_ip2c_country( $ip ) {
+			// Answers "1;US;USA;Country name" (https://about.ip2c.org). Not ip2c.org/s: that looks up this server.
+			$response = wp_remote_get( 'https://ip2c.org/' . $ip, array( 'timeout' => 2 ) );
+			$parts    = explode( ';', trim( wp_remote_retrieve_body( $response ) ) );
+
+			return ( '1' === $parts[0] && isset( $parts[1] ) ) ? self::sanitize_country_code( $parts[1] ) : '';
+		}
+
+		private static function sanitize_country_code( $code ) {
+			$code = strtolower( trim( $code ) );
+
+			// "zz" means unknown or reserved.
+			return ( preg_match( '/^[a-z]{2}$/', $code ) && 'zz' !== $code ) ? $code : '';
+		}
+
 		public function process_search_term( $search_term, $count ) {
+
+			$search_term = self::normalize_search_term( $search_term );
 
 			$exclude_search_for_roles = MWTSA_Options::get_option( 'mwtsa_exclude_search_for_role' );
 			$current_user_roles       = mwtsa_get_current_user_roles();
@@ -126,16 +195,20 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 			$exclude_if_contains = MWTSA_Options::get_option( 'mwtsa_exclude_if_string_contains' );
 
 			if ( ! empty( $exclude_if_contains ) ) {
-				$match_against = array_map( function ($excluded_string) {
-					$excluded_string = trim( $excluded_string );
+				// Skip empty entries (e.g. a trailing comma): an empty alternative would match every search.
+				$excluded_strings = array_filter( array_map( 'trim', explode( ',', $exclude_if_contains ) ), 'strlen' );
 
-					return preg_quote( $excluded_string, '/' );
-				}, explode( ',', $exclude_if_contains ) );
+				if ( ! empty( $excluded_strings ) ) {
+					$match_against = array_map( function ( $excluded_string ) {
+						return preg_quote( $excluded_string, '/' );
+					}, $excluded_strings );
 
-				preg_match( '/(' . implode( '|', $match_against ) . ')/i', $search_term, $matches );
+					// Match the text as typed (front-end terms arrive HTML-escaped); "u" makes "i" work beyond ASCII.
+					$subject = wp_specialchars_decode( $search_term, ENT_QUOTES );
 
-				if ( count( $matches ) > 0 ) {
-					return false;
+					if ( preg_match( '/(' . implode( '|', $match_against ) . ')/iu', $subject ) ) {
+						return false;
+					}
 				}
 			}
 
@@ -143,22 +216,8 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 				return false;
 			}
 
-			$country = '';
-
-			if ( ! empty( MWTSA_Options::get_option( 'mwtsa_save_search_country' ) ) ) {
-				//http://ip-api.com/json/24.48.0?fields=49154
-				// IP-API integration according to the documentation at http://ip-api.com/docs/api:json
-                // non-pro works with http only!
-				$request        = wp_remote_get( 'http://ip-api.com/json/' . $client_ip . '?fields=49155' );
-				$ip_details_get = wp_remote_retrieve_body( $request );
-				if ( ! empty( $ip_details_get ) ) {
-					$ip_details = json_decode( $ip_details_get );
-
-					if ( $ip_details && ! empty( $ip_details->status ) && $ip_details->status !== 'fail' ) {
-						$country = strtolower( $ip_details->countryCode );
-					}
-				}
-			}
+			// null: look the country up in save_search_term(), only once the search is actually going to be recorded.
+			$country = ! empty( MWTSA_Options::get_option( 'mwtsa_save_search_country' ) ) ? null : '';
 
 			$user_id = 0;
 
@@ -171,7 +230,8 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 
 				$minimum_length_term = MWTSA_Options::get_option( 'mwtsa_minimum_characters' );
 
-				if ( ! empty( $minimum_length_term ) && strlen( $search_term ) < $minimum_length_term ) {
+				// Characters, not bytes: "кот" is 3 characters but 6 bytes.
+				if ( ! empty( $minimum_length_term ) && mb_strlen( $search_term ) < (int) $minimum_length_term ) {
 					return false;
 				}
 
@@ -179,19 +239,25 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 					return false;
 				}
 
-				$this->save_search_term( $search_term, $count, $country, $user_id );
+				return (bool) $this->save_search_term( $search_term, $count, $country, $user_id );
 			}
 
-			return true;
+			return false;
 		}
 
 		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter -- MWTSAI()->terms_table_name and MWTSAI()->history_table_name are hardcoded.
 		public function save_search_term( $term, $found_posts, $country = '', $user_id = 0 ) {
 			global $wpdb;
 
-			//make sure db is up to date
-			// TODO: move this away
-			MWTSA_Install::activate_single_site();
+			// Also called directly by code that records its own searches, so normalize here too.
+			$term = self::normalize_search_term( $term );
+
+			if ( '' === $term ) {
+				return false;
+			}
+
+			// Creates the tables if they are missing; upgrading existing ones is left to the admin.
+			MWTSA_Install::activate_single_site( false );
 
             $instance = MWTSAI();
 
@@ -204,7 +270,7 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 				", $term
 			) );
 
-			$exclude_doubled_search_for = MWTSA_Options::get_option( 'mwtsa_exclude_doubled_search_for_interval' );
+			$exclude_doubled_search_for = (int) MWTSA_Options::get_option( 'mwtsa_exclude_doubled_search_for_interval' );
 
 			$current_user_cookie = MWTSA_Cookies::get_cookie_value();
 
@@ -214,7 +280,7 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 				$success = $wpdb->query( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 					"INSERT INTO `$instance->terms_table_name` (`term`, `total_count`)
 					VALUES (%s, %d)",
-					sanitize_text_field( $term ),
+					$term,
 					1
 				) );
 
@@ -229,14 +295,12 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 					}
 				}
 
-				$total_count = $existing_term->total_count + 1;
-
+				// Increment in the query itself, so concurrent searches for the same term don't overwrite each other.
 				$success = $wpdb->query( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 					"UPDATE `$instance->terms_table_name`
-					SET total_count = %d
-					WHERE term = %s
-					LIMIT 1
-					", $total_count, $term
+					SET total_count = total_count + 1
+					WHERE id = %d
+					", $existing_term->id
 				) );
 
 				if ( $success ) {
@@ -251,7 +315,12 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 
 				$history_term_id = null;
 
+				if ( null === $country ) {
+					$country = self::get_country_for_ip( mwtsa_get_current_user_ip() );
+				}
+
 				if ( ! empty ( $exclude_doubled_search_for ) ) {
+					$current_user_cookie = MWTSA_Cookies::remove_expired_searches( $current_user_cookie, $exclude_doubled_search_for );
 					$current_user_cookie['search'][ $term_id ] = time();
 					MWTSA_Cookies::set_cookie_value( $current_user_cookie, ( 86400 * 7 ) );
 				}

@@ -5,44 +5,50 @@ if ( ! class_exists( 'MWTSA_Uninstall' ) ) {
 
     class MWTSA_Uninstall {
 
-        public static function deactivation() {
-            global $wpdb;
-
-            $remove_tables = MWTSA_Options::get_option( 'mwtsa_uninstall' );
-            if ( empty( $remove_tables ) ) {
-                return;
-            }
+        public static function uninstall() {
+            $removed_data = false;
 
             if ( is_multisite() ) {
-                // Retrieve all site IDs from all networks (WordPress >= 4.6 provides easy to use functions for that).
-                if ( function_exists( 'get_sites' ) ) {
-                    $site_ids = get_sites( array( 'fields' => 'ids' ) );
-                } else {
-                    $site_ids = $wpdb->get_col( "SELECT blog_id FROM $wpdb->blogs;" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-                }
+                $site_ids = get_sites( array( 'fields' => 'ids', 'number' => 0 ) );
 
-                // Uninstall the plugin for all these sites.
                 foreach ( $site_ids as $site_id ) {
                     switch_to_blog( $site_id );
-                    self::deactivate_single_site();
+                    $removed_data = self::uninstall_single_site() || $removed_data;
                     restore_current_blog();
                 }
             } else {
-                self::deactivate_single_site();
+                $removed_data = self::uninstall_single_site();
+            }
+
+            if ( $removed_data ) {
+                delete_metadata( 'user', 0, 'mwtsa_entries_per_page', '', true );
             }
         }
 
-
-        public static function deactivate_single_site() {
+        public static function uninstall_single_site() {
             global $wpdb;
 
-            $table_name = $wpdb->prefix . MWTSAI()->history_table_name_no_prefix;
-            $wpdb->query( "DROP TABLE IF EXISTS $table_name" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.SchemaChange,PluginCheck.Security.DirectDB.UnescapedDBParameter
+            $options = get_option( 'mwtsa_settings', array() );
 
-            $table_name = $wpdb->prefix . MWTSAI()->terms_table_name_no_prefix;
-            $wpdb->query( "DROP TABLE IF EXISTS $table_name" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.SchemaChange,PluginCheck.Security.DirectDB.UnescapedDBParameter
+            if ( ! is_array( $options ) || empty( $options['mwtsa_uninstall'] ) ) {
+                return false;
+            }
 
-            delete_option( "mwtsa_db_version" );
+            $wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}mwt_search_history" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.DirectDatabaseQuery.SchemaChange
+            $wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}mwt_search_terms" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.DirectDatabaseQuery.SchemaChange
+
+            delete_option( 'mwtsa_settings' );
+            delete_option( 'mwtsa_db_version' );
+            delete_option( 'mwtsa_db_upgrade_lock' );
+
+            // Cached country lookups.
+            $wpdb->query( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+                "DELETE FROM {$wpdb->options} WHERE option_name LIKE %s OR option_name LIKE %s",
+                $wpdb->esc_like( '_transient_mwtsa_geo_' ) . '%',
+                $wpdb->esc_like( '_transient_timeout_mwtsa_geo_' ) . '%'
+            ) );
+
+            return true;
         }
     }
 }

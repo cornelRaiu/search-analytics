@@ -42,6 +42,9 @@ if ( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
 			$this->is_delete   = ! empty( $_REQUEST['action'] ) && 'delete' === $_REQUEST['action']; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$this->stats_table = ! empty( $_REQUEST['search-term'] ) && ! $this->is_delete ? new MWTSA_Term_Stats_Table( array( 'search-term' => (int) $_REQUEST['search-term'] ) ) : new MWTSA_Stats_Table(); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$this->stats_table->mwtsa_init();
+
+			// Deleting redirects afterwards, so it has to run here, before the admin page starts printing.
+			$this->stats_table->process_bulk_action();
 		}
 
 		public function add_screen_options() {
@@ -76,11 +79,44 @@ if ( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
 			$this->view = $view;
 		}
 
+		/**
+		 * Windows can't draw flag emoji. The polyfill (bundled, no CDN) canvas-tests the browser and only registers
+		 * the Twemoji flag font when that test fails, leaving native flags elsewhere untouched.
+		 */
+		public function print_country_flag_polyfill() {
+			$vendor_url = MWTSAI()->plugin_admin_url . 'assets/vendor/country-flag-emoji-polyfill/';
+			?>
+            <script type="module">
+                import { polyfillCountryFlagEmojis } from <?php echo wp_json_encode( esc_url_raw( $vendor_url . 'country-flag-emoji-polyfill.js?ver=0.1.10' ) ); ?>;
+                polyfillCountryFlagEmojis( 'Twemoji Country Flags', <?php echo wp_json_encode( esc_url_raw( $vendor_url . 'TwemojiCountryFlags.woff2' ) ); ?> );
+            </script>
+			<?php
+		}
+
+		/**
+		 * The screens that use the plugin's stylesheet: statistics, settings and the dashboard widget.
+		 */
+		private function is_plugin_screen( $hook ) {
+			$page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+			return 'index.php' === $hook || ( '' !== $this->view && $hook === $this->view ) || 'mwtsa-search-analytics-settings' === $page;
+		}
+
 		public function load_admin_assets( $hook ) {
-			wp_enqueue_style( 'mwtsa-stats-style', MWTSAI()->plugin_admin_url . 'assets/css/stats-style.css', array(), MWTSAI()->version );
+			if ( $this->is_plugin_screen( $hook ) ) {
+				wp_enqueue_style( 'mwtsa-stats-style', MWTSAI()->plugin_admin_url . 'assets/css/stats-style.css', array(), MWTSAI()->version );
+			}
 
 			if ( $hook != $this->view ) {
 				return;
+			}
+
+			if ( ! empty( $this->charts ) ) {
+				$this->charts->load_admin_assets();
+			}
+
+			if ( ! empty( MWTSA_Options::get_option( 'mwtsa_save_search_country' ) ) ) {
+				add_action( 'admin_print_footer_scripts', array( $this, 'print_country_flag_polyfill' ) );
 			}
 
 			if ( ! empty( MWTSA_Options::get_option( 'mwtsa_save_search_by_user' ) ) ) {
@@ -178,19 +214,18 @@ if ( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
                             </p>
 
                             <ul class="changelog-list">
-                                <li><strong>Structure:</strong> Changed the main page from `wp-admin/index.php?page=search-analytics/admin/includes/class.stats.php` to `wp-admin/index.php?page=mwtsa-search-analytics`. A proper redirect was added to the old route</li>
-                                <li><strong>Structure:</strong> Changed the settings page from `wp-admin/options-general.php?page=search-analytics` to `wp-admin/admin.php?page=mwtsa-search-analytics-settings`. A proper redirect was added to the old route</li>
-                                <li><strong>Structure:</strong> Added a new way to access the plugin main page as a section on the sidebar</li>
-                                <li>Bugfix: Fix a possible crash in case ip-api.com did not return a valid response</li>
-                                <li>Bugfix: Fix potential IP spoofing when running a search with save country on</li>
-                                <li>Feature: Added `mwtsa_run_terms_history_data_query_args` filter for changing the args before history data gets queried</li>
-                                <li>Feature: Added a link to the statistics page on the dashboard widget</li>
-                                <li>Optimization: Security improvements and general code optimization. Fixed Cross-Site Request Forgery (CSRF) vulnerability</li>
-                                <li>Optimization: Performance improvements</li>
-                                <li>Optimization: Added the select2 and jQuery UI Smoothness theme as assets in the plugin</li>
-                                <li>Optimization: Deprecated the global `$mwtsa`. It will be removed in a later version. Use the `MWTSAI()` to get the instance</li>
-                                <li>Deprecations: Deprecated the helper functions with `mwt_` prefix and renamed them to the proper prefix `mwtsa_` to prevent possible collisions</li>
-                                <li>Deprecations: Deprecated the `mwtsa_run_terms_history_data_query` filter. It could be used by bad actors to modify the query and pass a not sanitized query through</li>
+                                <li><strong>Structure:</strong> Search data is now only removed when you delete the plugin (with the setting checked), never on deactivation</li>
+                                <li>Feature: The country lookup can use ip2c.org instead of ip-api.com</li>
+                                <li>Bugfix: The statistics charts were not loading since 1.5.0</li>
+                                <li>Bugfix: The charts and the "By date" view mixed up searches from the same day of different months</li>
+                                <li>Bugfix: On multisite, deactivating the plugin on one site could remove every site's search data</li>
+                                <li>Bugfix: A trailing comma in the "Exclude search" setting excluded every search</li>
+                                <li>Bugfix: More accurate counts: real "Last 24 hours" periods, no counting of result pages and feeds, no duplicate terms</li>
+                                <li>Bugfix: The roles allowed on the settings page can now save it, and the roles allowed on the statistics page can export</li>
+                                <li>Security: Safer CSV exports, a validated tracking cookie and explicit permission checks</li>
+                                <li>Optimization: Country flags are now emoji, with a bundled font for browsers that can't draw them</li>
+                                <li>Optimization: Database indexes, cached country lookups and no more cookie on every page</li>
+                                <li>Deprecations: The statistics table filters are deprecated ahead of the 2.0 rebuild</li>
 							</ul>
                             <p><a href="<?php echo esc_url( MWTSA_WORDPRESS_URL ) ?>/#developers" target="_blank"><?php esc_html_e( 'Click here to check the complete log', 'search-analytics' ) ?></a></p>
                             <h3><?php esc_html_e( 'Useful Links', 'search-analytics' ) ?></h3>

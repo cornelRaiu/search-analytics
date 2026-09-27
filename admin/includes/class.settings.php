@@ -11,22 +11,55 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 			$this->existing_options = MWTSA_Options::get_options();
 
 			add_action( 'admin_init', array( $this, 'mwtsa_settings_init' ) );
+			add_filter( 'option_page_capability_mwtsa_general_options', array( $this, 'settings_page_capability' ) );
+		}
+
+		public function sanitize_settings( $values ) {
+			$existing = get_option( MWTSAI()->main_option_name, array() );
+
+			if ( ! is_array( $existing ) ) {
+				$existing = array();
+			}
+
+			if ( ! is_array( $values ) ) {
+				return $existing;
+			}
+
+			$values = array_map( function ( $value ) {
+				if ( is_array( $value ) ) {
+					return array_map( 'sanitize_text_field', $value );
+				}
+
+				return sanitize_text_field( $value );
+			}, $values );
+
+			// The chart defaults are saved from the statistics page, not from this form, so keep them.
+			foreach ( array( 'chart_default_line_style', 'chart_default_range' ) as $key ) {
+				if ( ! isset( $values[ $key ] ) && isset( $existing[ $key ] ) ) {
+					$values[ $key ] = $existing[ $key ];
+				}
+			}
+
+			if ( isset( $values['mwtsa_geolocation_provider'] ) && 'ip2c' !== $values['mwtsa_geolocation_provider'] ) {
+				$values['mwtsa_geolocation_provider'] = 'ip-api';
+			}
+
+			return $values;
+		}
+
+		/**
+		 * options.php requires manage_options by default, so the roles given access to the settings page could open
+		 * it but not save it.
+		 */
+		public function settings_page_capability( $capability ) {
+			return mwtsa_current_user_can_manage_settings() ? 'read' : $capability;
 		}
 
 		public function mwtsa_settings_init() {
 
 			register_setting( 'mwtsa_general_options', MWTSAI()->main_option_name, array(
-				'type'              => 'string',
-				'sanitize_callback' => function ( $values ) {
-
-					return array_map( function ( $value ) {
-						if ( is_array( $value ) ) {
-							return array_map( 'sanitize_text_field', $value );
-						}
-
-						return sanitize_text_field( $value );
-					}, $values );
-				},
+				'type'              => 'array',
+				'sanitize_callback' => array( $this, 'sanitize_settings' ),
 			) );
 
 			add_settings_section(
@@ -127,6 +160,14 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 				'mwtsa_save_search_country',
 				__( 'Save Search Country', 'search-analytics' ),
 				array( &$this, 'field_save_search_country' ),
+				'mwtsa_general_options',
+				'mwtsa_display_options_sections'
+			);
+
+			add_settings_field(
+				'mwtsa_geolocation_provider',
+				__( 'Country lookup service', 'search-analytics' ),
+				array( &$this, 'field_geolocation_provider' ),
 				'mwtsa_general_options',
 				'mwtsa_display_options_sections'
 			);
@@ -311,9 +352,10 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
             <label>
                 <input type="hidden" name='mwtsa_settings[mwtsa_uninstall]' value='0'/>
                 <input type='checkbox' name='mwtsa_settings[mwtsa_uninstall]' value='1' <?php checked( $this->existing_options['mwtsa_uninstall'], 1 ) ?> />
-                <span><?php esc_html_e( 'Remove plugin tables on deactivate', 'search-analytics' ) ?></span>
+                <span><?php esc_html_e( 'Delete all search data and settings when the plugin is deleted', 'search-analytics' ) ?></span>
             </label>
             <br/>
+            <strong><?php esc_html_e( 'Deactivating the plugin always keeps your data. It is only removed when you delete the plugin from the Plugins screen.', 'search-analytics' ) ?></strong>
 			<?php
 		}
 
@@ -357,8 +399,26 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
                 <span><?php esc_html_e( 'Save the country from where the search was launched', 'search-analytics' ) ?></span>
             </label>
             <br/>
-            <strong><?php echo wp_kses_post( __( 'NOTE: this uses the <a href="https://ip-api.com">https://ip-api.com</a> JSON service which is limited to 150 requests per minute. In case you have more than 150 searches per minute on the website, please uncheck this checkbox. <br />In case the site\'s IP got banned, you can go here: <a href="https://ip-api.com/docs/unban">https://ip-api.com/docs/unban</a> and remove the ban.<br />A future version of Search Analytics will come with support for the PRO service of IP-API.com<br /><br />Disclaimer: I am not associated with the IP-API.com service in any way. I am just using it for providing you a way of finding out where the users search content from on your website.', 'search-analytics' ) ) ?></strong>
+            <strong><?php echo wp_kses_post( __( 'NOTE: this sends the IP address of each visitor who searches to the country lookup service selected below (at most once per day per address), so mention it in your privacy policy. <br />In case the site\'s IP got banned by ip-api.com, you can go here: <a href="https://ip-api.com/docs/unban">https://ip-api.com/docs/unban</a> and remove the ban.<br />A future version of Search Analytics will come with support for the PRO service of IP-API.com<br /><br />Disclaimer: I am not associated with the IP-API.com or ip2c.org services in any way. I am just using them for providing you a way of finding out where the users search content from on your website.', 'search-analytics' ) ) ?></strong>
 			<?php
+		}
+
+		public function field_geolocation_provider() {
+			$provider = isset( $this->existing_options['mwtsa_geolocation_provider'] ) ? $this->existing_options['mwtsa_geolocation_provider'] : 'ip-api';
+
+			$providers = array(
+				'ip-api' => __( '<a href="https://ip-api.com">ip-api.com</a>: IPv4 and IPv6, HTTP only. Free for non-commercial use, up to 45 requests per minute. <a href="https://ip-api.com/docs/legal">Terms and privacy policy</a>', 'search-analytics' ),
+				'ip2c'   => __( '<a href="https://ip2c.org">ip2c.org</a>: HTTPS, free (LGPL). IPv4 only: searches from IPv6 addresses are saved without a country. <a href="https://about.ip2c.org">Terms and privacy policy</a>', 'search-analytics' ),
+			);
+
+			foreach ( $providers as $value => $label ) :
+				?>
+                <label>
+                    <input type="radio" name="mwtsa_settings[mwtsa_geolocation_provider]" value="<?php echo esc_attr( $value ) ?>" <?php checked( $provider, $value ) ?> />
+                    <span><?php echo wp_kses_post( $label ) ?></span>
+                </label><br/>
+				<?php
+			endforeach;
 		}
 
 		public function field_save_search_by_user() {
@@ -376,6 +436,10 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 		}
 
 		public function settings_section_callback() {
+
+			if ( ( isset( $_POST['mwtsa_erase_data'] ) || isset( $_POST['mwtsa_erase_old_data'] ) ) && ! mwtsa_current_user_can_manage_settings() ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing -- the nonce is checked below, before anything is erased.
+				wp_die( esc_html__( 'You are not allowed to erase search data.', 'search-analytics' ), 403 );
+			}
 
 			if ( isset( $_POST['mwtsa_erase_data'] ) && check_admin_referer( 'mwtsa-erase-data' ) ) {
 				$this->erase_history();
@@ -416,7 +480,8 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
                         <form action="" method="post">
 							<?php wp_nonce_field( 'mwtsa-erase-data' ); ?>
                             <p class="submit">
-                                <input name="mwtsa_erase_data" class="button-secondary" value="<?php esc_attr_e( 'Erase All Data', 'search-analytics' ) ?>" type="submit" onclick="return confirm( '<?php esc_attr_e( 'Are you sure you want to delete all data?\n\nClick `OK` to proceed.', 'search-analytics' ) ?>');"/><br/>
+                                <?php // The strings keep their literal "\n" so existing translations still match; esc_js() keeps an apostrophe in a translation from breaking the confirmation. ?>
+                            <input name="mwtsa_erase_data" class="button-secondary" value="<?php esc_attr_e( 'Erase All Data', 'search-analytics' ) ?>" type="submit" onclick="return confirm( '<?php echo esc_js( str_replace( '\n', "\n", __( 'Are you sure you want to delete all data?\n\nClick `OK` to proceed.', 'search-analytics' ) ) ) ?>' );"/><br/>
                                 <strong><?php esc_html_e( 'Warning! Clicking this button will delete all historical search data', 'search-analytics' ) ?></strong>
                             </p>
                         </form>
@@ -430,7 +495,7 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
                             <p class="submit">
                                 <!--suppress HtmlFormInputWithoutLabel -->
                                 <input type="number" name="mwtsa_data_older_than_days" value="90"/> <?php esc_attr_e( 'days', 'search-analytics' ) ?> &nbsp;
-                                <input name="mwtsa_erase_old_data" class="button-secondary" value="<?php esc_attr_e( 'Erase Data', 'search-analytics' ) ?>" type="submit" onclick="return confirm( '<?php esc_attr_e( 'Are you sure you want to delete the selected data?\n\nClick `OK` to proceed.', 'search-analytics' ) ?>');"/>
+                                <input name="mwtsa_erase_old_data" class="button-secondary" value="<?php esc_attr_e( 'Erase Data', 'search-analytics' ) ?>" type="submit" onclick="return confirm( '<?php echo esc_js( str_replace( '\n', "\n", __( 'Are you sure you want to delete the selected data?\n\nClick `OK` to proceed.', 'search-analytics' ) ) ) ?>' );"/>
                             </p>
                         </form>
                     </td>

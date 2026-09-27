@@ -1,13 +1,15 @@
 <?php
 /*
-Plugin Name: Search Analytics for WP
+Plugin Name: Search Analytics for WP - Site Search Tracking
 Plugin URI: https://www.cornelraiu.com/wordpress-plugins/mwt-search-analytics/
-Description: Search Analytics for WP will store and display the search terms used on your website. No third-party service is used!
-Version: 1.5.0
+Description: See what visitors search for on your site and which searches come up empty. Popular search terms and statistics, stored in your own database.
+Version: 1.6.0
 Author: Cornel Raiu
 Author URI: https://www.cornelraiu.com/
 Text Domain: search-analytics
 Domain Path: /languages
+Requires at least: 4.7
+Requires PHP: 5.6
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 */
@@ -26,11 +28,12 @@ if ( ! class_exists( 'MWTSA' ) ) {
 
 	final class MWTSA {
 
-		public $version = '1.5.0';
-		public $db_version = '1.1.1';
+		public $version = '1.6.0';
+		public $db_version = '1.2.1';
 
 		public $plugin_dir;
 		public $plugin_url;
+		public $plugin_basename;
 		public $plugin_admin_dir;
 		public $plugin_admin_url;
 		public $includes_dir;
@@ -71,6 +74,7 @@ if ( ! class_exists( 'MWTSA' ) ) {
 			global $wpdb;
 			$this->plugin_dir       = plugin_dir_path( __FILE__ );
 			$this->plugin_url       = plugin_dir_url( __FILE__ );
+			$this->plugin_basename  = plugin_basename( __FILE__ );
 			$this->plugin_admin_dir = $this->plugin_dir . 'admin/';
 			$this->plugin_admin_url = $this->plugin_url . 'admin/';
 			$this->includes_dir     = $this->plugin_dir . 'includes/';
@@ -106,8 +110,6 @@ if ( ! class_exists( 'MWTSA' ) ) {
 		}
 
 		public function add_actions_and_filters() {
-			add_action( 'init', array( 'MWTSA_Cookies', 'clear_expired_search_history' ) );
-
 			add_action( 'init', array( 'MWTSA_Display_Search_Stats_Shortcode', 'init' ) );
 			add_action( 'init', array( 'MWTSA_Display_Latest_Searches_Shortcode', 'init' ) );
 
@@ -120,7 +122,11 @@ if ( ! class_exists( 'MWTSA' ) ) {
 				'process_wpforo_search_term_action'
 			), 20, 4 );
 
-			add_action( 'wp_insert_site', array( 'MWTSA_Install', 'activation' ) );
+			add_action( 'admin_init', array( 'MWTSA_Install', 'maybe_upgrade' ) );
+
+			// Core creates a new site's tables on wp_initialize_site at priority 10, so run after it.
+			add_action( 'wp_initialize_site', array( 'MWTSA_Install', 'initialize_new_site' ), 11 );
+			add_filter( 'wpmu_drop_tables', array( 'MWTSA_Install', 'add_site_tables_to_drop' ), 10, 2 );
 			add_action( 'wp_login', array( 'MWTSA_Cookies', 'set_is_excluded_cookie_if_needed' ), 10, 2 );
 		}
 	}
@@ -136,8 +142,8 @@ if ( ! function_exists( 'MWTSAI' ) ) {
 if ( class_exists( 'MWTSA' ) ) {
     $GLOBALS['mwtsa'] = MWTSAI(); // Added for backwards compatibility
 
+	// Data is only removed when the plugin is deleted (see uninstall.php), never on deactivation.
 	register_activation_hook( __FILE__, array( 'MWTSA_Install', 'activation' ) );
-	register_deactivation_hook( __FILE__, array( 'MWTSA_Uninstall', 'deactivation' ) );
 }
 
 

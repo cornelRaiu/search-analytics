@@ -72,7 +72,7 @@ if ( ! class_exists( 'MWTSA_Term_Stats_Table' ) ) :
 				$columns['searches'] = esc_attr__( 'No. of Searches', 'search-analytics' );
 			}
 
-			return apply_filters( 'mwtsa_term_stats_table_columns', $columns );
+			return mwtsa_apply_list_table_filter( 'mwtsa_term_stats_table_columns', $columns );
 		}
 
 		public function get_sortable_columns() {
@@ -86,7 +86,7 @@ if ( ! class_exists( 'MWTSA_Term_Stats_Table' ) ) :
 				$sortable_columns['searches'] = array( 'searches', false );
 			}
 
-			return apply_filters( 'mwtsa_term_stats_table_sortable_columns', $sortable_columns );
+			return mwtsa_apply_list_table_filter( 'mwtsa_term_stats_table_sortable_columns', $sortable_columns );
 		}
 
 		private function get_date_format() {
@@ -134,29 +134,27 @@ if ( ! class_exists( 'MWTSA_Term_Stats_Table' ) ) :
 					break;
 			}
 
-			echo apply_filters( 'mwtsa_term_stats_table_column_output', $output, $column_name, $item );  // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			echo mwtsa_apply_list_table_filter( 'mwtsa_term_stats_table_column_output', $output, $column_name, $item );  // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 
-		public function usort_reorder( $a, $b ) {
-			$orderby = ( ! empty( $_GET['orderby'] ) ) ? $_GET['orderby'] : 'date_time'; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized,WordPress.Security.NonceVerification.Recommended
-			$order   = ( ! empty( $_GET['order'] ) ) ? $_GET['order'] : 'desc'; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized,WordPress.Security.NonceVerification.Recommended
+		protected function set_sort_args() {
+			$orderby = ( ! empty( $_GET['orderby'] ) ) ? sanitize_key( wp_unslash( $_GET['orderby'] ) ) : 'date_time'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$order   = ( ! empty( $_GET['order'] ) ) ? sanitize_key( wp_unslash( $_GET['order'] ) ) : 'desc'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 			switch ( $orderby ) {
 				case 'results':
-					$orderby = 'results_count';
+					$this->sort_column = 'results_count';
 					break;
 				case 'searches':
-					$orderby = 'count';
+					$this->sort_column = 'count';
 					break;
 				case 'date_time':
 				default:
-					$orderby = 'datetime';
+					$this->sort_column = 'datetime';
 					break;
 			}
 
-			$result = strnatcmp( $a[ $orderby ], $b[ $orderby ] );
-
-			return ( $order === 'asc' ) ? $result : - $result;
+			$this->sort_order = ( 'asc' === $order ) ? 'asc' : 'desc';
 		}
 
 		function get_bulk_actions() {

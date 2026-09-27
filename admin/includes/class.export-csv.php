@@ -23,15 +23,27 @@ if ( ! class_exists( 'MWTSA_Export_CSV' ) ) {
             $stream = fopen( "php://output", "w" );
 
             if ( ! empty ( $columns ) ) {
-                fputcsv( $stream, $columns );
+                fputcsv( $stream, array_map( array( $this, 'escape_csv_cell' ), $columns ), ',', '"', '\\' );
             }
 
             foreach ( $values as $result ) {
-                fputcsv( $stream, $result );
+                fputcsv( $stream, array_map( array( $this, 'escape_csv_cell' ), $result ), ',', '"', '\\' );
             }
 
             fclose( $stream ); // phpcs:ignore
             exit();
+        }
+
+        /**
+         * Search terms are typed by visitors, so a term such as =HYPERLINK(...) must not run as a formula when the
+         * export is opened in a spreadsheet app. Prefixing a quote makes the app show it as text.
+         */
+        public function escape_csv_cell( $value ) {
+            if ( is_string( $value ) && '' !== $value && ! is_numeric( $value ) && in_array( $value[0], array( '=', '+', '-', '@', "\t", "\r" ), true ) ) {
+                return "'" . $value;
+            }
+
+            return $value;
         }
     }
 
