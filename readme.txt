@@ -4,7 +4,7 @@ Tags: search analytics, site search, search, statistics, history
 Requires at least: 4.7
 Tested up to: 7.1
 Requires PHP: 5.6
-Stable tag: 1.6.0
+Stable tag: 1.6.1
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -35,7 +35,8 @@ Often the lesson is simply vocabulary. Visitors type "couch" when your store say
 * Time filters from the last 24 hours to all time, or any date range you pick.
 * A **no-results filter** that shows only the searches that found nothing.
 * Each term's history by date or by hour, plus a "No Group" view that lists every search in order.
-* A daily chart compared with the previous period, and a dashboard widget with last week's numbers.
+* A daily chart compared with the previous period, and a **"When people search" chart** with the busiest days and times.
+* A dashboard widget with the last 7 days: searches compared with the week before, trending terms, searches with no results and your busiest day and time.
 * **CSV export** of whatever view you're on.
 * Keep **your own searches** out, even after you log out. You can also skip repeat searches, listed IP addresses, very short terms and words you block.
 * Optional country and logged-in user for each search, both off by default.
@@ -177,6 +178,21 @@ Service terms and privacy policy: [https://about.ip2c.org](https://about.ip2c.or
 Country flags on Windows use the "Twemoji Country Flags" font from [country-flag-emoji-polyfill](https://github.com/talkjs/country-flag-emoji-polyfill) by TalkJS (MIT license). The flag artwork comes from [Twemoji](https://github.com/twitter/twemoji) and is licensed under [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/). The font and polyfill are bundled with the plugin and loaded from your own site.
 
 == Changelog ==
+= 1.6.1 =
+
+**Features:**
+
+* The dashboard widget is redesigned. For the last 7 days it shows the searches, the searches with no results and the unique terms compared with the 7 days before, the last search, a bar per day, the trending terms, the top searches and the top searches with no results. It also shows the busiest day and time of the last 4 weeks
+* The new "When people search" chart on the statistics page shows the searches of the last 4 weeks by day of the week and 4-hour interval. It follows the "Show results dates as UTC" setting
+
+**Bugfixes:**
+
+* The time filters, the shortcodes and the dashboard widget failed on SQLite databases, such as the one WordPress Playground uses for the Live Preview
+
+**Optimizations:**
+
+* Statistics for the time filters are cached for up to a minute, and old cache entries expire after an hour
+
 = 1.6.0 =
 
 **Structure:**
@@ -465,6 +481,9 @@ Country flags on Windows use the "Twemoji Country Flags" font from [country-flag
 * Initial Release
 
 == Upgrade Notice ==
+
+= 1.6.1 =
+A redesigned dashboard widget and a new "When people search" chart. Also fixes the statistics on SQLite databases, such as WordPress Playground.
 
 = 1.6.0 =
 Fixes the charts, a multisite bug that could delete other sites' search data, and several counting errors. Search data is now only removed when you delete the plugin. Database indexes are added on your next admin page load.
