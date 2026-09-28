@@ -23,9 +23,49 @@
 /* "Twemoji Country Flags" only exists when the flag polyfill registered it (Windows); other browsers skip it. */
 .mwtsa-flag { font-family: "Twemoji Country Flags", "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif; }
 
-.mwtsa-stats-widget-wrapper .stats-list-label { width: 40%; display: inline-block; font-weight: bold; }
+/* Dashboard widget */
+#mwtsa_last_week_stats_widget .inside { margin: 0; padding: 0; }
+.mwtsa-dw { padding: 0 12px; }
+.mwtsa-dw-heading { display: flex; align-items: baseline; gap: 8px; margin: 14px 0 8px; }
+.mwtsa-dw-heading h3 { margin: 0; font-size: 14px; font-weight: 600; }
+.mwtsa-dw-heading a { margin-left: auto; text-decoration: none; }
+.mwtsa-dw-period { color: #646970; font-size: 12px; }
+.mwtsa-dw-icon-link { color: #a7aaad; }
+.mwtsa-dw-icon-link:hover, .mwtsa-dw-icon-link:focus { color: #2271b1; }
+.mwtsa-dw-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 0 0 4px; border: 1px solid #dcdcde; border-radius: 4px; }
+.mwtsa-dw-cards li { margin: 0; padding: 12px 16px; min-width: 0; border-bottom: 1px solid #dcdcde; }
+.mwtsa-dw-cards li:nth-child(odd) { border-right: 1px solid #dcdcde; }
+.mwtsa-dw-cards li:nth-last-child(-n+2) { border-bottom: 0; }
+.mwtsa-dw-label { display: flex; align-items: center; gap: 4px; margin-bottom: 4px; font-weight: 600; color: #1d2327; }
+.mwtsa-dw-label .dashicons { width: 16px; height: 16px; font-size: 16px; color: #a7aaad; cursor: help; }
+.mwtsa-dw-value { font-size: 20px; line-height: 1.4; font-weight: 600; color: #1d2327; }
+.mwtsa-dw-note { margin-left: 6px; font-size: 12px; color: #646970; }
+.mwtsa-dw-card-term .mwtsa-dw-value { display: block; font-size: 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mwtsa-dw-card-term .mwtsa-dw-note { margin-left: 0; }
+.mwtsa-dw-terms { margin: 0 0 4px; list-style: none; }
+.mwtsa-dw-terms li { display: flex; justify-content: space-between; gap: 12px; margin: 0; padding: 6px 0; border-bottom: 1px solid #f0f0f1; }
+.mwtsa-dw-terms li:last-child { border-bottom: 0; }
+.mwtsa-dw-terms a { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mwtsa-dw-count { flex-shrink: 0; color: #646970; }
+.mwtsa-dw-empty, .mwtsa-dw-list-empty { margin: 0 0 8px; color: #646970; }
+.mwtsa-dw-empty { margin-top: 12px; }
+.mwtsa-dw-footer { display: flex; gap: 16px; margin-top: 12px; padding: 10px 12px; border-top: 1px solid #dcdcde; background: #f6f7f7; }
+.mwtsa-dw-footer a { text-decoration: none; }
+.mwtsa-dw-footer .dashicons { width: 14px; height: 14px; margin-left: 2px; font-size: 14px; vertical-align: text-bottom; }
+.mwtsa-dw-growth { color: #008a20; }
+.mwtsa-dw-bars { display: flex; align-items: flex-end; gap: 6px; height: 64px; margin: 12px 0 4px; list-style: none; }
+.mwtsa-dw-bars li { display: flex; flex: 1; flex-direction: column; align-items: center; height: 100%; margin: 0; }
+.mwtsa-dw-bar { display: flex; flex: 1; align-items: flex-end; width: 100%; background: #f0f0f1; border-radius: 2px; }
+.mwtsa-dw-bar span { display: block; width: 100%; background: #2271b1; border-radius: 2px; }
+.mwtsa-dw-bar-label { margin-top: 4px; font-size: 11px; line-height: 1; color: #646970; }
 
-.mwtsa-stats-widget-wrapper .stats-list-value { vertical-align: top; }
+/* "When people search" on the statistics page */
+.mwtsa-heatmap { width: 100%; max-width: 640px; border-collapse: separate; border-spacing: 3px; }
+.mwtsa-heatmap caption { padding-bottom: 8px; text-align: left; color: #646970; }
+.mwtsa-heatmap th { padding: 2px 6px; font-size: 12px; font-weight: normal; color: #646970; }
+.mwtsa-heatmap th[scope="row"] { text-align: left; }
+.mwtsa-heatmap td { height: 32px; font-size: 12px; text-align: center; background-color: #f6f7f7; border-radius: 3px; }
+.mwtsa-heatmap-busiest { font-weight: 600; }
 
 .erase-history-table p.submit { padding-top: 0; margin-top: 0;}
 

@@ -75,6 +75,70 @@ if ( ! class_exists( 'MWTSA_Admin_Charts' ) ) {
                 </div>
             </div>
             <?php
+			$this->render_search_times();
+		}
+
+		/**
+		 * Searches of the last 4 weeks by day of the week and 4-hour interval, shaded by how busy each slot was.
+		 */
+		private function render_search_times() {
+			global $wp_locale;
+
+			$times         = ( new MWTSA_History_Data() )->get_search_times( 28 );
+			$max           = max( array_map( 'max', $times['grid'] ) );
+			$start_of_week = (int) get_option( 'start_of_week', 1 );
+			?>
+            <div class="col-content mwtsa-search-times">
+                <h2><?php esc_html_e( 'When people search', 'search-analytics' ); ?></h2>
+				<?php if ( ! $max ) : ?>
+                    <p><?php esc_html_e( 'No searches in the last 4 weeks.', 'search-analytics' ); ?></p>
+				<?php else : ?>
+                    <table class="mwtsa-heatmap">
+                        <caption>
+							<?php
+							/* translators: %s: timezone name, e.g. "UTC" */
+							echo esc_html( sprintf( __( 'Searches over the last 4 weeks, by day of the week and time of day (%s).', 'search-analytics' ), $times['timezone']->getName() ) );
+							?>
+                        </caption>
+                        <thead>
+                            <tr>
+                                <td></td>
+								<?php for ( $interval = 0; $interval < 6; $interval ++ ) : ?>
+                                    <th scope="col" title="<?php echo esc_attr( mwtsa_time_interval_label( $interval ) ); ?>"><?php echo esc_html( sprintf( '%02d–%02d', 4 * $interval, 4 * $interval + 4 ) ); ?></th>
+								<?php endfor; ?>
+                            </tr>
+                        </thead>
+                        <tbody>
+							<?php for ( $row = 0; $row < 7; $row ++ ) :
+								$weekday = ( $start_of_week + $row ) % 7;
+								?>
+                                <tr>
+                                    <th scope="row"><?php echo esc_html( $wp_locale->get_weekday_abbrev( $wp_locale->get_weekday( $weekday ) ) ); ?></th>
+									<?php foreach ( $times['grid'][ $weekday ] as $interval => $count ) :
+										$heat  = $count / $max;
+										$style = $count ? 'background-color: rgba(34, 113, 177, ' . round( 0.12 + 0.88 * $heat, 2 ) . ');' . ( $heat > 0.55 ? ' color: #fff;' : '' ) : '';
+										/* translators: 1: weekday, 2: time interval, 3: number of searches */
+										$title = sprintf( _n( '%1$s, %2$s: %3$s search', '%1$s, %2$s: %3$s searches', $count, 'search-analytics' ), $wp_locale->get_weekday( $weekday ), mwtsa_time_interval_label( $interval ), number_format_i18n( $count ) );
+										?>
+                                        <td title="<?php echo esc_attr( $title ); ?>" style="<?php echo esc_attr( $style ); ?>"><?php echo $count ? esc_html( number_format_i18n( $count ) ) : ''; ?></td>
+									<?php endforeach; ?>
+                                </tr>
+							<?php endfor; ?>
+                        </tbody>
+                    </table>
+                    <p class="mwtsa-heatmap-busiest">
+						<?php
+						echo esc_html( sprintf(
+							/* translators: 1: weekday, 2: time interval */
+							__( 'Busiest day: %1$s. Busiest time: %2$s.', 'search-analytics' ),
+							$wp_locale->get_weekday( $times['busiest_weekday'] ),
+							mwtsa_time_interval_label( $times['busiest_interval'] )
+						) );
+						?>
+                    </p>
+				<?php endif; ?>
+            </div>
+			<?php
 		}
 
 		public function render_chart_data() {

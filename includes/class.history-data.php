@@ -118,7 +118,8 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
 			if ( empty( $args['date_since'] ) && empty( $args['date_until'] ) ) {
 				if ( $args['unit'] != '' ) {
 					// Computed in PHP: SQLite (used by Playground) can't do MySQL's "- INTERVAL" date arithmetic.
-					$since_datetime = gmdate( 'Y-m-d H:i:s', strtotime( '-' . $args['since'] . ' ' . strtolower( $args['unit'] ) ) );
+					// To the minute, so the query text, and with it the cache key, stays the same for a minute.
+					$since_datetime = gmdate( 'Y-m-d H:i:00', strtotime( '-' . $args['since'] . ' ' . strtolower( $args['unit'] ) ) );
 					$where         .= $wpdb->prepare( ' AND h.datetime >= %s', $since_datetime );
 				}
 			} else {
@@ -263,12 +264,196 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
 				'Modifying the raw SQL query is unsafe. Use the mwtsa_run_terms_history_data_query_args filter to modify query arguments instead.'
 			);
 
+			return $this->get_cached_results( $query );
+		}
+
+		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- the table names come from MWTSAI().
+
+		/**
+		 * Totals for the searches from $since up to $until (UTC "Y-m-d H:i:s"; an empty $until means up to now).
+		 */
+		public function get_period_summary( $since, $until = '' ) {
+			global $wpdb;
+
+			$instance = MWTSAI();
+			$query    = "SELECT COUNT(*) AS searches, SUM( CASE WHEN count_posts = 0 THEN 1 ELSE 0 END ) AS no_results, COUNT( DISTINCT term_id ) AS terms
+				FROM $instance->history_table_name
+				WHERE `datetime` >= %s";
+			$params   = array( $since );
+
+			if ( '' !== $until ) {
+				$query   .= ' AND `datetime` < %s';
+				$params[] = $until;
+			}
+
+			$rows = $this->get_cached_results( $wpdb->prepare( $query, $params ) );
+
+			return array(
+				'searches'   => empty( $rows ) ? 0 : (int) $rows[0]['searches'],
+				'no_results' => empty( $rows ) ? 0 : (int) $rows[0]['no_results'],
+				'terms'      => empty( $rows ) ? 0 : (int) $rows[0]['terms'],
+			);
+		}
+
+		/**
+		 * The terms searched most often since $since. With $only_no_results, only the searches that found nothing count.
+		 */
+		public function get_top_terms( $since, $limit = 5, $only_no_results = false ) {
+			global $wpdb;
+
+			$instance = MWTSAI();
+			$filter   = $only_no_results ? 'AND h.count_posts = 0' : '';
+
+			return $this->get_cached_results( $wpdb->prepare(
+				"SELECT t.id, t.term, COUNT( h.id ) AS searches
+				FROM $instance->history_table_name AS h
+				JOIN $instance->terms_table_name AS t ON t.id = h.term_id
+				WHERE h.`datetime` >= %s $filter
+				GROUP BY t.id, t.term
+				ORDER BY searches DESC, t.term ASC
+				LIMIT %d",
+				$since,
+				$limit
+			) );
+		}
+
+		/**
+		 * The most recent search (its term and UTC date), or null when nothing was recorded yet.
+		 */
+		public function get_last_search() {
+			$instance = MWTSAI();
+			$rows     = $this->get_cached_results(
+				"SELECT t.term, h.`datetime`
+				FROM $instance->history_table_name AS h
+				JOIN $instance->terms_table_name AS t ON t.id = h.term_id
+				ORDER BY h.`datetime` DESC, h.id DESC
+				LIMIT 1"
+			);
+
+			return empty( $rows ) ? null : $rows[0];
+		}
+
+		/**
+		 * Terms searched more often since $since than from $previous_since to $since. "growth" is the difference.
+		 */
+		public function get_trending_terms( $since, $previous_since, $limit = 5 ) {
+			global $wpdb;
+
+			$instance = MWTSAI();
+
+			return $this->get_cached_results( $wpdb->prepare(
+				"SELECT t.id, t.term,
+					SUM( CASE WHEN h.`datetime` >= %s THEN 1 ELSE 0 END ) AS searches,
+					SUM( CASE WHEN h.`datetime` >= %s THEN 1 ELSE -1 END ) AS growth
+				FROM $instance->history_table_name AS h
+				JOIN $instance->terms_table_name AS t ON t.id = h.term_id
+				WHERE h.`datetime` >= %s
+				GROUP BY t.id, t.term
+				HAVING growth > 0
+				ORDER BY growth DESC, searches DESC, t.term ASC
+				LIMIT %d",
+				$since,
+				$since,
+				$previous_since,
+				$limit
+			) );
+		}
+
+		/**
+		 * Searches since $since counted per UTC hour, keyed by the hour's Unix timestamp.
+		 */
+		public function get_hourly_counts( $since ) {
+			global $wpdb;
+
+			$instance = MWTSAI();
+			// SUBSTR works on MySQL and on SQLite (Playground), unlike HOUR() with a timezone conversion.
+			$rows     = $this->get_cached_results( $wpdb->prepare(
+				"SELECT SUBSTR( `datetime`, 1, 13 ) AS utc_hour, COUNT(*) AS searches
+				FROM $instance->history_table_name
+				WHERE `datetime` >= %s
+				GROUP BY utc_hour",
+				$since
+			) );
+			$counts   = array();
+
+			foreach ( $rows as $row ) {
+				$counts[ strtotime( $row['utc_hour'] . ':00:00 UTC' ) ] = (int) $row['searches'];
+			}
+
+			return $counts;
+		}
+
+		// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+
+		/**
+		 * The searches of the last $days days (today included), in the statistics timezone: per day, per weekday and
+		 * 4-hour interval ("grid", [0 = Sunday][0 = midnight to 4 AM]), and the busiest weekday and interval.
+		 */
+		public function get_search_times( $days = 28 ) {
+			$timezone = mwtsa_stats_timezone();
+			$today    = new DateTime( 'today', $timezone );
+			$start    = clone $today;
+			$start->modify( '-' . ( $days - 1 ) . ' days' );
+
+			$per_day = array();
+
+			for ( $day = clone $start; $day <= $today; $day->modify( '+1 day' ) ) {
+				$per_day[ $day->format( 'Y-m-d' ) ] = 0;
+			}
+
+			$grid  = array_fill( 0, 7, array_fill( 0, 6, 0 ) );
+			$since = clone $start;
+			$since->setTimezone( new DateTimeZone( 'UTC' ) );
+
+			foreach ( $this->get_hourly_counts( $since->format( 'Y-m-d H:i:s' ) ) as $timestamp => $count ) {
+				$local = new DateTime( '@' . $timestamp );
+				$local->setTimezone( $timezone );
+				$date = $local->format( 'Y-m-d' );
+
+				if ( ! isset( $per_day[ $date ] ) ) {
+					continue;
+				}
+
+				$per_day[ $date ] += $count;
+				$grid[ (int) $local->format( 'w' ) ][ (int) floor( (int) $local->format( 'G' ) / 4 ) ] += $count;
+			}
+
+			$per_weekday  = array_map( 'array_sum', $grid );
+			$per_interval = array();
+
+			for ( $interval = 0; $interval < 6; $interval ++ ) {
+				$per_interval[ $interval ] = array_sum( array_column( $grid, $interval ) );
+			}
+
+			$total = array_sum( $per_day );
+
+			return array(
+				'timezone'         => $timezone,
+				'total'            => $total,
+				'per_day'          => $per_day,
+				'grid'             => $grid,
+				'busiest_weekday'  => $total ? array_search( max( $per_weekday ), $per_weekday, true ) : null,
+				'busiest_interval' => $total ? array_search( max( $per_interval ), $per_interval, true ) : null,
+				'per_weekday'      => $per_weekday,
+				'per_interval'     => $per_interval,
+			);
+		}
+
+		/**
+		 * Cached until a new search is saved. The expiry clears keys for time windows that have moved on.
+		 */
+		private function get_cached_results( $query ) {
+			global $wpdb;
+
+			// Creates the tables if they are missing; upgrading existing ones is left to the admin.
+			MWTSA_Install::activate_single_site( false );
+
 			$cache_key = md5( $query ) . wp_cache_get_last_changed( 'mwtsa' );
-			$results    = wp_cache_get( $cache_key, 'mwtsa' );
+			$results   = wp_cache_get( $cache_key, 'mwtsa' );
 
 			if ( false === $results ) {
 				$results = $wpdb->get_results( $query, 'ARRAY_A' ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery, PluginCheck.Security.DirectDB.UnescapedDBParameter
-				wp_cache_set( $cache_key, $results, 'mwtsa' );
+				wp_cache_set( $cache_key, $results, 'mwtsa', HOUR_IN_SECONDS );
 			}
 
 			return $results;

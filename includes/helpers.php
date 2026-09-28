@@ -253,3 +253,23 @@ if ( ! function_exists( 'mwtsa_process_search_term' ) ) {
 		return ( new MWTSA_Process_Query() )->process_search_term( $term, (int) $result_count );
 	}
 }
+
+if ( ! function_exists( 'mwtsa_stats_timezone' ) ) {
+	/**
+	 * The timezone the statistics show dates in: UTC, or the site's timezone when "Show results dates as UTC" is off.
+	 */
+	function mwtsa_stats_timezone() {
+		return MWTSA_Options::get_option( 'mwtsa_show_dates_as_utc' ) ? new DateTimeZone( 'UTC' ) : mwtsa_wp_timezone();
+	}
+}
+
+if ( ! function_exists( 'mwtsa_time_interval_label' ) ) {
+	/**
+	 * The label of a 4-hour interval of the day (0 = midnight to 4 AM), in the site's time format, e.g. "16:00–20:00".
+	 */
+	function mwtsa_time_interval_label( $interval ) {
+		$format = get_option( 'time_format' );
+
+		return date_i18n( $format, $interval * 4 * HOUR_IN_SECONDS ) . '–' . date_i18n( $format, ( ( $interval + 1 ) % 6 ) * 4 * HOUR_IN_SECONDS );
+	}
+}
