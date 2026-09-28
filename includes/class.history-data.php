@@ -117,7 +117,9 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
 
 			if ( empty( $args['date_since'] ) && empty( $args['date_until'] ) ) {
 				if ( $args['unit'] != '' ) {
-					$where .= " AND h.datetime >= UTC_TIMESTAMP() - INTERVAL {$args['since']} {$args['unit']}";
+					// Computed in PHP: SQLite (used by Playground) can't do MySQL's "- INTERVAL" date arithmetic.
+					$since_datetime = gmdate( 'Y-m-d H:i:s', strtotime( '-' . $args['since'] . ' ' . strtolower( $args['unit'] ) ) );
+					$where         .= $wpdb->prepare( ' AND h.datetime >= %s', $since_datetime );
 				}
 			} else {
 				$since = ( empty( $args['date_since'] ) ) ? time() : strtotime( $args['date_since'] );
