@@ -35,7 +35,6 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 					'offset'              => 0,
 					'fields'              => 'ids',
 					's'                   => $custom_search_value,
-					'suppress_filters'    => true,
 					'ignore_sticky_posts' => true,
 					'no_found_rows'       => false,
 				);

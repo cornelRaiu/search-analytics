@@ -90,10 +90,6 @@ if ( ! class_exists( 'MWTSA_Install' ) ) {
 				return;
 			}
 
-			if ( function_exists( 'set_time_limit' ) ) {
-				@set_time_limit( 300 ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged -- adding indexes to a large table can take a while.
-			}
-
 			require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 			$charset_collate = $wpdb->get_charset_collate();
 

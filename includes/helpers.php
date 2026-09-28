@@ -218,7 +218,7 @@ if ( ! function_exists( 'mwtsa_apply_list_table_filter' ) ) {
 			_deprecated_hook( $hook, '1.6.0', '', __( 'The statistics screens are rebuilt in Search Analytics 2.0, where this filter no longer runs.', 'search-analytics' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- core escapes the message.
 		}
 
-		return apply_filters_ref_array( $hook, $args );
+		return apply_filters_ref_array( $hook, $args ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound -- only called with the plugin's own mwtsa_ hooks.
 	}
 }
 
