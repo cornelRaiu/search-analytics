@@ -67,6 +67,11 @@
 .mwtsa-heatmap td { height: 32px; font-size: 12px; text-align: center; background-color: #f6f7f7; border-radius: 3px; }
 .mwtsa-heatmap-busiest { font-weight: 600; }
 
+/* Review notice */
+.mwtsa-review-notice { position: relative; padding-right: 38px; }
+.mwtsa-review-notice .notice-dismiss { text-decoration: none; }
+.mwtsa-review-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+
 .erase-history-table p.submit { padding-top: 0; margin-top: 0;}
 
 #mwtsa-filters { display: inline-flex; align-items: center }

@@ -383,6 +383,20 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
 			return $counts;
 		}
 
+		/**
+		 * Every search ever recorded, and the Unix time of the oldest search still in the history (0 if there is none).
+		 */
+		public function get_lifetime_stats() {
+			$instance = MWTSAI();
+			$total    = $this->get_cached_results( "SELECT SUM( total_count ) AS searches FROM $instance->terms_table_name" );
+			$first    = $this->get_cached_results( "SELECT MIN( `datetime` ) AS first_search FROM $instance->history_table_name" );
+
+			return array(
+				'searches'     => empty( $total ) ? 0 : (int) $total[0]['searches'],
+				'first_search' => empty( $first[0]['first_search'] ) ? 0 : strtotime( $first[0]['first_search'] . ' UTC' ),
+			);
+		}
+
 		// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
 		/**

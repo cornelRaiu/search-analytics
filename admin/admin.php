@@ -18,12 +18,15 @@ if ( ! class_exists( 'MWTSA_Admin' ) ) {
 			include_once( 'includes/class.stats.php' );
 			include_once( 'includes/class.export-csv.php' );
 			include_once( 'includes/class.menu.php' );
+			include_once( 'includes/class.review-notice.php' );
 		}
 
 		public function add_actions_and_filters() {
 			add_action( 'wp_dashboard_setup', array( 'MWTSA_Dashboard', 'init_action' ) );
 
 			add_filter( 'plugin_row_meta', array( 'MWTSA_Dashboard', 'add_plugin_meta_links' ), 10, 2 );
+
+			new MWTSA_Review_Notice();
 		}
 
         public function init_menus_and_screens()

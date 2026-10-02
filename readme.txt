@@ -193,6 +193,10 @@ Country flags on Windows use the "Twemoji Country Flags" font from [country-flag
 
 * Statistics for the time filters are cached for up to a minute, and old cache entries expire after an hour
 
+**Others:**
+
+* After at least a week of use, the statistics and settings pages show a notice asking for a review. It appears once, and you can dismiss it for good
+
 = 1.6.0 =
 
 **Structure:**

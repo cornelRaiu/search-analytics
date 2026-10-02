@@ -6,6 +6,7 @@ if ( ! class_exists( 'MWTSA_Install' ) ) {
 	class MWTSA_Install {
 
 		const UPGRADE_LOCK = 'mwtsa_db_upgrade_lock';
+		const VERSION_INFO = 'mwtsa_version_info';
 
         //TODO: check if multisite works correctly.
 		public static function activation( $network_wide ) {
@@ -52,6 +53,18 @@ if ( ! class_exists( 'MWTSA_Install' ) ) {
 			}
 
 			self::activate_single_site();
+			self::track_version();
+		}
+
+		/**
+		 * Remembers when the current version was installed or updated to.
+		 */
+		private static function track_version() {
+			$info = get_option( self::VERSION_INFO );
+
+			if ( ! is_array( $info ) || ! isset( $info['version'] ) || MWTSAI()->version !== $info['version'] ) {
+				update_option( self::VERSION_INFO, array( 'version' => MWTSAI()->version, 'since' => time() ) );
+			}
 		}
 
 		/**
