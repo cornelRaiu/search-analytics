@@ -39,6 +39,7 @@ Often the lesson is simply vocabulary. Visitors type "couch" when your store say
 * A dashboard widget with the last 7 days: searches compared with the week before, trending terms, searches with no results and your busiest day and time.
 * **CSV export** of whatever view you're on.
 * Keep **your own searches** out, even after you log out. You can also skip repeat searches, listed IP addresses, very short terms and words you block.
+* Leaves out **searches made by bots**, and junk searches that contain a link or HTML.
 * Optional country and logged-in user for each search, both off by default.
 * **Popular Searches** and **Latest Searches** blocks to show what people search for on your site, with a live preview in the editor. Both are also available as shortcodes.
 * Separate role access for viewing the statistics and changing the settings.
@@ -60,7 +61,7 @@ IP addresses are never saved with the searches, and no cookies are set unless yo
 
 To record searches from your own code, such as an AJAX live search, call `mwtsa_process_search_term( $term, $result_count )`. It runs the same exclusion checks as a normal search and returns whether the search was saved.
 
-Filters: `mwtsa_do_not_save_search`, `mwtsa_exclude_term`, `mwtsa_extra_exclude_conditions`, `mwtsa_result_count`, `mwtsa_export_filename`, `mwtsa_term_search_link`, plus filters on the shortcode output, which apply to the blocks too. Actions: `mwtsa_after_term_save`, `mwtsa_after_history_term_save`. The code is on [GitHub](https://github.com/cornelRaiu/search-analytics).
+Filters: `mwtsa_do_not_save_search`, `mwtsa_exclude_term`, `mwtsa_extra_exclude_conditions`, `mwtsa_result_count`, `mwtsa_export_filename`, `mwtsa_term_search_link`, `mwtsa_is_bot`, `mwtsa_is_junk_term`, plus filters on the shortcode output, which apply to the blocks too. Actions: `mwtsa_after_term_save`, `mwtsa_after_history_term_save`. The code is on [GitHub](https://github.com/cornelRaiu/search-analytics).
 
 = Support =
 
@@ -96,12 +97,19 @@ On the Search Analytics page, click "Only Without Results" and pick a time range
 
 Yes. In the settings, choose the roles to ignore under "Ignore search queries for these user roles", for example Administrator and Editor. To keep ignoring those users after they log out, also tick "Ignore search queries for the above user roles even after the user has logged out". This sets a cookie in their browser when they log in. You can list IP addresses to ignore too, like your office's.
 
+= Are searches made by bots counted? =
+
+No. Searches made by search engine crawlers, link previews, monitoring tools and scripts are skipped. They are recognized by their user agent, so a bot that presents itself as a normal browser still gets through. If one keeps coming back, add its IP address to the excluded ones.
+
+Searches that contain a link or HTML, or that are longer than 100 characters, are skipped too, because they are almost always spam or probes. Each of the two checks has a setting. Turn the second one off if your visitors search for web addresses or HTML tags, as on a web development site.
+
 = Why aren't some searches being recorded? =
 
 The plugin records searches that load your site's search results page (the `?s=` address). If one is missing, check these:
 
 * Ignored roles, IP addresses, the minimum length, blocked words and the repeat-search interval all skip searches on purpose. If your own role is ignored, test in a private browser window.
-* Opening page 2 of the results or the search feed doesn't count as a new search.
+* Searches made by bots are skipped, and so are searches that contain a link or HTML or are longer than 100 characters. Both have a setting.
+* Opening page 2 of the results or the search feed doesn't count as a new search. Neither does following a term's link in the Popular Searches or Latest Searches block, unless you turned that on in the block.
 * If your search form uses its own URL parameter instead of `s`, add it under "Add custom search parameters for recording the searches".
 * A live search that shows results without loading the search results page has to record its searches itself. Call this from the code that handles it, once per finished search rather than on every keystroke:
 
@@ -193,6 +201,7 @@ Country flags on Windows use the "Twemoji Country Flags" font from [country-flag
 * New **Popular Searches** and **Latest Searches** blocks show the same lists as the `[mwtsa_display_search_stats]` and `[mwtsa_display_latest_searches]` shortcodes, with the same settings and a live preview in the editor. Pasted shortcodes and Shortcode blocks can be turned into them. The blocks need WordPress 5.6 or later
 * The shortcodes and blocks can link each term to its search results, with `link_terms="true"` in the shortcodes and by default in the blocks. Searches opened from those links are only recorded if you turn that on, with `count_link_clicks="true"` or the setting in the blocks
 * The text above the lists can be left out, with `show_label="false"` in the shortcodes and a setting in the blocks
+* Searches made by bots are no longer recorded. Crawlers, link previews, monitoring tools and scripts are recognized by their user agent. Searches that contain a link or HTML, or that are longer than 100 characters, are skipped as junk. Both checks are on by default and have a setting
 
 **Bugfixes:**
 
@@ -498,7 +507,7 @@ Country flags on Windows use the "Twemoji Country Flags" font from [country-flag
 == Upgrade Notice ==
 
 = 1.6.1 =
-A redesigned dashboard widget, a new "When people search" chart, and Popular Searches and Latest Searches blocks. Also fixes the statistics on SQLite databases, such as WordPress Playground.
+A redesigned dashboard widget, a new "When people search" chart, and Popular Searches and Latest Searches blocks. Searches made by bots are no longer recorded. Also fixes the statistics on SQLite databases, such as WordPress Playground.
 
 = 1.6.0 =
 Fixes the charts, a multisite bug that could delete other sites' search data, and several counting errors. Search data is now only removed when you delete the plugin. Database indexes are added on your next admin page load.

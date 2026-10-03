@@ -30,6 +30,8 @@ if ( ! class_exists( 'MWTSA_Options' ) ) {
 				'mwtsa_save_search_by_user'                  => 0,
 				'mwtsa_exclude_doubled_search_for_interval'  => 0,
 				'mwtsa_exclude_searches_from_ip_addresses'   => '',
+				'mwtsa_exclude_bots'                         => 1,
+				'mwtsa_exclude_junk_terms'                   => 1,
 				'mwtsa_minimum_characters'                   => 1,
 				'mwtsa_uninstall'                            => 0,
 				'mwtsa_hide_charts'                          => 0,

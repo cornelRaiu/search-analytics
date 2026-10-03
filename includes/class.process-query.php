@@ -8,6 +8,12 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 		// The shortcodes and blocks add this to the links of the terms they list, unless the clicks are to be counted.
 		const LISTED_TERM_ARG = 'mwtsa_listed';
 
+		// Crawlers, link previews, monitors and scanners that name themselves in their user agent.
+		const BOT_USER_AGENTS = '/(?<!cu)bot(?![a-z])|crawl|spider|slurp|archiver|external(?:hit|agent)|mediapartners|googleother|inspectiontool|feedfetcher|preview|headless|lighthouse|pagespeed|gtmetrix|pingdom|uptime|monitor|sqlmap|nikto|wpscan|zgrab|scrapy|phantomjs/i';
+
+		// HTTP libraries. Apps and headless front ends call the REST API with these, so there they are not treated as bots.
+		const SCRIPT_USER_AGENTS = '/curl|wget|python|java\/|go-http|libwww|httpclient|okhttp|node-fetch|axios|guzzle|postman/i';
+
 		public static function process_wpforo_search_term_action( $args, $items_count, $posts, $sql ) {
 			$process = new self();
 
@@ -151,7 +157,49 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 			return ( preg_match( '/^[a-z]{2}$/', $code ) && 'zz' !== $code ) ? $code : '';
 		}
 
+		/**
+		 * Whether the request comes from a crawler or a script, judged by its user agent.
+		 */
+		public static function is_bot() {
+			// WP-CLI and other code running outside a web request has no user agent to judge.
+			if ( ! isset( $_SERVER['REQUEST_METHOD'] ) ) {
+				return false;
+			}
+
+			$user_agent = isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
+
+			$is_bot = (bool) preg_match( self::BOT_USER_AGENTS, $user_agent );
+
+			if ( ! $is_bot && ! ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
+				$is_bot = '' === $user_agent || (bool) preg_match( self::SCRIPT_USER_AGENTS, $user_agent );
+			}
+
+			return (bool) apply_filters( 'mwtsa_is_bot', $is_bot, $user_agent );
+		}
+
+		/**
+		 * Whether the term is spam or a probe rather than a search: it contains a link or HTML, or is longer than the
+		 * 100 characters a term can have.
+		 */
+		public static function is_junk_term( $term ) {
+			// Front-end terms arrive HTML-escaped.
+			$term = trim( wp_specialchars_decode( (string) $term, ENT_QUOTES ) );
+
+			$is_junk = mb_strlen( $term ) > 100 || preg_match( '#://|www\.|<[a-z/!]#i', $term );
+
+			return (bool) apply_filters( 'mwtsa_is_junk_term', (bool) $is_junk, $term );
+		}
+
 		public function process_search_term( $search_term, $count ) {
+
+			if ( ! empty( MWTSA_Options::get_option( 'mwtsa_exclude_bots' ) ) && self::is_bot() ) {
+				return false;
+			}
+
+			// Checked before the term is normalized, which strips the tags and cuts it to 100 characters.
+			if ( ! empty( MWTSA_Options::get_option( 'mwtsa_exclude_junk_terms' ) ) && self::is_junk_term( $search_term ) ) {
+				return false;
+			}
 
 			$search_term = self::normalize_search_term( $search_term );
 

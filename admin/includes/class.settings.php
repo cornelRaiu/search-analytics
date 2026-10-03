@@ -102,6 +102,22 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 			);
 
 			add_settings_field(
+				'mwtsa_exclude_bots',
+				__( 'Ignore searches made by bots:', 'search-analytics' ),
+				array( &$this, 'field_exclude_bots_render' ),
+				'mwtsa_general_options',
+				'mwtsa_general_options_section'
+			);
+
+			add_settings_field(
+				'mwtsa_exclude_junk_terms',
+				__( 'Ignore junk searches:', 'search-analytics' ),
+				array( &$this, 'field_exclude_junk_terms_render' ),
+				'mwtsa_general_options',
+				'mwtsa_general_options_section'
+			);
+
+			add_settings_field(
 				'mwtsa_minimum_characters',
 				__( 'Only record searches with at least the number of characters', 'search-analytics' ),
 				array( &$this, 'field_minimum_characters_render' ),
@@ -262,6 +278,36 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
             <strong><?php
 				/* translators: %s: The user's IP Address */
 				printf( esc_html__( 'Your IP address is: %s', 'search-analytics' ), esc_attr( $admin_ip ) ) ?></strong>
+			<?php
+		}
+
+		public function field_exclude_bots_render() {
+			if ( ! isset( $this->existing_options['mwtsa_exclude_bots'] ) ) {
+				$this->existing_options['mwtsa_exclude_bots'] = 1;
+			}
+			?>
+            <label>
+                <input type="hidden" name='mwtsa_settings[mwtsa_exclude_bots]' value='0'/>
+                <input type='checkbox' name='mwtsa_settings[mwtsa_exclude_bots]' value='1' <?php checked( $this->existing_options['mwtsa_exclude_bots'], 1 ) ?> />
+                <span><?php esc_html_e( 'Skip searches made by search engine crawlers, link previews, monitoring tools and scripts', 'search-analytics' ) ?></span>
+            </label>
+            <br/>
+            <strong><?php esc_html_e( 'They are recognized by their user agent. A bot that presents itself as a normal browser is not recognized; exclude its IP address above instead.', 'search-analytics' ) ?></strong>
+			<?php
+		}
+
+		public function field_exclude_junk_terms_render() {
+			if ( ! isset( $this->existing_options['mwtsa_exclude_junk_terms'] ) ) {
+				$this->existing_options['mwtsa_exclude_junk_terms'] = 1;
+			}
+			?>
+            <label>
+                <input type="hidden" name='mwtsa_settings[mwtsa_exclude_junk_terms]' value='0'/>
+                <input type='checkbox' name='mwtsa_settings[mwtsa_exclude_junk_terms]' value='1' <?php checked( $this->existing_options['mwtsa_exclude_junk_terms'], 1 ) ?> />
+                <span><?php esc_html_e( 'Skip searches that contain a link or HTML, or that are longer than 100 characters', 'search-analytics' ) ?></span>
+            </label>
+            <br/>
+            <strong><?php esc_html_e( 'These are almost always spam or probes. Uncheck this if your visitors search for web addresses or HTML tags, as on a web development site.', 'search-analytics' ) ?></strong>
 			<?php
 		}
 

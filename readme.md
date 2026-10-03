@@ -30,6 +30,7 @@ Everything stays in your WordPress database. There's no account, API key or outs
 - A dashboard widget with the last 7 days: searches compared with the week before, trending terms, searches with no results, and your busiest day and time.
 - **CSV export** of whatever view you're on.
 - Keeps **your own searches** out: ignore user roles (even after they log out), IP addresses, repeat searches, very short terms and words you block.
+- Leaves out **searches made by bots**, and junk searches that contain a link or HTML.
 - Optional country and logged-in user for each search, both off by default.
 - **Popular Searches** and **Latest Searches** blocks for showing what people search for on your site, with a live preview in the editor. Both are also available as shortcodes.
 - Separate role access for the statistics and the settings, multisite support, and translation-ready.
@@ -38,6 +39,7 @@ Everything stays in your WordPress database. There's no account, API key or outs
 
 - **Blocks.** Popular Searches and Latest Searches show the same lists as the two shortcodes, with the same settings and a live preview in the editor. See [Blocks and shortcodes](#blocks-and-shortcodes).
 - **Links and labels.** The shortcodes and blocks can link each term to its search results, and the text above the lists can be left out.
+- **No more bot searches.** Crawlers, link previews, monitoring tools and scripts are recognized by their user agent and skipped. Searches that contain a link or HTML, or that are longer than 100 characters, are skipped as junk. Both checks have a setting.
 - **A redesigned dashboard widget.** The last 7 days compared with the week before, a bar per day, trending terms, top searches, searches with no results, and the busiest day and time.
 - **"When people search".** A new chart on the statistics page shows the searches of the last 4 weeks by day of the week and 4-hour interval.
 - **SQLite fix.** The time filters, the shortcodes and the dashboard widget failed on SQLite databases, such as the one WordPress Playground uses.
@@ -165,6 +167,8 @@ For a live search, call it once the visitor stops typing or picks a result. Call
 | `mwtsa_do_not_save_search` | `$skip`, `$custom_search_value` | Decide whether a front-end request is skipped (`true` skips it). |
 | `mwtsa_extra_exclude_conditions` | `$skip`, `$term` | Skip a search. Runs before the minimum length check. |
 | `mwtsa_exclude_term` | `$skip`, `$term` | Skip a search. Runs after the minimum length check. |
+| `mwtsa_is_bot` | `$is_bot`, `$user_agent` | Decide whether a request comes from a bot. Used when "Ignore searches made by bots" is on. |
+| `mwtsa_is_junk_term` | `$is_junk`, `$term` | Decide whether a term is junk. Used when "Ignore junk searches" is on. |
 | `mwtsa_result_count` | `$count`, `$term` | Change the result count saved for a front-end search. |
 | `mwtsa_rest_api_do_not_save_search` | `$skip`, `$term` | Skip a REST API search. |
 | `mwtsa_rest_api_result_count` | `$count`, `$term` | Provide the result count for a REST API search. With `0`, the plugin counts the results itself. |

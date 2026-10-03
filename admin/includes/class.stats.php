@@ -218,6 +218,7 @@ if ( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
                                 <li>Feature: "When people search" on this page shows the busiest days and times of the last 4 weeks</li>
                                 <li>Feature: Popular Searches and Latest Searches blocks, with the same settings as the shortcodes</li>
                                 <li>Feature: The shortcodes and blocks can link terms to their search results and leave out the text above the list</li>
+                                <li>Feature: Searches made by bots, and junk searches with a link or HTML, are no longer recorded. Both have a setting</li>
                                 <li>Bugfix: The time filters, shortcodes and dashboard widget failed on SQLite databases, such as WordPress Playground</li>
                                 <li>Bugfix: "Your Last Searches" listed the visitor's most searched terms instead of the latest ones</li>
                             </ul>
