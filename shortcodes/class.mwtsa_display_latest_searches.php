@@ -18,11 +18,15 @@ if ( ! class_exists( 'MWTSA_Display_Latest_Searches_Shortcode' ) ) {
 				'amount'            => 1,
 				'count'             => 10,
 				'only_with_results' => true,
+				'link_terms'        => false,
+				'show_label'        => true,
 				'wrapper_class'     => 'mwtsa-latest-searches',
 				'label'             => ''
 			), $atts, 'mwtsa_display_latest_searches' );
 
 			$atts['only_with_results'] = filter_var( $atts['only_with_results'], FILTER_VALIDATE_BOOLEAN );
+			$atts['link_terms']        = filter_var( $atts['link_terms'], FILTER_VALIDATE_BOOLEAN );
+			$atts['show_label']        = filter_var( $atts['show_label'], FILTER_VALIDATE_BOOLEAN );
 
 			if ( $atts['label'] === '' ) {
 				$atts['label'] = ( $atts['only_with_results'] ) ?
@@ -51,14 +55,16 @@ if ( ! class_exists( 'MWTSA_Display_Latest_Searches_Shortcode' ) ) {
 			?>
             <div class="<?php echo esc_attr( $atts['wrapper_class'] ) ?>">
 				<?php if ( count( $search_results ) > 0 ) : ?>
+					<?php if ( $atts['show_label'] ) : ?>
                     <p><?php echo esc_html( $atts['label'] ) ?></p>
+					<?php endif; ?>
                     <ul>
 						<?php foreach ( $search_results as $term ) :
 							echo apply_filters( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 								'mwtsa_display_latest_searches_shortcode_list_item_output',
 								sprintf(
 									'<li>%s</li>',
-									esc_attr( $term['term'] )
+									mwtsa_listed_term_html( $term['term'], $atts['link_terms'] )
 								),
 								$atts,
 								$term

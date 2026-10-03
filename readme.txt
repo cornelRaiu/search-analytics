@@ -40,7 +40,7 @@ Often the lesson is simply vocabulary. Visitors type "couch" when your store say
 * **CSV export** of whatever view you're on.
 * Keep **your own searches** out, even after you log out. You can also skip repeat searches, listed IP addresses, very short terms and words you block.
 * Optional country and logged-in user for each search, both off by default.
-* Two shortcodes to show **popular or recent searches** on your site.
+* **Popular Searches** and **Latest Searches** blocks to show what people search for on your site, with a live preview in the editor. Both are also available as shortcodes.
 * Separate role access for viewing the statistics and changing the settings.
 * Works on multisite, with separate data for each site, and is translation-ready.
 
@@ -60,7 +60,7 @@ IP addresses are never saved with the searches, and no cookies are set unless yo
 
 To record searches from your own code, such as an AJAX live search, call `mwtsa_process_search_term( $term, $result_count )`. It runs the same exclusion checks as a normal search and returns whether the search was saved.
 
-Filters: `mwtsa_do_not_save_search`, `mwtsa_exclude_term`, `mwtsa_extra_exclude_conditions`, `mwtsa_result_count`, `mwtsa_export_filename`, plus filters on the shortcode output. Actions: `mwtsa_after_term_save`, `mwtsa_after_history_term_save`. The code is on [GitHub](https://github.com/cornelRaiu/search-analytics).
+Filters: `mwtsa_do_not_save_search`, `mwtsa_exclude_term`, `mwtsa_extra_exclude_conditions`, `mwtsa_result_count`, `mwtsa_export_filename`, `mwtsa_term_search_link`, plus filters on the shortcode output, which apply to the blocks too. Actions: `mwtsa_after_term_save`, `mwtsa_after_history_term_save`. The code is on [GitHub](https://github.com/cornelRaiu/search-analytics).
 
 = Support =
 
@@ -134,14 +134,20 @@ Yes. The "Export Data" button on the statistics page downloads what you're looki
 
 = Can I show popular searches on my site? =
 
-Yes, with two shortcodes:
+Yes. Add the **Popular Searches** or **Latest Searches** block to a page, a post or a widget area. The editor shows a live preview, and a block with nothing to list stays hidden on your site. The blocks need WordPress 5.6 or later.
 
-* `[mwtsa_display_search_stats]` lists the most searched terms, plus the visitor's own recent searches if they're logged in and "Save Search By User" is on.
-* `[mwtsa_display_latest_searches]` lists the most recent search terms.
+The same lists are available as shortcodes:
 
-Both hide terms with no results by default and take options for the period, the number of terms and the labels. For example, `[mwtsa_display_latest_searches unit="month" count="5"]` shows the five most recent terms from the past month.
+* `[mwtsa_display_search_stats]` lists the most searched terms, plus the visitor's own recent searches if they're logged in and "Save Search By User" is on. The Popular Searches block shows the same.
+* `[mwtsa_display_latest_searches]` lists the most recent search terms, like the Latest Searches block.
 
-In a widget area, use the Shortcode block, or the Text widget on WordPress 4.9 and later. On 4.7 and 4.8, add `add_filter( 'widget_text', 'do_shortcode' );` to your child theme's `functions.php`.
+Both hide terms with no results by default and take options for the period, the number of terms and the text above the list, which `show_label="false"` leaves out. For example, `[mwtsa_display_latest_searches unit="month" count="5"]` shows the five most recent terms from the past month.
+
+Each term can link to its search results. The blocks do that unless you turn it off, and the shortcodes do it with `link_terms="true"`. A search opened from one of these links isn't recorded, so the listed terms don't keep themselves on top.
+
+Paste one of these shortcodes into the block editor, or convert classic content to blocks, and it becomes the matching block with the same settings. A Shortcode block can be transformed into it too.
+
+With classic widgets, put the shortcode in a Text widget. On WordPress 4.7 and 4.8, also add `add_filter( 'widget_text', 'do_shortcode' );` to your child theme's `functions.php`.
 
 = Does deactivating the plugin delete my search data? =
 
@@ -184,14 +190,19 @@ Country flags on Windows use the "Twemoji Country Flags" font from [country-flag
 
 * The dashboard widget is redesigned. For the last 7 days it shows the searches, the searches with no results and the unique terms compared with the 7 days before, the last search, a bar per day, the trending terms, the top searches and the top searches with no results. It also shows the busiest day and time of the last 4 weeks
 * The new "When people search" chart on the statistics page shows the searches of the last 4 weeks by day of the week and 4-hour interval. It follows the "Show results dates as UTC" setting
+* New **Popular Searches** and **Latest Searches** blocks show the same lists as the `[mwtsa_display_search_stats]` and `[mwtsa_display_latest_searches]` shortcodes, with the same settings and a live preview in the editor. Pasted shortcodes and Shortcode blocks can be turned into them. The blocks need WordPress 5.6 or later
+* The shortcodes and blocks can link each term to its search results, with `link_terms="true"` in the shortcodes and by default in the blocks. Searches opened from those links are not recorded
+* The text above the lists can be left out, with `show_label="false"` in the shortcodes and a setting in the blocks
 
 **Bugfixes:**
 
 * The time filters, the shortcodes and the dashboard widget failed on SQLite databases, such as the one WordPress Playground uses for the Live Preview
+* The "Your Last Searches" list of the `[mwtsa_display_search_stats]` shortcode showed the terms the visitor searched most often instead of the latest ones
 
 **Optimizations:**
 
 * Statistics for the time filters are cached for up to a minute, and old cache entries expire after an hour
+* The `[mwtsa_display_search_stats]` shortcode only loads the terms it shows, instead of every term searched in the period
 
 **Others:**
 
@@ -487,7 +498,7 @@ Country flags on Windows use the "Twemoji Country Flags" font from [country-flag
 == Upgrade Notice ==
 
 = 1.6.1 =
-A redesigned dashboard widget and a new "When people search" chart. Also fixes the statistics on SQLite databases, such as WordPress Playground.
+A redesigned dashboard widget, a new "When people search" chart, and Popular Searches and Latest Searches blocks. Also fixes the statistics on SQLite databases, such as WordPress Playground.
 
 = 1.6.0 =
 Fixes the charts, a multisite bug that could delete other sites' search data, and several counting errors. Search data is now only removed when you delete the plugin. Database indexes are added on your next admin page load.

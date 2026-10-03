@@ -1,0 +1,59 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "search-analytics/latest-searches",
+	"title": "Latest Searches",
+	"category": "widgets",
+	"icon": "clock",
+	"description": "The terms searched for most recently on your site.",
+	"keywords": [ "recent searches", "last searches", "search terms" ],
+	"textdomain": "search-analytics",
+	"attributes": {
+		"unit": {
+			"type": "string",
+			"default": "week"
+		},
+		"amount": {
+			"type": "integer",
+			"default": 1
+		},
+		"count": {
+			"type": "integer",
+			"default": 10
+		},
+		"onlyWithResults": {
+			"type": "boolean",
+			"default": true
+		},
+		"label": {
+			"type": "string",
+			"default": ""
+		},
+		"linkTerms": {
+			"type": "boolean",
+			"default": true
+		},
+		"showLabel": {
+			"type": "boolean",
+			"default": true
+		}
+	},
+	"supports": {
+		"html": false,
+		"color": {
+			"background": true,
+			"text": true,
+			"link": true
+		},
+		"spacing": {
+			"margin": true,
+			"padding": true
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true
+		}
+	},
+	"example": {},
+	"editorScript": "mwtsa-blocks-editor"
+}

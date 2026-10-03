@@ -107,11 +107,13 @@ if ( ! class_exists( 'MWTSA' ) ) {
 
 			require_once( $this->shortcodes_dir . 'class.mwtsa_display_search_stats.php' );
 			require_once( $this->shortcodes_dir . 'class.mwtsa_display_latest_searches.php' );
+			require_once( $this->plugin_dir . 'blocks/class.blocks.php' );
 		}
 
 		public function add_actions_and_filters() {
 			add_action( 'init', array( 'MWTSA_Display_Search_Stats_Shortcode', 'init' ) );
 			add_action( 'init', array( 'MWTSA_Display_Latest_Searches_Shortcode', 'init' ) );
+			add_action( 'init', array( 'MWTSA_Blocks', 'init' ) );
 
 			add_action( 'rest_api_init', array( 'MWTSA_Process_Query', 'process_rest_api_search_term_action' ), 20 );
 

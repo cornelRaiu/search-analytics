@@ -1,0 +1,79 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "search-analytics/popular-searches",
+	"title": "Popular Searches",
+	"category": "widgets",
+	"icon": "chart-bar",
+	"description": "The most searched terms on your site, plus the last searches of logged-in visitors.",
+	"keywords": [ "most searched", "top searches", "search stats" ],
+	"textdomain": "search-analytics",
+	"attributes": {
+		"unit": {
+			"type": "string",
+			"default": "week"
+		},
+		"amount": {
+			"type": "integer",
+			"default": 1
+		},
+		"mostSearched": {
+			"type": "boolean",
+			"default": true
+		},
+		"mostSearchedCount": {
+			"type": "integer",
+			"default": 5
+		},
+		"mostSearchedOnlyWithResults": {
+			"type": "boolean",
+			"default": true
+		},
+		"mostSearchedLabel": {
+			"type": "string",
+			"default": ""
+		},
+		"userSearches": {
+			"type": "boolean",
+			"default": true
+		},
+		"userSearchesCount": {
+			"type": "integer",
+			"default": 5
+		},
+		"userSearchesOnlyWithResults": {
+			"type": "boolean",
+			"default": true
+		},
+		"userSearchesLabel": {
+			"type": "string",
+			"default": ""
+		},
+		"linkTerms": {
+			"type": "boolean",
+			"default": true
+		},
+		"showLabel": {
+			"type": "boolean",
+			"default": true
+		}
+	},
+	"supports": {
+		"html": false,
+		"color": {
+			"background": true,
+			"text": true,
+			"link": true
+		},
+		"spacing": {
+			"margin": true,
+			"padding": true
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true
+		}
+	},
+	"example": {},
+	"editorScript": "mwtsa-blocks-editor"
+}

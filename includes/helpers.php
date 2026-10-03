@@ -254,6 +254,36 @@ if ( ! function_exists( 'mwtsa_process_search_term' ) ) {
 	}
 }
 
+if ( ! function_exists( 'mwtsa_term_search_link' ) ) {
+	/**
+	 * The URL of a term's search results, marked so that the visit is not recorded as a new search.
+	 */
+	function mwtsa_term_search_link( $term ) {
+		$link = add_query_arg(
+			array(
+				's'                                  => rawurlencode( $term ),
+				MWTSA_Process_Query::LISTED_TERM_ARG => 1,
+			),
+			home_url( '/' )
+		);
+
+		return apply_filters( 'mwtsa_term_search_link', $link, $term );
+	}
+}
+
+if ( ! function_exists( 'mwtsa_listed_term_html' ) ) {
+	/**
+	 * A term as the shortcodes and blocks list it: plain text, or a link to its search results.
+	 */
+	function mwtsa_listed_term_html( $term, $link ) {
+		if ( ! $link ) {
+			return esc_html( $term );
+		}
+
+		return sprintf( '<a href="%s" rel="nofollow">%s</a>', esc_url( mwtsa_term_search_link( $term ) ), esc_html( $term ) );
+	}
+}
+
 if ( ! function_exists( 'mwtsa_stats_timezone' ) ) {
 	/**
 	 * The timezone the statistics show dates in: UTC, or the site's timezone when "Show results dates as UTC" is off.

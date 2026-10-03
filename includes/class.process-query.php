@@ -5,6 +5,9 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 
 	class MWTSA_Process_Query {
 
+		// The shortcodes and blocks add this to the links of the terms they list.
+		const LISTED_TERM_ARG = 'mwtsa_listed';
+
 		public static function process_wpforo_search_term_action( $args, $items_count, $posts, $sql ) {
 			$process = new self();
 
@@ -55,6 +58,9 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 
 			// Paging through the results or loading the search feed is not a new search.
 			$do_not_save = ( ! is_search() && $custom_search_value == '' ) || is_admin() || is_paged() || is_feed();
+
+			// Neither is following the link of a listed term. Counting those would keep the listed terms on top.
+			$do_not_save = $do_not_save || isset( $_GET[ self::LISTED_TERM_ARG ] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 			if ( apply_filters( 'mwtsa_do_not_save_search', $do_not_save, $custom_search_value ) ) {
 				return;
