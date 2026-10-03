@@ -276,17 +276,18 @@ if ( ! class_exists( 'MWTSA_History_Data' ) ) {
 			global $wpdb;
 
 			$instance = MWTSAI();
-			$query    = "SELECT COUNT(*) AS searches, SUM( CASE WHEN count_posts = 0 THEN 1 ELSE 0 END ) AS no_results, COUNT( DISTINCT term_id ) AS terms
+			$query    = $wpdb->prepare(
+				"SELECT COUNT(*) AS searches, SUM( CASE WHEN count_posts = 0 THEN 1 ELSE 0 END ) AS no_results, COUNT( DISTINCT term_id ) AS terms
 				FROM $instance->history_table_name
-				WHERE `datetime` >= %s";
-			$params   = array( $since );
+				WHERE `datetime` >= %s",
+				$since
+			);
 
 			if ( '' !== $until ) {
-				$query   .= ' AND `datetime` < %s';
-				$params[] = $until;
+				$query .= $wpdb->prepare( ' AND `datetime` < %s', $until );
 			}
 
-			$rows = $this->get_cached_results( $wpdb->prepare( $query, $params ) );
+			$rows = $this->get_cached_results( $query );
 
 			return array(
 				'searches'   => empty( $rows ) ? 0 : (int) $rows[0]['searches'],
