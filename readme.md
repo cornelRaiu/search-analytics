@@ -98,7 +98,8 @@ Lists the most recent search terms.
 | `onlyWithResults` | `only_with_results` | `true` | Leave out terms that found nothing. |
 | `label` | `label` | | Text above the list. Defaults to "Recently Searched Terms With Results", or "Recently Searched Terms". |
 | `showLabel` | `show_label` | `true` | Show the text above the list. |
-| `linkTerms` | `link_terms` | `false`, or `true` in the block | Link each term to its search results. A search opened from such a link is not recorded. |
+| `linkTerms` | `link_terms` | `false`, or `true` in the block | Link each term to its search results. |
+| `countLinkClicks` | `count_link_clicks` | `false` | Record the searches opened from those links. Left off, they are not recorded, so the listed terms don't keep themselves on top. |
 | | `wrapper_class` | `mwtsa-latest-searches` | CSS class of the wrapping `div`. |
 
 ### Popular Searches
@@ -121,7 +122,8 @@ Lists the most searched terms, plus the logged-in visitor's own recent searches 
 | `userSearchesOnlyWithResults` | `user_searches_only_with_results` | `true` | Leave out the visitor's searches that found nothing. |
 | `userSearchesLabel` | `user_searches_label` | | Text above the list. Defaults to "Your Last Successful Searches", or "Your Last Searches". |
 | `showLabel` | `show_label` | `true` | Show the text above each list. Without it, each list is a plain `ul` with the class `mwtsa-most-searched` or `mwtsa-user-searches`. |
-| `linkTerms` | `link_terms` | `false`, or `true` in the block | Link each term to its search results. A search opened from such a link is not recorded. |
+| `linkTerms` | `link_terms` | `false`, or `true` in the block | Link each term to its search results. |
+| `countLinkClicks` | `count_link_clicks` | `false` | Record the searches opened from those links. Left off, they are not recorded, so the listed terms don't keep themselves on top. |
 | | `wrapper_class` | `mwtsa-search-stats` | CSS class of the wrapping `div`. |
 
 ### Usage
@@ -171,7 +173,7 @@ For a live search, call it once the visitor stops typing or picks a result. Call
 | `mwtsa_run_terms_history_data_query_args` | `$args` | Change the arguments of the statistics queries. |
 | `mwtsa_run_terms_history_order_by` | `$order_by`, `$args` | Change the order of the statistics queries. |
 | `mwtsa_export_filename` | `$filename` | Rename the CSV export. |
-| `mwtsa_term_search_link` | `$link`, `$term` | Change the link of a term listed by the shortcodes and blocks. |
+| `mwtsa_term_search_link` | `$link`, `$term`, `$counted` | Change the link of a term listed by the shortcodes and blocks. |
 | `mwtsa_display_latest_searches_shortcode_list_item_output` | `$html`, `$atts`, `$term` | Change one term's HTML in `[mwtsa_display_latest_searches]`. |
 | `mwtsa_display_latest_searches_shortcode_output` | `$html`, `$atts`, `$terms` | Change the whole output of `[mwtsa_display_latest_searches]`. |
 | `mwtsa_display_search_stats_shortcode_most_searched_terms` | `$terms` | Supply your own most searched terms. |
@@ -205,14 +207,6 @@ Send the links of the listed terms to the WooCommerce product search:
 ```php
 add_filter( 'mwtsa_term_search_link', function ( $link ) {
     return add_query_arg( 'post_type', 'product', $link );
-} );
-```
-
-Count the searches opened from listed terms after all, by taking the marker off their links:
-
-```php
-add_filter( 'mwtsa_term_search_link', function ( $link ) {
-    return remove_query_arg( 'mwtsa_listed', $link );
 } );
 ```
 

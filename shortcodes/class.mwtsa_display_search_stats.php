@@ -21,6 +21,7 @@ if ( ! class_exists( 'MWTSA_Display_Search_Stats_Shortcode' ) ) {
 				'user_searches_only_with_results' => true,
 				'user_searches_label'             => '',
 				'link_terms'                      => false,
+				'count_link_clicks'               => false,
 				'show_label'                      => true,
 				'wrapper_class'                   => 'mwtsa-search-stats',
 			), $atts, 'mwtsa_display_search_stats' );
@@ -30,6 +31,7 @@ if ( ! class_exists( 'MWTSA_Display_Search_Stats_Shortcode' ) ) {
 			$atts['user_searches']                   = filter_var( $atts['user_searches'], FILTER_VALIDATE_BOOLEAN );
 			$atts['user_searches_only_with_results'] = filter_var( $atts['user_searches_only_with_results'], FILTER_VALIDATE_BOOLEAN );
 			$atts['link_terms']                      = filter_var( $atts['link_terms'], FILTER_VALIDATE_BOOLEAN );
+			$atts['count_link_clicks']               = filter_var( $atts['count_link_clicks'], FILTER_VALIDATE_BOOLEAN );
 			$atts['show_label']                      = filter_var( $atts['show_label'], FILTER_VALIDATE_BOOLEAN );
 
 			if ( $atts['most_searched_label'] === '' ) {
@@ -139,7 +141,7 @@ if ( ! class_exists( 'MWTSA_Display_Search_Stats_Shortcode' ) ) {
 					'mwtsa_display_search_stats_shortcode_list_item_output',
 					sprintf(
 						'<li>%s</li>',
-						mwtsa_listed_term_html( $term['term'], $atts['link_terms'] )
+						mwtsa_listed_term_html( $term['term'], $atts['link_terms'], $atts['count_link_clicks'] )
 					),
 					$atts,
 					$list,

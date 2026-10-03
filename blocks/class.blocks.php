@@ -42,6 +42,7 @@ if ( ! class_exists( 'MWTSA_Blocks' ) ) {
 				'user_searches_only_with_results' => $attributes['userSearchesOnlyWithResults'],
 				'user_searches_label'             => $attributes['userSearchesLabel'],
 				'link_terms'                      => $attributes['linkTerms'],
+				'count_link_clicks'               => $attributes['countLinkClicks'],
 				'show_label'                      => $attributes['showLabel'],
 			) ) );
 		}
@@ -54,6 +55,7 @@ if ( ! class_exists( 'MWTSA_Blocks' ) ) {
 				'only_with_results' => $attributes['onlyWithResults'],
 				'label'             => $attributes['label'],
 				'link_terms'        => $attributes['linkTerms'],
+				'count_link_clicks' => $attributes['countLinkClicks'],
 				'show_label'        => $attributes['showLabel'],
 			) ) );
 		}

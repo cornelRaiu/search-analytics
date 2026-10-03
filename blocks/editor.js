@@ -80,8 +80,13 @@
   const displayControls = function (props, showLabelText) {
     return [
       control(props, ToggleControl, 'linkTerms', {
-        label: __('Link terms to their search results', 'search-analytics'),
-        help: __('Searches opened from these links are not counted.', 'search-analytics')
+        label: __('Link terms to their search results', 'search-analytics')
+      }),
+      props.attributes.linkTerms && control(props, ToggleControl, 'countLinkClicks', {
+        label: __('Count clicks on these links as searches', 'search-analytics'),
+        help: props.attributes.countLinkClicks
+          ? __('Visits from crawlers that follow the links are counted too.', 'search-analytics')
+          : __('Not counted, so that the listed terms do not keep themselves on top.', 'search-analytics')
       }),
       control(props, ToggleControl, 'showLabel', {
         label: showLabelText
@@ -246,6 +251,7 @@
       userSearchesOnlyWithResults: ['user_searches_only_with_results', 'boolean'],
       userSearchesLabel: ['user_searches_label', 'string'],
       linkTerms: ['link_terms', 'boolean', false],
+      countLinkClicks: ['count_link_clicks', 'boolean'],
       showLabel: ['show_label', 'boolean'],
       className: ['wrapper_class', 'string']
     })
@@ -261,6 +267,7 @@
       onlyWithResults: ['only_with_results', 'boolean'],
       label: ['label', 'string'],
       linkTerms: ['link_terms', 'boolean', false],
+      countLinkClicks: ['count_link_clicks', 'boolean'],
       showLabel: ['show_label', 'boolean'],
       className: ['wrapper_class', 'string']
     })

@@ -33,6 +33,10 @@
 			"type": "boolean",
 			"default": true
 		},
+		"countLinkClicks": {
+			"type": "boolean",
+			"default": false
+		},
 		"showLabel": {
 			"type": "boolean",
 			"default": true

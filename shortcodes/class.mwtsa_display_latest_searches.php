@@ -19,6 +19,7 @@ if ( ! class_exists( 'MWTSA_Display_Latest_Searches_Shortcode' ) ) {
 				'count'             => 10,
 				'only_with_results' => true,
 				'link_terms'        => false,
+				'count_link_clicks' => false,
 				'show_label'        => true,
 				'wrapper_class'     => 'mwtsa-latest-searches',
 				'label'             => ''
@@ -26,6 +27,7 @@ if ( ! class_exists( 'MWTSA_Display_Latest_Searches_Shortcode' ) ) {
 
 			$atts['only_with_results'] = filter_var( $atts['only_with_results'], FILTER_VALIDATE_BOOLEAN );
 			$atts['link_terms']        = filter_var( $atts['link_terms'], FILTER_VALIDATE_BOOLEAN );
+			$atts['count_link_clicks'] = filter_var( $atts['count_link_clicks'], FILTER_VALIDATE_BOOLEAN );
 			$atts['show_label']        = filter_var( $atts['show_label'], FILTER_VALIDATE_BOOLEAN );
 
 			if ( $atts['label'] === '' ) {
@@ -64,7 +66,7 @@ if ( ! class_exists( 'MWTSA_Display_Latest_Searches_Shortcode' ) ) {
 								'mwtsa_display_latest_searches_shortcode_list_item_output',
 								sprintf(
 									'<li>%s</li>',
-									mwtsa_listed_term_html( $term['term'], $atts['link_terms'] )
+									mwtsa_listed_term_html( $term['term'], $atts['link_terms'], $atts['count_link_clicks'] )
 								),
 								$atts,
 								$term

@@ -5,7 +5,7 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 
 	class MWTSA_Process_Query {
 
-		// The shortcodes and blocks add this to the links of the terms they list.
+		// The shortcodes and blocks add this to the links of the terms they list, unless the clicks are to be counted.
 		const LISTED_TERM_ARG = 'mwtsa_listed';
 
 		public static function process_wpforo_search_term_action( $args, $items_count, $posts, $sql ) {

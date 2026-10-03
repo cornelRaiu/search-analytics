@@ -143,7 +143,7 @@ The same lists are available as shortcodes:
 
 Both hide terms with no results by default and take options for the period, the number of terms and the text above the list, which `show_label="false"` leaves out. For example, `[mwtsa_display_latest_searches unit="month" count="5"]` shows the five most recent terms from the past month.
 
-Each term can link to its search results. The blocks do that unless you turn it off, and the shortcodes do it with `link_terms="true"`. A search opened from one of these links isn't recorded, so the listed terms don't keep themselves on top.
+Each term can link to its search results. The blocks do that unless you turn it off, and the shortcodes do it with `link_terms="true"`. A search opened from one of these links isn't recorded, so the listed terms don't keep themselves on top. To count those searches too, turn on "Count clicks on these links as searches" in the block, or add `count_link_clicks="true"` to the shortcode.
 
 Paste one of these shortcodes into the block editor, or convert classic content to blocks, and it becomes the matching block with the same settings. A Shortcode block can be transformed into it too.
 
@@ -191,7 +191,7 @@ Country flags on Windows use the "Twemoji Country Flags" font from [country-flag
 * The dashboard widget is redesigned. For the last 7 days it shows the searches, the searches with no results and the unique terms compared with the 7 days before, the last search, a bar per day, the trending terms, the top searches and the top searches with no results. It also shows the busiest day and time of the last 4 weeks
 * The new "When people search" chart on the statistics page shows the searches of the last 4 weeks by day of the week and 4-hour interval. It follows the "Show results dates as UTC" setting
 * New **Popular Searches** and **Latest Searches** blocks show the same lists as the `[mwtsa_display_search_stats]` and `[mwtsa_display_latest_searches]` shortcodes, with the same settings and a live preview in the editor. Pasted shortcodes and Shortcode blocks can be turned into them. The blocks need WordPress 5.6 or later
-* The shortcodes and blocks can link each term to its search results, with `link_terms="true"` in the shortcodes and by default in the blocks. Searches opened from those links are not recorded
+* The shortcodes and blocks can link each term to its search results, with `link_terms="true"` in the shortcodes and by default in the blocks. Searches opened from those links are only recorded if you turn that on, with `count_link_clicks="true"` or the setting in the blocks
 * The text above the lists can be left out, with `show_label="false"` in the shortcodes and a setting in the blocks
 
 **Bugfixes:**

@@ -256,18 +256,16 @@ if ( ! function_exists( 'mwtsa_process_search_term' ) ) {
 
 if ( ! function_exists( 'mwtsa_term_search_link' ) ) {
 	/**
-	 * The URL of a term's search results, marked so that the visit is not recorded as a new search.
+	 * The URL of a term's search results. Unless $counted, it is marked so that the visit is not recorded as a new search.
 	 */
-	function mwtsa_term_search_link( $term ) {
-		$link = add_query_arg(
-			array(
-				's'                                  => rawurlencode( $term ),
-				MWTSA_Process_Query::LISTED_TERM_ARG => 1,
-			),
-			home_url( '/' )
-		);
+	function mwtsa_term_search_link( $term, $counted = false ) {
+		$args = array( 's' => rawurlencode( $term ) );
 
-		return apply_filters( 'mwtsa_term_search_link', $link, $term );
+		if ( ! $counted ) {
+			$args[ MWTSA_Process_Query::LISTED_TERM_ARG ] = 1;
+		}
+
+		return apply_filters( 'mwtsa_term_search_link', add_query_arg( $args, home_url( '/' ) ), $term, $counted );
 	}
 }
 
@@ -275,12 +273,12 @@ if ( ! function_exists( 'mwtsa_listed_term_html' ) ) {
 	/**
 	 * A term as the shortcodes and blocks list it: plain text, or a link to its search results.
 	 */
-	function mwtsa_listed_term_html( $term, $link ) {
+	function mwtsa_listed_term_html( $term, $link, $counted = false ) {
 		if ( ! $link ) {
 			return esc_html( $term );
 		}
 
-		return sprintf( '<a href="%s" rel="nofollow">%s</a>', esc_url( mwtsa_term_search_link( $term ) ), esc_html( $term ) );
+		return sprintf( '<a href="%s" rel="nofollow">%s</a>', esc_url( mwtsa_term_search_link( $term, $counted ) ), esc_html( $term ) );
 	}
 }
 
