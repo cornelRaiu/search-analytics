@@ -61,7 +61,7 @@ IP addresses are never saved with the searches, and no cookies are set unless yo
 
 To record searches from your own code, such as an AJAX live search, call `mwtsa_process_search_term( $term, $result_count )`. It runs the same exclusion checks as a normal search and returns whether the search was saved.
 
-Filters: `mwtsa_do_not_save_search`, `mwtsa_exclude_term`, `mwtsa_extra_exclude_conditions`, `mwtsa_result_count`, `mwtsa_export_filename`, `mwtsa_term_search_link`, `mwtsa_is_bot`, `mwtsa_is_junk_term`, plus filters on the shortcode output, which apply to the blocks too. Actions: `mwtsa_after_term_save`, `mwtsa_after_history_term_save`. The code is on [GitHub](https://github.com/cornelRaiu/search-analytics).
+Filters: `mwtsa_do_not_save_search`, `mwtsa_exclude_term`, `mwtsa_extra_exclude_conditions`, `mwtsa_result_count`, `mwtsa_export_filename`, `mwtsa_term_search_link`, `mwtsa_is_bot`, `mwtsa_is_junk_term`, `mwtsa_live_search_merge_seconds`, plus filters on the shortcode output, which apply to the blocks too. Actions: `mwtsa_after_term_save`, `mwtsa_after_history_term_save`. The code is on [GitHub](https://github.com/cornelRaiu/search-analytics).
 
 = Support =
 
@@ -110,12 +110,13 @@ The plugin records searches that load your site's search results page (the `?s=`
 * Ignored roles, IP addresses, the minimum length, blocked words and the repeat-search interval all skip searches on purpose. If your own role is ignored, test in a private browser window.
 * Searches made by bots are skipped, and so are searches that contain a link or HTML or are longer than 100 characters. Both have a setting.
 * Opening page 2 of the results or the search feed doesn't count as a new search. Neither does following a term's link in the Popular Searches or Latest Searches block, unless you turned that on in the block.
+* A live search asks for results every few keystrokes. Requests from the same visitor that follow each other within 20 seconds are merged into one search, so typing "sofa" records "sofa" and not "sof" as well. Pressing Enter right after doesn't count it a second time.
 * If your search form uses its own URL parameter instead of `s`, add it under "Add custom search parameters for recording the searches".
-* A live search that shows results without loading the search results page has to record its searches itself. Call this from the code that handles it, once per finished search rather than on every keystroke:
+* A live search that shows results without loading the search results page, and without a parameter you can add there, has to record its searches itself. Call this from the code that handles it:
 
 `if ( function_exists( 'mwtsa_process_search_term' ) ) { mwtsa_process_search_term( $term, $result_count ); }`
 
-`mwtsa_process_search_term()` applies the same settings as a normal search. For anything else, ask on the [Support Forum](https://wordpress.org/support/plugin/search-analytics).
+`mwtsa_process_search_term()` applies the same settings as a normal search, and the same merging, so it can be called on every request the live search makes. For anything else, ask on the [Support Forum](https://wordpress.org/support/plugin/search-analytics).
 
 = Will it slow down my site? =
 
@@ -134,6 +135,7 @@ Here is everything it keeps and shares, so you can check it against the GDPR or 
 * "Save Search Country" (off by default) adds the visitor's country. To find it, the visitor's IP address is sent to ip-api.com or ip2c.org (see External services), and the country is cached for a day under a hash of the IP address.
 * "Save Search By User" (off by default) links logged-in users' searches to their accounts.
 * A cookie is only set if you use the repeat-search interval or the "even after the user has logged out" option. It holds the IDs of recently searched terms and when they were searched, or a flag that the user's role is ignored.
+* To merge the requests a live search sends while a visitor types, the plugin keeps a note of the last term under a hash of the visitor's IP address and browser. The note expires after one minute, and nothing about the visitor is saved with the search.
 * You can erase all data, or everything older than a number of days, from the settings at any time.
 
 = Can I export the search data? =
@@ -207,6 +209,7 @@ Country flags on Windows use the "Twemoji Country Flags" font from [country-flag
 
 * The time filters, the shortcodes and the dashboard widget failed on SQLite databases, such as the one WordPress Playground uses for the Live Preview
 * The "Your Last Searches" list of the `[mwtsa_display_search_stats]` shortcode showed the terms the visitor searched most often instead of the latest ones
+* A live search whose requests the plugin records, such as FiboSearch or a custom live search with its parameter listed in the settings, stored a search for every few keystrokes. Successive requests from the same visitor are now merged into one search, and the results page that follows is not counted again
 
 **Optimizations:**
 
@@ -507,7 +510,7 @@ Country flags on Windows use the "Twemoji Country Flags" font from [country-flag
 == Upgrade Notice ==
 
 = 1.6.1 =
-A redesigned dashboard widget, a new "When people search" chart, and Popular Searches and Latest Searches blocks. Searches made by bots are no longer recorded. Also fixes the statistics on SQLite databases, such as WordPress Playground.
+A redesigned dashboard widget, a new "When people search" chart, and Popular Searches and Latest Searches blocks. Searches made by bots are no longer recorded, and a live search no longer leaves partial terms. Also fixes the statistics on SQLite databases, such as WordPress Playground.
 
 = 1.6.0 =
 Fixes the charts, a multisite bug that could delete other sites' search data, and several counting errors. Search data is now only removed when you delete the plugin. Database indexes are added on your next admin page load.

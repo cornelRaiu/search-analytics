@@ -11,6 +11,9 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 		// Crawlers, link previews, monitors and scanners that name themselves in their user agent.
 		const BOT_USER_AGENTS = '/(?<!cu)bot(?![a-z])|crawl|spider|slurp|archiver|external(?:hit|agent)|mediapartners|googleother|inspectiontool|feedfetcher|preview|headless|lighthouse|pagespeed|gtmetrix|pingdom|uptime|monitor|sqlmap|nikto|wpscan|zgrab|scrapy|phantomjs/i';
 
+		// How long after a live search the same visitor's next request can still be part of it.
+		const MERGE_SECONDS = 20;
+
 		// HTTP libraries. Apps and headless front ends call the REST API with these, so there they are not treated as bots.
 		const SCRIPT_USER_AGENTS = '/curl|wget|python|java\/|go-http|libwww|httpclient|okhttp|node-fetch|axios|guzzle|postman/i';
 
@@ -190,6 +193,81 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 			return (bool) apply_filters( 'mwtsa_is_junk_term', (bool) $is_junk, $term );
 		}
 
+		/**
+		 * Whether a script in the visitor's browser made the request, as a live search does, rather than the visitor
+		 * opening a page.
+		 */
+		public static function is_live_request() {
+			// Browsers say what a request is for: "empty" for a script's request, "document" for a page.
+			if ( isset( $_SERVER['HTTP_SEC_FETCH_DEST'] ) ) {
+				return 'empty' === sanitize_text_field( wp_unslash( $_SERVER['HTTP_SEC_FETCH_DEST'] ) );
+			}
+
+			// They leave that out over plain http. jQuery marks its requests, and the two endpoints below only answer scripts.
+			if ( isset( $_SERVER['HTTP_X_REQUESTED_WITH'] ) && 'xmlhttprequest' === strtolower( sanitize_text_field( wp_unslash( $_SERVER['HTTP_X_REQUESTED_WITH'] ) ) ) ) {
+				return true;
+			}
+
+			return wp_doing_ajax() || isset( $_GET['wc-ajax'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		}
+
+		/**
+		 * How a term relates to the same visitor's last live search: 'same', 'shorter' (what is left of it after
+		 * deleting characters), 'longer' (the visitor kept typing), 'corrected' (a typo fixed), or '' for another search.
+		 */
+		public static function compare_with_last_search( $last_term, $term ) {
+			$lower     = function_exists( 'mb_strtolower' ) ? 'mb_strtolower' : 'strtolower';
+			$last_term = $lower( $last_term );
+			$term      = $lower( $term );
+
+			if ( $term === $last_term ) {
+				return 'same';
+			}
+
+			if ( 0 === strpos( $last_term, $term ) ) {
+				return 'shorter';
+			}
+
+			if ( 0 === strpos( $term, $last_term ) ) {
+				return 'longer';
+			}
+
+			// "sofs", then "sofa": one change, or two in a longer term. levenshtein() takes up to 255 bytes.
+			if ( mb_strlen( $term ) > 3 && mb_strlen( $last_term ) > 3 && strlen( $term ) < 256 && strlen( $last_term ) < 256 ) {
+				if ( levenshtein( $last_term, $term ) <= ( mb_strlen( $term ) > 5 ? 2 : 1 ) ) {
+					return 'corrected';
+				}
+			}
+
+			return '';
+		}
+
+		// The name of the note about this visitor's last live search. A hash, so it does not reveal the IP address.
+		private static function last_search_key() {
+			$user_agent = isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
+
+			return 'mwtsa_last_' . md5( wp_salt() . mwtsa_get_current_user_ip() . $user_agent . get_current_user_id() );
+		}
+
+		/**
+		 * This visitor's last search, if a live search made it in the last $seconds: its term, term ID and history row.
+		 */
+		private static function get_last_live_search( $seconds ) {
+			$last = get_transient( self::last_search_key() );
+
+			if ( ! is_array( $last ) || ! isset( $last['term'], $last['term_id'], $last['history_id'], $last['time'] ) || time() - $last['time'] > $seconds ) {
+				return null;
+			}
+
+			return $last;
+		}
+
+		private static function remember_live_search( $search ) {
+			$search['time'] = time();
+
+			set_transient( self::last_search_key(), $search, MINUTE_IN_SECONDS );
+		}
+
 		public function process_search_term( $search_term, $count ) {
 
 			if ( ! empty( MWTSA_Options::get_option( 'mwtsa_exclude_bots' ) ) && self::is_bot() ) {
@@ -314,6 +392,30 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 
             $instance = MWTSAI();
 
+			// A live search sends a request every few keystrokes. When this visitor's last search was one of those,
+			// moments ago, this request may only repeat, continue or correct it.
+			$merge_seconds = (int) apply_filters( 'mwtsa_live_search_merge_seconds', self::MERGE_SECONDS );
+			$is_live       = $merge_seconds > 0 && self::is_live_request();
+			$last          = $merge_seconds > 0 ? self::get_last_live_search( $merge_seconds ) : null;
+			$relation      = $last ? self::compare_with_last_search( $last['term'], $term ) : '';
+
+			if ( 'same' === $relation || ( $is_live && 'shorter' === $relation ) ) {
+				if ( $is_live ) {
+					// Still typing, so keep the window open.
+					self::remember_live_search( $last );
+				} else {
+					// The results page for the term the live search just recorded. Its count is the final one.
+					$wpdb->update( $instance->history_table_name, array( 'count_posts' => $found_posts ), array( 'id' => $last['history_id'] ), array( '%d' ), array( '%d' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+					wp_cache_set( 'last_changed', microtime(), 'mwtsa' );
+					delete_transient( self::last_search_key() );
+				}
+
+				return false;
+			}
+
+			// Anything else that relates to the last search takes its place.
+			$replace = '' !== $relation;
+
 			//1. add/update term string
 			$existing_term = $wpdb->get_row( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 				"SELECT *
@@ -344,6 +446,11 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 
 				if ( ! empty ( $exclude_doubled_search_for ) ) {
 					if ( isset( $current_user_cookie['search'] ) && isset( $current_user_cookie['search'][ $existing_term->id ] ) && ( $current_user_cookie['search'][ $existing_term->id ] + ( 60 * $exclude_doubled_search_for ) ) > time() ) {
+						if ( $replace ) {
+							// The search this one would have replaced was only the start of it.
+							$this->delete_search( $last );
+						}
+
 						return false;
 					}
 				}
@@ -368,35 +475,99 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 
 				$history_term_id = null;
 
-				if ( null === $country ) {
-					$country = self::get_country_for_ip( mwtsa_get_current_user_ip() );
-				}
-
 				if ( ! empty ( $exclude_doubled_search_for ) ) {
 					$current_user_cookie = MWTSA_Cookies::remove_expired_searches( $current_user_cookie, $exclude_doubled_search_for );
 					$current_user_cookie['search'][ $term_id ] = time();
 					MWTSA_Cookies::set_cookie_value( $current_user_cookie, ( 86400 * 7 ) );
 				}
 
-				$success = $wpdb->query( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
-					"INSERT INTO `$instance->history_table_name` (`term_id`, `datetime`, `count_posts`, `country`, `user_id`)
-					VALUES (%d, UTC_TIMESTAMP(), %d, %s, %d)",
-					$term_id,
-					$found_posts,
-					$country,
-					$user_id
-				) );
+				if ( $replace ) {
+					$success = $wpdb->query( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+						"UPDATE `$instance->history_table_name`
+						SET `term_id` = %d, `datetime` = %s, `count_posts` = %d
+						WHERE id = %d",
+						$term_id,
+						gmdate( 'Y-m-d H:i:s' ),
+						$found_posts,
+						$last['history_id']
+					) );
 
-				if ( $success ) {
-					$history_term_id = $wpdb->insert_id;
+					if ( $success ) {
+						$history_term_id = $last['history_id'];
+						$this->release_term( $last['term_id'] );
+
+						// The row keeps the country it was saved with.
+						$country = (string) $country;
+					} else {
+						// The earlier search is gone, so this one is added.
+						$replace = false;
+					}
+				}
+
+				if ( ! $replace ) {
+					if ( null === $country ) {
+						$country = self::get_country_for_ip( mwtsa_get_current_user_ip() );
+					}
+
+					$success = $wpdb->query( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+						"INSERT INTO `$instance->history_table_name` (`term_id`, `datetime`, `count_posts`, `country`, `user_id`)
+						VALUES (%d, UTC_TIMESTAMP(), %d, %s, %d)",
+						$term_id,
+						$found_posts,
+						$country,
+						$user_id
+					) );
+
+					if ( $success ) {
+						$history_term_id = $wpdb->insert_id;
+					}
 				}
 
 				do_action( 'mwtsa_after_history_term_save', $history_term_id, $term_id, $found_posts, $country, $user_id );
 
 				wp_cache_set( 'last_changed', microtime(), 'mwtsa' );
+
+				if ( $is_live && $history_term_id ) {
+					self::remember_live_search( array( 'term' => $term, 'term_id' => $term_id, 'history_id' => $history_term_id ) );
+				} elseif ( $last ) {
+					delete_transient( self::last_search_key() );
+				}
 			}
 
 			return $success;
+		}
+
+		// Takes one search off a term's count, and removes the term when that leaves nothing of it.
+		private function release_term( $term_id ) {
+			global $wpdb;
+
+			$instance = MWTSAI();
+
+			$wpdb->query( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+				"UPDATE `$instance->terms_table_name` SET total_count = total_count - 1 WHERE id = %d AND total_count > 0",
+				$term_id
+			) );
+
+			$searches = $wpdb->get_var( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+				"SELECT COUNT(*) FROM `$instance->history_table_name` WHERE term_id = %d",
+				$term_id
+			) );
+
+			// "Delete data older than" keeps a term's count without its searches, so a count above zero stays.
+			if ( ! $searches ) {
+				$wpdb->delete( $instance->terms_table_name, array( 'id' => $term_id, 'total_count' => 0 ), array( '%d', '%d' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+			}
+		}
+
+		private function delete_search( $search ) {
+			global $wpdb;
+
+			$wpdb->delete( MWTSAI()->history_table_name, array( 'id' => $search['history_id'] ), array( '%d' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+
+			$this->release_term( $search['term_id'] );
+
+			wp_cache_set( 'last_changed', microtime(), 'mwtsa' );
+			delete_transient( self::last_search_key() );
 		}
 		// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 	}

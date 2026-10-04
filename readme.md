@@ -39,6 +39,7 @@ Everything stays in your WordPress database. There's no account, API key or outs
 
 - **Blocks.** Popular Searches and Latest Searches show the same lists as the two shortcodes, with the same settings and a live preview in the editor. See [Blocks and shortcodes](#blocks-and-shortcodes).
 - **Links and labels.** The shortcodes and blocks can link each term to its search results, and the text above the lists can be left out.
+- **One search per typed word.** A live search whose requests the plugin records, such as FiboSearch or a custom one with its parameter in the settings, stored a search for every few keystrokes. Successive requests from the same visitor are now merged.
 - **No more bot searches.** Crawlers, link previews, monitoring tools and scripts are recognized by their user agent and skipped. Searches that contain a link or HTML, or that are longer than 100 characters, are skipped as junk. Both checks have a setting.
 - **A redesigned dashboard widget.** The last 7 days compared with the week before, a bar per day, trending terms, top searches, searches with no results, and the busiest day and time.
 - **"When people search".** A new chart on the statistics page shows the searches of the last 4 weeks by day of the week and 4-hour interval.
@@ -73,6 +74,7 @@ To run the development version, clone this repository into `wp-content/plugins/s
 - Searches are stored in your own database, without IP addresses.
 - Nothing is sent anywhere unless you turn on **Save Search Country** (off by default). It sends the visitor's IP address to [ip-api.com](https://ip-api.com/) (HTTP, free for non-commercial use) or [ip2c.org](https://ip2c.org/) (HTTPS, IPv4 only), at most once a day per address. Private and reserved addresses are never sent.
 - A cookie is only set if you use the repeat-search interval or the "even after the user has logged out" setting.
+- To merge the requests a live search sends while a visitor types, a note of the last term is kept for one minute under a hash of the visitor's IP address and browser. Nothing about the visitor is saved with the search.
 
 ## Blocks and shortcodes
 
@@ -158,7 +160,7 @@ if ( function_exists( 'mwtsa_process_search_term' ) ) {
 }
 ```
 
-For a live search, call it once the visitor stops typing or picks a result. Called on every keystroke, it records "c", "co", "cou" and so on as separate terms.
+For a live search, it can be called on every request: calls from the same visitor that follow each other within 20 seconds are merged, so "cou" replaces "co". That relies on the browser marking the request as made by a script, which it does on https sites and for `admin-ajax.php`.
 
 ### Filters
 
@@ -169,6 +171,7 @@ For a live search, call it once the visitor stops typing or picks a result. Call
 | `mwtsa_exclude_term` | `$skip`, `$term` | Skip a search. Runs after the minimum length check. |
 | `mwtsa_is_bot` | `$is_bot`, `$user_agent` | Decide whether a request comes from a bot. Used when "Ignore searches made by bots" is on. |
 | `mwtsa_is_junk_term` | `$is_junk`, `$term` | Decide whether a term is junk. Used when "Ignore junk searches" is on. |
+| `mwtsa_live_search_merge_seconds` | `$seconds` | Change how long a live search's next request from the same visitor is merged with it (20 seconds). `0` turns the merging off. |
 | `mwtsa_result_count` | `$count`, `$term` | Change the result count saved for a front-end search. |
 | `mwtsa_rest_api_do_not_save_search` | `$skip`, `$term` | Skip a REST API search. |
 | `mwtsa_rest_api_result_count` | `$count`, `$term` | Provide the result count for a REST API search. With `0`, the plugin counts the results itself. |

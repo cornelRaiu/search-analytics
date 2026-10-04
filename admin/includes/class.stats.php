@@ -221,6 +221,7 @@ if ( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
                                 <li>Feature: Searches made by bots, and junk searches with a link or HTML, are no longer recorded. Both have a setting</li>
                                 <li>Bugfix: The time filters, shortcodes and dashboard widget failed on SQLite databases, such as WordPress Playground</li>
                                 <li>Bugfix: "Your Last Searches" listed the visitor's most searched terms instead of the latest ones</li>
+                                <li>Bugfix: A live search stored a search for every few keystrokes. Successive requests from one visitor are now merged</li>
                             </ul>
 
                             <p><?php
