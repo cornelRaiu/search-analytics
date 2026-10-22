@@ -219,6 +219,7 @@ Country flags on Windows use the "Twemoji Country Flags" font from [country-flag
 **Others:**
 
 * After at least a week of use, the statistics and settings pages show a notice asking for a review. It appears once, and you can dismiss it for good
+* The Search Analytics admin menu item uses the plugin's new icon instead of a generic chart icon
 
 = 1.6.0 =
 
