@@ -1,6 +1,6 @@
 # Search Analytics for WP
 
-![Search Analytics for WP](https://ps.w.org/search-analytics/assets/banner-1544x500.jpg)
+![Search Analytics for WP](.wordpress-org/banner-1544x500.png)
 
 [![Version](https://img.shields.io/wordpress/plugin/v/search-analytics)](https://wordpress.org/plugins/search-analytics/)
 [![Active installs](https://img.shields.io/wordpress/plugin/installs/search-analytics)](https://wordpress.org/plugins/search-analytics/)

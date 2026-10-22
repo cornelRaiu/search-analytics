@@ -75,13 +75,13 @@ After the installation and activation is complete you should visit the plugin's 
 
 == Screenshots ==
 
-1. Main statistics view with time filters
-2. Export data to CSV
-3. Single term statistics view
+1. Search statistics with time, results and grouping filters
+2. The searches that returned no results
+3. Charts comparing two periods, and the times of the week when people search
 4. Single term statistics view with results grouped by date
-5. Settings page
-6. Dashboard widget
-7. Erase history section in the settings page
+5. Dashboard widget
+6. The Popular Searches and Latest Searches blocks in the editor
+7. Settings page
 
 == Frequently Asked Questions ==
 
