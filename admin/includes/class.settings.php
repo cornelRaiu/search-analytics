@@ -289,7 +289,7 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
             <label>
                 <input type="hidden" name='mwtsa_settings[mwtsa_exclude_bots]' value='0'/>
                 <input type='checkbox' name='mwtsa_settings[mwtsa_exclude_bots]' value='1' <?php checked( $this->existing_options['mwtsa_exclude_bots'], 1 ) ?> />
-                <span><?php esc_html_e( 'Skip searches made by search engine crawlers, link previews, monitoring tools and scripts', 'search-analytics' ) ?></span>
+                <span><?php esc_html_e( 'Skip searches made by search engine crawlers, AI assistants, link previews, monitoring tools and scripts', 'search-analytics' ) ?></span>
             </label>
             <br/>
             <strong><?php esc_html_e( 'They are recognized by their user agent. A bot that presents itself as a normal browser is not recognized; exclude its IP address above instead.', 'search-analytics' ) ?></strong>

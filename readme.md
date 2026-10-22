@@ -40,7 +40,7 @@ Everything stays in your WordPress database. There's no account, API key or outs
 - **Blocks.** Popular Searches and Latest Searches show the same lists as the two shortcodes, with the same settings and a live preview in the editor. See [Blocks and shortcodes](#blocks-and-shortcodes).
 - **Links and labels.** The shortcodes and blocks can link each term to its search results, and the text above the lists can be left out.
 - **One search per typed word.** A live search whose requests the plugin records, such as FiboSearch or a custom one with its parameter in the settings, stored a search for every few keystrokes. Successive requests from the same visitor are now merged.
-- **No more bot searches.** Crawlers, link previews, monitoring tools and scripts are recognized by their user agent and skipped. Searches that contain a link or HTML, or that are longer than 100 characters, are skipped as junk. Both checks have a setting.
+- **No more bot searches.** Crawlers, AI assistants, link previews, monitoring tools and scripts are recognized by their user agent and skipped. Searches that contain a link or HTML, or that are longer than 100 characters, are skipped as junk. Both checks have a setting.
 - **A redesigned dashboard widget.** The last 7 days compared with the week before, a bar per day, trending terms, top searches, searches with no results, and the busiest day and time.
 - **"When people search".** A new chart on the statistics page shows the searches of the last 4 weeks by day of the week and 4-hour interval.
 - **SQLite fix.** The time filters, the shortcodes and the dashboard widget failed on SQLite databases, such as the one WordPress Playground uses.

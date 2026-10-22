@@ -99,7 +99,7 @@ Yes. In the settings, choose the roles to ignore under "Ignore search queries fo
 
 = Are searches made by bots counted? =
 
-No. Searches made by search engine crawlers, link previews, monitoring tools and scripts are skipped. They are recognized by their user agent, so a bot that presents itself as a normal browser still gets through. If one keeps coming back, add its IP address to the excluded ones.
+No. Searches made by search engine crawlers, AI assistants, link previews, monitoring tools and scripts are skipped. They are recognized by their user agent, so a bot that presents itself as a normal browser still gets through. If one keeps coming back, add its IP address to the excluded ones.
 
 Searches that contain a link or HTML, or that are longer than 100 characters, are skipped too, because they are almost always spam or probes. Each of the two checks has a setting. Turn the second one off if your visitors search for web addresses or HTML tags, as on a web development site.
 
@@ -203,7 +203,7 @@ Country flags on Windows use the "Twemoji Country Flags" font from [country-flag
 * New **Popular Searches** and **Latest Searches** blocks show the same lists as the `[mwtsa_display_search_stats]` and `[mwtsa_display_latest_searches]` shortcodes, with the same settings and a live preview in the editor. Pasted shortcodes and Shortcode blocks can be turned into them. The blocks need WordPress 5.6 or later
 * The shortcodes and blocks can link each term to its search results, with `link_terms="true"` in the shortcodes and by default in the blocks. Searches opened from those links are only recorded if you turn that on, with `count_link_clicks="true"` or the setting in the blocks
 * The text above the lists can be left out, with `show_label="false"` in the shortcodes and a setting in the blocks
-* Searches made by bots are no longer recorded. Crawlers, link previews, monitoring tools and scripts are recognized by their user agent. Searches that contain a link or HTML, or that are longer than 100 characters, are skipped as junk. Both checks are on by default and have a setting
+* Searches made by bots are no longer recorded. Crawlers, AI assistants, link previews, monitoring tools and scripts are recognized by their user agent. Searches that contain a link or HTML, or that are longer than 100 characters, are skipped as junk. Both checks are on by default and have a setting
 
 **Bugfixes:**
 

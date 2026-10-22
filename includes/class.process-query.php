@@ -8,8 +8,8 @@ if ( ! class_exists( 'MWTSA_Process_Query' ) ) {
 		// The shortcodes and blocks add this to the links of the terms they list, unless the clicks are to be counted.
 		const LISTED_TERM_ARG = 'mwtsa_listed';
 
-		// Crawlers, link previews, monitors and scanners that name themselves in their user agent.
-		const BOT_USER_AGENTS = '/(?<!cu)bot(?![a-z])|crawl|spider|slurp|archiver|external(?:hit|agent)|mediapartners|googleother|inspectiontool|feedfetcher|preview|headless|lighthouse|pagespeed|gtmetrix|pingdom|uptime|monitor|sqlmap|nikto|wpscan|zgrab|scrapy|phantomjs/i';
+		// Crawlers, AI assistants, link previews, monitors and scanners that name themselves in their user agent.
+		const BOT_USER_AGENTS = '/(?<!cu)bot(?![a-z])|crawl|spider|slurp|archiver|external(?:hit|agent)|mediapartners|googleother|inspectiontool|feedfetcher|preview|headless|lighthouse|pagespeed|gtmetrix|pingdom|uptime|monitor|sqlmap|nikto|wpscan|zgrab|scrapy|phantomjs|perplexity|claude-user|mistralai|google-(?:agent|gemininotebook|notebooklm)/i';
 
 		// How long after a live search the same visitor's next request can still be part of it.
 		const MERGE_SECONDS = 20;
