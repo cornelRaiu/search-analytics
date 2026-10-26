@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: Search Analytics for WP - Site Search Tracking
-Plugin URI: https://www.cornelraiu.com/wordpress-plugins/mwt-search-analytics/
+Plugin URI: https://wpsearchanalytics.com/
 Description: See what visitors search for on your site and which searches come up empty. Popular search terms and statistics, stored in your own database.
 Version: 1.6.1
 Author: Cornel Raiu
