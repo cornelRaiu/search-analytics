@@ -28,6 +28,10 @@ if ( ! defined( 'MWTSA_PRO_WAITLIST_URL' ) ) {
 	define( 'MWTSA_PRO_WAITLIST_URL', 'https://wpsearchanalytics.com/pro' );
 }
 
+if ( ! defined( 'MWTSA_CHANGELOG_URL' ) ) {
+	define( 'MWTSA_CHANGELOG_URL', 'https://wpsearchanalytics.com/changelog' );
+}
+
 if ( ! class_exists( 'MWTSA' ) ) {
 
 	final class MWTSA {

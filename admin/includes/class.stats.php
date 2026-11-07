@@ -215,36 +215,16 @@ if ( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
                             </p>
 
                             <ul class="changelog-list">
-                                <li>Feature: A redesigned dashboard widget: the last 7 days compared with the week before, a bar per day, trending terms and the busiest day and time</li>
-                                <li>Feature: "When people search" on this page shows the busiest days and times of the last 4 weeks</li>
-                                <li>Feature: Popular Searches and Latest Searches blocks, with the same settings as the shortcodes</li>
-                                <li>Feature: The shortcodes and blocks can link terms to their search results and leave out the text above the list</li>
-                                <li>Feature: Searches made by bots, and junk searches with a link or HTML, are no longer recorded. Both have a setting</li>
-                                <li>Bugfix: The time filters, shortcodes and dashboard widget failed on SQLite databases, such as WordPress Playground</li>
-                                <li>Bugfix: "Your Last Searches" listed the visitor's most searched terms instead of the latest ones</li>
-                                <li>Bugfix: A live search stored a search for every few keystrokes. Successive requests from one visitor are now merged</li>
+                                <li>A redesigned dashboard widget: the last 7 days compared with the week before, a bar per day, trending terms and the busiest day and time</li>
+                                <li>"When people search" on this page shows the busiest days and times of the last 4 weeks</li>
+                                <li>Popular Searches and Latest Searches blocks, with the same settings as the shortcodes</li>
+                                <li>Searches made by bots, and junk searches with a link or HTML, are no longer recorded</li>
                             </ul>
-
                             <p><?php
-	                            /* translators: %s: Plugin version */
-                                printf( esc_attr__( 'New in version %s', 'search-analytics' ), '1.6.0' ); ?>
+	                            /* translators: %d: Number of other changes in this version */
+                                printf( esc_html( _n( '+%d other change', '+%d other changes', 10, 'search-analytics' ) ), 10 ); ?>
                             </p>
-
-                            <ul class="changelog-list">
-                                <li><strong>Structure:</strong> Search data is now only removed when you delete the plugin (with the setting checked), never on deactivation</li>
-                                <li>Feature: The country lookup can use ip2c.org instead of ip-api.com</li>
-                                <li>Bugfix: The statistics charts were not loading since 1.5.0</li>
-                                <li>Bugfix: The charts and the "By date" view mixed up searches from the same day of different months</li>
-                                <li>Bugfix: On multisite, deactivating the plugin on one site could remove every site's search data</li>
-                                <li>Bugfix: A trailing comma in the "Exclude search" setting excluded every search</li>
-                                <li>Bugfix: More accurate counts: real "Last 24 hours" periods, no counting of result pages and feeds, no duplicate terms</li>
-                                <li>Bugfix: The roles allowed on the settings page can now save it, and the roles allowed on the statistics page can export</li>
-                                <li>Security: Safer CSV exports, a validated tracking cookie and explicit permission checks</li>
-                                <li>Optimization: Country flags are now emoji, with a bundled font for browsers that can't draw them</li>
-                                <li>Optimization: Database indexes, cached country lookups and no more cookie on every page</li>
-                                <li>Deprecations: The statistics table filters are deprecated ahead of the 2.0 rebuild</li>
-							</ul>
-                            <p><a href="<?php echo esc_url( MWTSA_WORDPRESS_URL ) ?>/#developers" target="_blank"><?php esc_html_e( 'Click here to check the complete log', 'search-analytics' ) ?></a></p>
+                            <p><a href="<?php echo esc_url( MWTSA_CHANGELOG_URL ) ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Click here to check the complete log', 'search-analytics' ) ?></a></p>
                             <h3><?php esc_html_e( 'Useful Links', 'search-analytics' ) ?></h3>
                             <ul>
                                 <li>
