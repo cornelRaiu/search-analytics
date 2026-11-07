@@ -4,7 +4,7 @@ Tags: search analytics, site search, search, statistics, history
 Requires at least: 4.7
 Tested up to: 7.1
 Requires PHP: 5.6
-Stable tag: 1.6.0
+Stable tag: 1.6.1
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -35,11 +35,13 @@ Often the lesson is simply vocabulary. Visitors type "couch" when your store say
 * Time filters from the last 24 hours to all time, or any date range you pick.
 * A **no-results filter** that shows only the searches that found nothing.
 * Each term's history by date or by hour, plus a "No Group" view that lists every search in order.
-* A daily chart compared with the previous period, and a dashboard widget with last week's numbers.
+* A daily chart compared with the previous period, and a **"When people search" chart** with the busiest days and times.
+* A dashboard widget with the last 7 days: searches compared with the week before, trending terms, searches with no results and your busiest day and time.
 * **CSV export** of whatever view you're on.
 * Keep **your own searches** out, even after you log out. You can also skip repeat searches, listed IP addresses, very short terms and words you block.
+* Leaves out **searches made by bots**, and junk searches that contain a link or HTML.
 * Optional country and logged-in user for each search, both off by default.
-* Two shortcodes to show **popular or recent searches** on your site.
+* **Popular Searches** and **Latest Searches** blocks to show what people search for on your site, with a live preview in the editor. Both are also available as shortcodes.
 * Separate role access for viewing the statistics and changing the settings.
 * Works on multisite, with separate data for each site, and is translation-ready.
 
@@ -59,7 +61,7 @@ IP addresses are never saved with the searches, and no cookies are set unless yo
 
 To record searches from your own code, such as an AJAX live search, call `mwtsa_process_search_term( $term, $result_count )`. It runs the same exclusion checks as a normal search and returns whether the search was saved.
 
-Filters: `mwtsa_do_not_save_search`, `mwtsa_exclude_term`, `mwtsa_extra_exclude_conditions`, `mwtsa_result_count`, `mwtsa_export_filename`, plus filters on the shortcode output. Actions: `mwtsa_after_term_save`, `mwtsa_after_history_term_save`. The code is on [GitHub](https://github.com/cornelRaiu/search-analytics).
+Filters: `mwtsa_do_not_save_search`, `mwtsa_exclude_term`, `mwtsa_extra_exclude_conditions`, `mwtsa_result_count`, `mwtsa_export_filename`, `mwtsa_term_search_link`, `mwtsa_is_bot`, `mwtsa_is_junk_term`, `mwtsa_live_search_merge_seconds`, plus filters on the shortcode output, which apply to the blocks too. Actions: `mwtsa_after_term_save`, `mwtsa_after_history_term_save`. The code is on [GitHub](https://github.com/cornelRaiu/search-analytics).
 
 = Support =
 
@@ -73,13 +75,13 @@ After the installation and activation is complete you should visit the plugin's 
 
 == Screenshots ==
 
-1. Main statistics view with time filters
-2. Export data to CSV
-3. Single term statistics view
+1. Search statistics with time, results and grouping filters
+2. The searches that returned no results
+3. Charts comparing two periods, and the times of the week when people search
 4. Single term statistics view with results grouped by date
-5. Settings page
-6. Dashboard widget
-7. Erase history section in the settings page
+5. Dashboard widget
+6. The Popular Searches and Latest Searches blocks in the editor
+7. Settings page
 
 == Frequently Asked Questions ==
 
@@ -95,18 +97,26 @@ On the Search Analytics page, click "Only Without Results" and pick a time range
 
 Yes. In the settings, choose the roles to ignore under "Ignore search queries for these user roles", for example Administrator and Editor. To keep ignoring those users after they log out, also tick "Ignore search queries for the above user roles even after the user has logged out". This sets a cookie in their browser when they log in. You can list IP addresses to ignore too, like your office's.
 
+= Are searches made by bots counted? =
+
+No. Searches made by search engine crawlers, AI assistants, link previews, monitoring tools and scripts are skipped. They are recognized by their user agent, so a bot that presents itself as a normal browser still gets through. If one keeps coming back, add its IP address to the excluded ones.
+
+Searches that contain a link or HTML, or that are longer than 100 characters, are skipped too, because they are almost always spam or probes. Each of the two checks has a setting. Turn the second one off if your visitors search for web addresses or HTML tags, as on a web development site.
+
 = Why aren't some searches being recorded? =
 
 The plugin records searches that load your site's search results page (the `?s=` address). If one is missing, check these:
 
 * Ignored roles, IP addresses, the minimum length, blocked words and the repeat-search interval all skip searches on purpose. If your own role is ignored, test in a private browser window.
-* Opening page 2 of the results or the search feed doesn't count as a new search.
+* Searches made by bots are skipped, and so are searches that contain a link or HTML or are longer than 100 characters. Both have a setting.
+* Opening page 2 of the results or the search feed doesn't count as a new search. Neither does following a term's link in the Popular Searches or Latest Searches block, unless you turned that on in the block.
+* A live search asks for results every few keystrokes. Requests from the same visitor that follow each other within 20 seconds are merged into one search, so typing "sofa" records "sofa" and not "sof" as well. Pressing Enter right after doesn't count it a second time.
 * If your search form uses its own URL parameter instead of `s`, add it under "Add custom search parameters for recording the searches".
-* A live search that shows results without loading the search results page has to record its searches itself. Call this from the code that handles it, once per finished search rather than on every keystroke:
+* A live search that shows results without loading the search results page, and without a parameter you can add there, has to record its searches itself. Call this from the code that handles it:
 
 `if ( function_exists( 'mwtsa_process_search_term' ) ) { mwtsa_process_search_term( $term, $result_count ); }`
 
-`mwtsa_process_search_term()` applies the same settings as a normal search. For anything else, ask on the [Support Forum](https://wordpress.org/support/plugin/search-analytics).
+`mwtsa_process_search_term()` applies the same settings as a normal search, and the same merging, so it can be called on every request the live search makes. For anything else, ask on the [Support Forum](https://wordpress.org/support/plugin/search-analytics).
 
 = Will it slow down my site? =
 
@@ -125,6 +135,7 @@ Here is everything it keeps and shares, so you can check it against the GDPR or 
 * "Save Search Country" (off by default) adds the visitor's country. To find it, the visitor's IP address is sent to ip-api.com or ip2c.org (see External services), and the country is cached for a day under a hash of the IP address.
 * "Save Search By User" (off by default) links logged-in users' searches to their accounts.
 * A cookie is only set if you use the repeat-search interval or the "even after the user has logged out" option. It holds the IDs of recently searched terms and when they were searched, or a flag that the user's role is ignored.
+* To merge the requests a live search sends while a visitor types, the plugin keeps a note of the last term under a hash of the visitor's IP address and browser. The note expires after one minute, and nothing about the visitor is saved with the search.
 * You can erase all data, or everything older than a number of days, from the settings at any time.
 
 = Can I export the search data? =
@@ -133,14 +144,20 @@ Yes. The "Export Data" button on the statistics page downloads what you're looki
 
 = Can I show popular searches on my site? =
 
-Yes, with two shortcodes:
+Yes. Add the **Popular Searches** or **Latest Searches** block to a page, a post or a widget area. The editor shows a live preview, and a block with nothing to list stays hidden on your site. The blocks need WordPress 5.6 or later.
 
-* `[mwtsa_display_search_stats]` lists the most searched terms, plus the visitor's own recent searches if they're logged in and "Save Search By User" is on.
-* `[mwtsa_display_latest_searches]` lists the most recent search terms.
+The same lists are available as shortcodes:
 
-Both hide terms with no results by default and take options for the period, the number of terms and the labels. For example, `[mwtsa_display_latest_searches unit="month" count="5"]` shows the five most recent terms from the past month.
+* `[mwtsa_display_search_stats]` lists the most searched terms, plus the visitor's own recent searches if they're logged in and "Save Search By User" is on. The Popular Searches block shows the same.
+* `[mwtsa_display_latest_searches]` lists the most recent search terms, like the Latest Searches block.
 
-In a widget area, use the Shortcode block, or the Text widget on WordPress 4.9 and later. On 4.7 and 4.8, add `add_filter( 'widget_text', 'do_shortcode' );` to your child theme's `functions.php`.
+Both hide terms with no results by default and take options for the period, the number of terms and the text above the list, which `show_label="false"` leaves out. For example, `[mwtsa_display_latest_searches unit="month" count="5"]` shows the five most recent terms from the past month.
+
+Each term can link to its search results. The blocks do that unless you turn it off, and the shortcodes do it with `link_terms="true"`. A search opened from one of these links isn't recorded, so the listed terms don't keep themselves on top. To count those searches too, turn on "Count clicks on these links as searches" in the block, or add `count_link_clicks="true"` to the shortcode.
+
+Paste one of these shortcodes into the block editor, or convert classic content to blocks, and it becomes the matching block with the same settings. A Shortcode block can be transformed into it too.
+
+With classic widgets, put the shortcode in a Text widget. On WordPress 4.7 and 4.8, also add `add_filter( 'widget_text', 'do_shortcode' );` to your child theme's `functions.php`.
 
 = Does deactivating the plugin delete my search data? =
 
@@ -177,6 +194,34 @@ Service terms and privacy policy: [https://about.ip2c.org](https://about.ip2c.or
 Country flags on Windows use the "Twemoji Country Flags" font from [country-flag-emoji-polyfill](https://github.com/talkjs/country-flag-emoji-polyfill) by TalkJS (MIT license). The flag artwork comes from [Twemoji](https://github.com/twitter/twemoji) and is licensed under [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/). The font and polyfill are bundled with the plugin and loaded from your own site.
 
 == Changelog ==
+= 1.6.1 =
+
+**Features:**
+
+* The dashboard widget is redesigned. For the last 7 days it shows the searches, the searches with no results and the unique terms compared with the 7 days before, the last search, a bar per day, the trending terms, the top searches and the top searches with no results. It also shows the busiest day and time of the last 4 weeks
+* The new "When people search" chart on the statistics page shows the searches of the last 4 weeks by day of the week and 4-hour interval. It follows the "Show results dates as UTC" setting
+* New **Popular Searches** and **Latest Searches** blocks show the same lists as the `[mwtsa_display_search_stats]` and `[mwtsa_display_latest_searches]` shortcodes, with the same settings and a live preview in the editor. Pasted shortcodes and Shortcode blocks can be turned into them. The blocks need WordPress 5.6 or later
+* The shortcodes and blocks can link each term to its search results, with `link_terms="true"` in the shortcodes and by default in the blocks. Searches opened from those links are only recorded if you turn that on, with `count_link_clicks="true"` or the setting in the blocks
+* The text above the lists can be left out, with `show_label="false"` in the shortcodes and a setting in the blocks
+* Searches made by bots are no longer recorded. Crawlers, AI assistants, link previews, monitoring tools and scripts are recognized by their user agent. Searches that contain a link or HTML, or that are longer than 100 characters, are skipped as junk. Both checks are on by default and have a setting
+
+**Bugfixes:**
+
+* The time filters, the shortcodes and the dashboard widget failed on SQLite databases, such as the one WordPress Playground uses for the Live Preview
+* The "Your Last Searches" list of the `[mwtsa_display_search_stats]` shortcode showed the terms the visitor searched most often instead of the latest ones
+* A live search whose requests the plugin records, such as FiboSearch or a custom live search with its parameter listed in the settings, stored a search for every few keystrokes. Successive requests from the same visitor are now merged into one search, and the results page that follows is not counted again
+
+**Optimizations:**
+
+* Statistics for the time filters are cached for up to a minute, and old cache entries expire after an hour
+* The `[mwtsa_display_search_stats]` shortcode only loads the terms it shows, instead of every term searched in the period
+
+**Others:**
+
+* After at least a week of use, the statistics and settings pages show a notice asking for a review. It appears once, and you can dismiss it for good
+* The Search Analytics admin menu item uses the plugin's new icon instead of a generic chart icon
+* The statistics and settings pages have a box with a link to the Search Analytics Pro waitlist on wpsearchanalytics.com. The plugin sends nothing to that site
+
 = 1.6.0 =
 
 **Structure:**
@@ -313,158 +358,13 @@ Country flags on Windows use the "Twemoji Country Flags" font from [country-flag
 * Bugfix: Fix broken settings page URL from the results page
 * Others: Rename the plugin to "WP Search Analytics"
 
-= 1.3.6 =
-* Bugfix: Users can not see the statistics page in some cases. [Bug report](https://github.com/cornelRaiu/search-analytics/issues/3)
-* Bugfix: Database error on term delete success page
-* Optimization: **Compatibility with WP versions up to 5.8**
-* Optimization: **Compatibility with PHP versions between 5.6 - 8.0**
-* Optimization: Security improvements and general code optimization
-* Optimization: Remove filters and groups on the term delete success page
-* Others: Add more "Useful Links"
-* Others: Add quick rate tool
-
-= 1.3.5 =
-* Bugfix: Fix dates filter not allowing you to select the current day in certain timezones
-* Bugfix: Deleting multiple entries with the bulk action would trigger 2 notices
-* Feature: Add support for WpForo
-* Feature: Add **mwtsa_export_filename** filter to allow control over the filename generated when exporting data
-* Feature: Add shortcode **mwtsa_display_search_stats** for displaying search statistics on the frontend of the website
-* Optimization: Prepare the plugin for community translation
-* Optimization: Security improvements and general code optimization
-
-= 1.3.4 Hotfix =
-* Bugfix: Fix fatal error for missing `wp_timezone()` in WP < 5.3.0
-
-= 1.3.3 =
-* Bugfix: Times displayed in UTC time instead of the website's timezone
-* Feature: allow filtering searches by user
-* Experimental Feature: prevent terms from being saved if they contain certain substrings
-* Experimental Feature: allow the plugin to capture search strings from custom search parameters
-* Optimization: hook **load_plugin_textdomain** on the **init** action instead of the **plugins_loaded** one
-* Optimization: prefix helper functions **create_date_range** and **get_current_user_ip** with **mwt_** to avoid eventual naming conflicts
-
-= 1.3.2 =
-* Bugfix: "Only display the statistics and settings page for these user roles" not working correctly
-* Bugfix: Fix missing script error if charts disabled
-* Bugfix: Add prefix to the option setting group to prevent conflicts
-* Bugfix: Database error if search-term URL param is empty
-* Feature: Split the "Only display the statistics and settings page for these user roles" in 2 different settings
-* Optimization: **compatibility with WP versions up to 5.4**
-* Optimization: Add prefix to the option setting group to prevent conflicts
-* Optimization: Review and patch the plugin from a security perspective
-* Optimization: Made sure administrator display rights can not be taken away by making the field disabled
-
-= 1.3.1 Hotfix =
-* Bugfix: database not being updated correctly in case of plugin update. It only worked for manual plugin activation
-* Bugfix: search country locked to Canada.
-
-= 1.3.0 =
-* Feature: add **save_search_term()** method to allow external search saving
-* Feature: add **mwtsa_extra_exclude_conditions** filter to allow more control over the conditions in which a search is processed
-* Feature: add **mwtsa_exclude_term** filter to allow more control over the conditions in which terms are saved
-* Feature: save searches by user so the user can see his search history
-* Feature: add country geolocation for the searches
-* Feature: add more options for the chart
-* Feature: add period comparison in the chart
-* Optimization: **compatibility with version 5.2.2**
-* Optimization: **Add multisite support**
-* Optimization: Build separate methods for displaying charts to be able to easily integrate it in other views
-* Optimization: Make chart include "today"
-* Optimization: general code optimizations
-* Optimization: general code optimizations
-
-= 1.2.3 =
-* Feature: add ability to delete all search history older than a selected number of days
-* Feature: add setting: "Exclude searches from IPs list"
-* Feature: add setting: "Only record searches with at least the number of characters"
-* Feature: add "Ungroup" view for the list of terms for having a chronological data view
-* Optimization: **compatibility with version 5.1**
-* Optimization: change default sort to last search date
-* Optimization: average number of results column to only 2 decimals
-* Optimization: update the singleton pattern
-
-= 1.2.2 =
-* Bugfix: fix bug in the database version update
-* Bugfix: "By Hour" group is not working correctly
-* Bugfix: "Hide graphical charts" setting not working correctly
-* Feature: Add a setting for using a cookie for previously logged in user for not counting searches made by users having a user role in the excluded roles list
-* Feature: Add a setting for not counting duplicate searches over a period of time
-* Feature: add role visibility for the dashboard widget
-* Optimization: update the way Group By works on the term details view
-* Optimization: use function_exists() and class_exists() for all function/class declarations
-* Optimization: add javascript graph compatibility with older IE versions
-* Optimization: show fewer points on the Y axis on the graphical chart if search count gets high
-
-= 1.2.1 =
-* Bugfix: fix "Unknown column 'average_posts' in 'where clause'" error on single term view ( introduced in v1.2.0 )
-* Bugfix: remove bulk actions on single term view ( introduced in v1.2.0 )
-* Bugfix: fix "Last 24 hours" time filter ( introduced in v1.2.0 )
-* Feature: add admin dashboard widget with last week stats
-* Feature: add possibility to group single term view results by day and hour
-* Feature: add charts for graphical data representation
-* Optimization: add link on searched term for faster navigation
-* Optimization: make custom views and filters language variables ( introduced in v1.2.0 )
-* Optimization: make all date and time columns use WP date and time format settings
-* Optimization: code updates to better comply to the WP coding standards
-
-= 1.2.0 =
-* Bugfix: fix PHP notice on the settings page ( introduced in v1.0.3 )
-* Bugfix: fix search resetting time and result filters ( introduced in v1.1.2 )
-* Bugfix: fix notice "Undefined index: date_from" ( introduced in v1.1.2 )
-* Bugfix: fix notice "Undefined index: date_to" ( introduced in v1.1.2 )
-* Feature: ability to download history in a CSV file
-* Feature: add single term view with detailed search historical stats
-* Feature: ability to choose which user roles can see the search history stats
-* Optimization: set table names in plugin constants for cleaner calls
-* Optimization: move history data return from db function to independent static class.
-* Optimization: change time filter default to "All Time"
-
-= 1.1.3 =
-* Bugfix: fix jquery.ui load over https ( introduced in v1.1.2 )
-
-= 1.1.2 =
-* Bugfix: make stats page full responsive ( introduced in v1.1 )
-* Feature: add filters: all, only successful, only unsuccessful ( 0 posts ) results
-* Feature: Time range filters
-* Optimization: make bulk action "Delete" use language variable ( introduced in v1.1.1 )
-* Optimization: add screen option to allow selection of number of results per page
-* Optimization: last search date - sortable column
-* Optimization: add "clear" option to the date pickers
-* Optimization: add 2 months view on the calendars
-
-= 1.1.1 =
-* Bugfix: remove limit of results on the table ( introduced in v1.1 )
-* Feature: ability to delete terms from the results
-* Feature: bulk terms delete action
-* Optimization: results per page reduced from 30 to 20
-
-= 1.1 =
-* Bugfix: exclude empty search strings ( introduced in v1.0 )
-* Design: display tables using the Wordpress Admin Tables
-* Feature: pagination for better data analysis
-* Feature: custom sorting on all columns
-* Feature: filter results by string
-
-= 1.0.4 =
-* fix a warning occurring in certain cases on search
-
-= 1.0.3 =
-* Add ability to delete all history
-* Add ability to remove the tables on plugin deactivate
-* Stats page restyling
-
-= 1.0.2 =
-* Update results sorting for better viewing the data
-* Minimum styling on the stats page
-* Add link to the settings page
-
-= 1.0.1 =
-* Fix deprecated notice
-
-= 1.0 =
-* Initial Release
+= Older versions =
+The changes in versions 1.0 to 1.3.6 are listed in the [full changelog](https://wpsearchanalytics.com/changelog).
 
 == Upgrade Notice ==
+
+= 1.6.1 =
+A redesigned dashboard widget, a new "When people search" chart, and Popular Searches and Latest Searches blocks. Searches made by bots are no longer recorded, and a live search no longer leaves partial terms. Also fixes the statistics on SQLite databases, such as WordPress Playground.
 
 = 1.6.0 =
 Fixes the charts, a multisite bug that could delete other sites' search data, and several counting errors. Search data is now only removed when you delete the plugin. Database indexes are added on your next admin page load.

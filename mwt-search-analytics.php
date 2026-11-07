@@ -1,9 +1,9 @@
 <?php
 /*
 Plugin Name: Search Analytics for WP - Site Search Tracking
-Plugin URI: https://www.cornelraiu.com/wordpress-plugins/mwt-search-analytics/
+Plugin URI: https://wpsearchanalytics.com/
 Description: See what visitors search for on your site and which searches come up empty. Popular search terms and statistics, stored in your own database.
-Version: 1.6.0
+Version: 1.6.1
 Author: Cornel Raiu
 Author URI: https://www.cornelraiu.com/
 Text Domain: search-analytics
@@ -24,11 +24,19 @@ if ( ! defined( 'MWTSA_WORDPRESS_URL' ) ) {
     define('MWTSA_WORDPRESS_URL', 'https://wordpress.org/plugin/search-analytics');
 }
 
+if ( ! defined( 'MWTSA_PRO_WAITLIST_URL' ) ) {
+	define( 'MWTSA_PRO_WAITLIST_URL', 'https://wpsearchanalytics.com/pro' );
+}
+
+if ( ! defined( 'MWTSA_CHANGELOG_URL' ) ) {
+	define( 'MWTSA_CHANGELOG_URL', 'https://wpsearchanalytics.com/changelog' );
+}
+
 if ( ! class_exists( 'MWTSA' ) ) {
 
 	final class MWTSA {
 
-		public $version = '1.6.0';
+		public $version = '1.6.1';
 		public $db_version = '1.2.1';
 
 		public $plugin_dir;
@@ -107,11 +115,13 @@ if ( ! class_exists( 'MWTSA' ) ) {
 
 			require_once( $this->shortcodes_dir . 'class.mwtsa_display_search_stats.php' );
 			require_once( $this->shortcodes_dir . 'class.mwtsa_display_latest_searches.php' );
+			require_once( $this->plugin_dir . 'blocks/class.blocks.php' );
 		}
 
 		public function add_actions_and_filters() {
 			add_action( 'init', array( 'MWTSA_Display_Search_Stats_Shortcode', 'init' ) );
 			add_action( 'init', array( 'MWTSA_Display_Latest_Searches_Shortcode', 'init' ) );
+			add_action( 'init', array( 'MWTSA_Blocks', 'init' ) );
 
 			add_action( 'rest_api_init', array( 'MWTSA_Process_Query', 'process_rest_api_search_term_action' ), 20 );
 

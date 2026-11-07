@@ -22,6 +22,7 @@ if ( ! class_exists( 'MWTSA_Uninstall' ) ) {
 
             if ( $removed_data ) {
                 delete_metadata( 'user', 0, 'mwtsa_entries_per_page', '', true );
+                delete_metadata( 'user', 0, 'mwtsa_review_notice', '', true );
             }
         }
 
@@ -40,6 +41,7 @@ if ( ! class_exists( 'MWTSA_Uninstall' ) ) {
             delete_option( 'mwtsa_settings' );
             delete_option( 'mwtsa_db_version' );
             delete_option( 'mwtsa_db_upgrade_lock' );
+            delete_option( 'mwtsa_version_info' );
 
             // Cached country lookups.
             $wpdb->query( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching

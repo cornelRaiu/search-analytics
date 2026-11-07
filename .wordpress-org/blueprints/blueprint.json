@@ -1,0 +1,33 @@
+{
+    "$schema": "https://playground.wordpress.net/blueprint-schema.json",
+    "landingPage": "/wp-admin/admin.php?page=mwtsa-search-analytics",
+    "preferredVersions": {
+        "php": "8.2",
+        "wp": "latest"
+    },
+    "steps": [
+        {
+            "step": "login",
+            "username": "admin",
+            "password": "password"
+        },
+        {
+            "step": "installPlugin",
+            "pluginZipFile": {
+                "resource": "wordpress.org/plugins",
+                "slug": "search-analytics"
+            },
+            "options": {
+                "activate": true
+            }
+        },
+        {
+            "step": "runPHP",
+            "code": "<?php\nrequire_once '/wordpress/wp-load.php';\nglobal $wpdb;\n\n// A furniture shop's searches over the last 30 days: term => [ searches, results per search ].\n$terms = [\n    'shipping'              => [ 25, 3 ],\n    'return policy'         => [ 20, 1 ],\n    'sofa'                  => [ 18, 12 ],\n    'gift card'             => [ 15, 2 ],\n    'opening hours'         => [ 12, 0 ],\n    'couch'                 => [ 11, 0 ],\n    'dining table'          => [ 9, 8 ],\n    'size guide'            => [ 8, 1 ],\n    'discount code'         => [ 7, 0 ],\n    'outdoor furniture'     => [ 6, 6 ],\n    'track my order'        => [ 5, 0 ],\n    'velvet armchair'       => [ 5, 4 ],\n    'assembly instructions' => [ 4, 0 ],\n    'warranty'              => [ 3, 1 ],\n    'rug'                   => [ 2, 5 ],\n];\n$countries = [ 'US', 'US', 'US', 'GB', 'GB', 'DE', 'CA', 'FR', 'ES', 'AU', 'NL', 'RO' ];\n\nmt_srand( 7 );\n\nforeach ( $terms as $term => [ $searches, $results ] ) {\n    $wpdb->insert( $wpdb->prefix . 'mwt_search_terms', [ 'term' => $term, 'total_count' => $searches ] );\n    $term_id = $wpdb->insert_id;\n\n    $rows = [];\n    for ( $i = 0; $i < $searches; $i++ ) {\n        $rows[] = $wpdb->prepare(\n            '(%d, %s, %d, %s, 0)',\n            $term_id,\n            gmdate( 'Y-m-d H:i:s', time() - mt_rand( 0, 30 * DAY_IN_SECONDS ) ),\n            $results,\n            $countries[ mt_rand( 0, count( $countries ) - 1 ) ]\n        );\n    }\n    $wpdb->query( \"INSERT INTO {$wpdb->prefix}mwt_search_history (term_id, datetime, count_posts, country, user_id) VALUES \" . implode( ',', $rows ) );\n}\n\n// Shows the country column with flags.\n$settings = get_option( 'mwtsa_settings', [] );\n$settings['mwtsa_save_search_country'] = 1;\nupdate_option( 'mwtsa_settings', $settings );"
+        },
+        {
+            "step": "runPHP",
+            "code": "<?php\nrequire_once '/wordpress/wp-load.php';\n\n$statistics = admin_url( 'admin.php?page=mwtsa-search-analytics' );\n\n$content  = '<!-- wp:paragraph --><p>Search for something, then open the <a href=\"' . esc_url( $statistics ) . '\">Search Analytics statistics</a> to see your search next to the demo data.</p><!-- /wp:paragraph -->';\n$content .= '<!-- wp:search {\"label\":\"Search\",\"buttonText\":\"Search\"} /-->';\n$content .= '<!-- wp:shortcode -->[mwtsa_display_search_stats]<!-- /wp:shortcode -->';\n$content .= '<!-- wp:shortcode -->[mwtsa_display_latest_searches]<!-- /wp:shortcode -->';\n\n$page_id = wp_insert_post( [\n    'post_title'   => 'Try the search',\n    'post_name'    => 'search-demo',\n    'post_content' => $content,\n    'post_status'  => 'publish',\n    'post_type'    => 'page',\n] );\n\nupdate_option( 'show_on_front', 'page' );\nupdate_option( 'page_on_front', $page_id );"
+        }
+    ]
+}

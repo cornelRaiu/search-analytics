@@ -17,6 +17,19 @@ if ( ! class_exists( 'MWTSA_Admin_Menu' ) ) {
 			add_action( 'init', array( $this, 'redirect_legacy_urls' ) );
 		}
 
+		// The plugin's icon as add_menu_page() takes an SVG. WordPress repaints its fills to match the admin color scheme.
+		private function get_menu_icon() {
+			$svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="44 44 168 168" width="20" height="20">'
+				. '<rect x="56" y="52" width="144" height="28" rx="14" fill="#a7aaad"/>'
+				. '<rect x="56" y="98" width="104" height="28" rx="14" fill="#a7aaad"/>'
+				. '<rect x="56" y="144" width="52" height="28" rx="14" fill="#a7aaad"/>'
+				. '<path fill="#a7aaad" fill-rule="evenodd" d="M152 130a28 28 0 1 0 0 56a28 28 0 1 0 0-56zm0 12a16 16 0 1 1 0 32a16 16 0 1 1 0-32z"/>'
+				. '<rect x="155.62" y="180" width="50.77" height="14" rx="7" transform="rotate(45 181 187)" fill="#a7aaad"/>'
+				. '</svg>';
+
+			return 'data:image/svg+xml;base64,' . base64_encode( $svg ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode -- the format add_menu_page() expects.
+		}
+
 		public function register() {
 			$stats_roles    = $this->get_stats_roles();
 			$settings_roles = $this->get_settings_roles();
@@ -33,7 +46,7 @@ if ( ! class_exists( 'MWTSA_Admin_Menu' ) ) {
 				$capability,
 				'mwtsa-search-analytics',
 				array( $this->stats, 'render_stats_page' ),
-				'dashicons-analytics',
+				$this->get_menu_icon(),
 				81
 			);
 

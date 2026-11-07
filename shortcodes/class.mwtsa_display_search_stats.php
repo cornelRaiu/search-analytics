@@ -20,6 +20,9 @@ if ( ! class_exists( 'MWTSA_Display_Search_Stats_Shortcode' ) ) {
 				'user_searches_count'             => 5,
 				'user_searches_only_with_results' => true,
 				'user_searches_label'             => '',
+				'link_terms'                      => false,
+				'count_link_clicks'               => false,
+				'show_label'                      => true,
 				'wrapper_class'                   => 'mwtsa-search-stats',
 			), $atts, 'mwtsa_display_search_stats' );
 
@@ -27,6 +30,9 @@ if ( ! class_exists( 'MWTSA_Display_Search_Stats_Shortcode' ) ) {
 			$atts['most_searched_only_with_results'] = filter_var( $atts['most_searched_only_with_results'], FILTER_VALIDATE_BOOLEAN );
 			$atts['user_searches']                   = filter_var( $atts['user_searches'], FILTER_VALIDATE_BOOLEAN );
 			$atts['user_searches_only_with_results'] = filter_var( $atts['user_searches_only_with_results'], FILTER_VALIDATE_BOOLEAN );
+			$atts['link_terms']                      = filter_var( $atts['link_terms'], FILTER_VALIDATE_BOOLEAN );
+			$atts['count_link_clicks']               = filter_var( $atts['count_link_clicks'], FILTER_VALIDATE_BOOLEAN );
+			$atts['show_label']                      = filter_var( $atts['show_label'], FILTER_VALIDATE_BOOLEAN );
 
 			if ( $atts['most_searched_label'] === '' ) {
 				$atts['most_searched_label'] = ( $atts['most_searched_only_with_results'] ) ?
@@ -52,7 +58,8 @@ if ( ! class_exists( 'MWTSA_Display_Search_Stats_Shortcode' ) ) {
 			if ( $atts['most_searched'] && count( $data['most_searched'] ) === 0 ) {
 				$search_args = array(
 					'since' => $atts['amount'],
-					'unit'  => $atts['unit']
+					'unit'  => $atts['unit'],
+					'count' => (int) $atts['most_searched_count']
 				);
 
 				if ( $atts['most_searched_only_with_results'] ) {
@@ -71,14 +78,20 @@ if ( ! class_exists( 'MWTSA_Display_Search_Stats_Shortcode' ) ) {
 				$user_search_args = array(
 					'since' => $atts['amount'],
 					'unit'  => $atts['unit'],
-					'user'  => $user->ID
+					'user'  => $user->ID,
+					'count' => (int) $atts['user_searches_count']
 				);
 
 				if ( $atts['user_searches_only_with_results'] ) {
 					$user_search_args['min_results'] = 1;
 				}
 
+				// The latest first. The query's own order is by number of searches.
+				add_filter( 'mwtsa_run_terms_history_order_by', array( 'MWTSA_Display_Latest_Searches_Shortcode', 'order_by_latest' ) );
+
 				$search_results = ( new MWTSA_History_Data )->run_terms_history_data_query( $user_search_args );
+
+				remove_filter( 'mwtsa_run_terms_history_order_by', array( 'MWTSA_Display_Latest_Searches_Shortcode', 'order_by_latest' ) );
 
 				$data['user_searches'] = array_slice( $search_results, 0, (int) $atts['user_searches_count'] );
 			}
@@ -86,23 +99,13 @@ if ( ! class_exists( 'MWTSA_Display_Search_Stats_Shortcode' ) ) {
 			ob_start();
 			?>
             <div class="<?php echo esc_attr( $atts['wrapper_class'] ) ?>">
+				<?php if ( $atts['show_label'] ) : ?>
                 <ul>
 					<?php if ( count( $data['most_searched'] ) > 0 ) : ?>
                         <li>
                             <p><?php echo esc_html( $atts['most_searched_label'] ) ?></p>
                             <ul>
-								<?php foreach ( $data['most_searched'] as $term ) :
-									echo apply_filters(// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-										'mwtsa_display_search_stats_shortcode_list_item_output',
-										sprintf(
-											'<li>%s</li>',
-											esc_attr( $term['term'] )
-										),
-										$atts,
-										'most_searched',
-										$term
-									);
-								endforeach; ?>
+								<?php echo self::list_items( 'most_searched', $data, $atts ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
                             </ul>
                         </li>
 					<?php endif; ?>
@@ -110,26 +113,43 @@ if ( ! class_exists( 'MWTSA_Display_Search_Stats_Shortcode' ) ) {
                         <li>
                             <p><?php echo esc_attr( $atts['user_searches_label'] ) ?></p>
                             <ul>
-								<?php foreach ( $data['user_searches'] as $term ) :
-									echo apply_filters( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-										'mwtsa_display_search_stats_shortcode_list_item_output',
-										sprintf(
-											'<li>%s</li>',
-											esc_attr( $term['term'] )
-										),
-										$atts,
-										'user_searches',
-										$term
-									);
-								endforeach; ?>
+								<?php echo self::list_items( 'user_searches', $data, $atts ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
                             </ul>
                         </li>
 					<?php endif; ?>
                 </ul>
+				<?php else : ?>
+					<?php foreach ( array( 'most_searched', 'user_searches' ) as $list ) : ?>
+						<?php if ( count( $data[ $list ] ) > 0 ) : ?>
+                <ul class="mwtsa-<?php echo esc_attr( str_replace( '_', '-', $list ) ) ?>">
+					<?php echo self::list_items( $list, $data, $atts ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+                </ul>
+						<?php endif; ?>
+					<?php endforeach; ?>
+				<?php endif; ?>
             </div>
 			<?php
 
 			return apply_filters( 'mwtsa_display_search_stats_shortcode_output', ob_get_clean(), $atts, $data );
+		}
+
+		private static function list_items( $list, $data, $atts ) {
+			$items = '';
+
+			foreach ( $data[ $list ] as $term ) {
+				$items .= apply_filters(
+					'mwtsa_display_search_stats_shortcode_list_item_output',
+					sprintf(
+						'<li>%s</li>',
+						mwtsa_listed_term_html( $term['term'], $atts['link_terms'], $atts['count_link_clicks'] )
+					),
+					$atts,
+					$list,
+					$term
+				);
+			}
+
+			return $items;
 		}
 	}
 }
