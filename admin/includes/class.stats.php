@@ -203,6 +203,7 @@ if ( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
 						} ?>
                     </div>
                     <div class="mwtsa-col-2">
+						<?php MWTSA_Pro_Waitlist::render(); ?>
                         <div class="col-content">
                             <h2><?php esc_html_e( 'Search Analytics', 'search-analytics' ) ?></h2>
 

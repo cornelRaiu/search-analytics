@@ -24,6 +24,10 @@ if ( ! defined( 'MWTSA_WORDPRESS_URL' ) ) {
     define('MWTSA_WORDPRESS_URL', 'https://wordpress.org/plugin/search-analytics');
 }
 
+if ( ! defined( 'MWTSA_PRO_WAITLIST_URL' ) ) {
+	define( 'MWTSA_PRO_WAITLIST_URL', 'https://wpsearchanalytics.com/pro' );
+}
+
 if ( ! class_exists( 'MWTSA' ) ) {
 
 	final class MWTSA {

@@ -501,17 +501,25 @@ if ( ! class_exists( 'MWTSA_Admin_Settings' ) ) {
 
 		public function options_page() {
 			?>
-            <form action="<?php echo esc_url( admin_url( 'options.php' ) ); ?>" method="post">
-				<?php
-				settings_fields( 'mwtsa_general_options' );
-				do_settings_sections( 'mwtsa_general_options' );
+            <div class="mwtsa-wrapper">
+                <div class="mwtsa-2-col">
+                    <div class="mwtsa-col-1">
+                        <form action="<?php echo esc_url( admin_url( 'options.php' ) ); ?>" method="post">
+							<?php
+							settings_fields( 'mwtsa_general_options' );
+							do_settings_sections( 'mwtsa_general_options' );
 
-				submit_button();
-				?>
-            </form>
+							submit_button();
+							?>
+                        </form>
+						<?php $this->erase_history_form(); ?>
+                    </div>
+                    <div class="mwtsa-col-2">
+						<?php MWTSA_Pro_Waitlist::render(); ?>
+                    </div>
+                </div>
+            </div>
 			<?php
-
-			$this->erase_history_form();
 		}
 
         protected function erase_history_form() {

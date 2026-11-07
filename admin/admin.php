@@ -19,6 +19,7 @@ if ( ! class_exists( 'MWTSA_Admin' ) ) {
 			include_once( 'includes/class.export-csv.php' );
 			include_once( 'includes/class.menu.php' );
 			include_once( 'includes/class.review-notice.php' );
+			include_once( 'includes/class.pro-waitlist.php' );
 		}
 
 		public function add_actions_and_filters() {

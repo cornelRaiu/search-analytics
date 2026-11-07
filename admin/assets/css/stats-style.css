@@ -67,6 +67,15 @@
 .mwtsa-heatmap td { height: 32px; font-size: 12px; text-align: center; background-color: #f6f7f7; border-radius: 3px; }
 .mwtsa-heatmap-busiest { font-weight: 600; }
 
+/* Pro waitlist box */
+.mwtsa-2-col .mwtsa-pro { border-top: 3px solid #f2a541; }
+.mwtsa-pro-heading { display: flex; align-items: center; gap: 10px; margin: 4px 0 4px; }
+.mwtsa-pro-heading svg { flex-shrink: 0; }
+.mwtsa-pro-heading h3 { margin: 0; font-size: 15px; }
+.mwtsa-pro .button { display: inline-flex; align-items: center; gap: 4px; }
+.mwtsa-pro .button .dashicons { width: 16px; height: 16px; font-size: 16px; }
+.mwtsa-pro-note { color: #646970; font-size: 12px; }
+
 /* Review notice */
 .mwtsa-review-notice { position: relative; padding-right: 38px; }
 .mwtsa-review-notice .notice-dismiss { text-decoration: none; }
