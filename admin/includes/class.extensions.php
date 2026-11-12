@@ -56,7 +56,7 @@ if ( ! class_exists( 'MWTSA_Admin_Extensions' ) ) {
                             <div class="plugin-card-top">
                                 <div class="name column-name">
                                     <h3>
-                                        MWT Search Steer
+                                        <?php echo esc_html( MWTSA_Search_Steer::TITLE ); ?>
                                         <img src="<?php echo esc_attr( self::get_search_steer_icon() ); ?>" class="plugin-icon" alt="">
                                     </h3>
                                 </div>

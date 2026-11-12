@@ -10,6 +10,7 @@ if ( ! class_exists( 'MWTSA_Search_Steer' ) ) {
 	class MWTSA_Search_Steer {
 
 		const SLUG      = 'mwt-search-steer';
+		const TITLE     = 'MWT Search Steer – Hide from Search & Search Keywords';
 		const USER_META = 'mwtsa_search_steer_line';
 		const QUERY_ARG = 'mwtsa_search_steer';
 
@@ -87,7 +88,7 @@ if ( ! class_exists( 'MWTSA_Search_Steer' ) ) {
 
 			$url = self::plugin_admin_url( 'plugin-install.php?tab=plugin-information&plugin=' . self::SLUG . '&TB_iframe=true&width=600&height=550' );
 
-			return sprintf( '<a href="%s" class="thickbox open-plugin-details-modal" data-title="MWT Search Steer">%s</a>', esc_url( $url ), esc_html( $text ) );
+			return sprintf( '<a href="%s" class="thickbox open-plugin-details-modal" data-title="%s">%s</a>', esc_url( $url ), esc_attr( self::TITLE ), esc_html( $text ) );
 		}
 
 		/**
