@@ -77,6 +77,15 @@ if ( ! class_exists( 'MWTSA_Admin_Menu' ) ) {
 				);
 			}
 
+			add_submenu_page(
+				'mwtsa-search-analytics',
+				__( 'Search Analytics Extensions', 'search-analytics' ),
+				__( 'Extensions', 'search-analytics' ),
+				'activate_plugins',
+				MWTSA_Admin_Extensions::PAGE,
+				array( 'MWTSA_Admin_Extensions', 'render' )
+			);
+
 			// Backward-compat: keep the old Dashboard entry visible and redirect to new location
 			if ( ! empty( $stats_roles ) ) {
 				$old_stats_hook = add_submenu_page(

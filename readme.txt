@@ -194,6 +194,13 @@ Service terms and privacy policy: [https://about.ip2c.org](https://about.ip2c.or
 Country flags on Windows use the "Twemoji Country Flags" font from [country-flag-emoji-polyfill](https://github.com/talkjs/country-flag-emoji-polyfill) by TalkJS (MIT license). The flag artwork comes from [Twemoji](https://github.com/twitter/twemoji) and is licensed under [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/). The font and polyfill are bundled with the plugin and loaded from your own site.
 
 == Changelog ==
+= 1.6.2 =
+
+**Others:**
+
+* A new Extensions page in the Search Analytics menu lists MWT Search Steer, a free plugin by the same author that gives posts search keywords, with buttons to install or activate it. The page is shown to users who can activate plugins
+* When the statistics page lists searches that found nothing, a line points to MWT Search Steer, so those searches can find a post. It links to installing or activating it for users who are allowed to, and each user can dismiss it. It is not shown on sites below WordPress 6.6 or PHP 7.4, which Search Steer needs
+
 = 1.6.1 =
 
 **Features:**

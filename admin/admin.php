@@ -20,6 +20,8 @@ if ( ! class_exists( 'MWTSA_Admin' ) ) {
 			include_once( 'includes/class.menu.php' );
 			include_once( 'includes/class.review-notice.php' );
 			include_once( 'includes/class.pro-waitlist.php' );
+			include_once( 'includes/class.search-steer.php' );
+			include_once( 'includes/class.extensions.php' );
 		}
 
 		public function add_actions_and_filters() {
@@ -28,6 +30,8 @@ if ( ! class_exists( 'MWTSA_Admin' ) ) {
 			add_filter( 'plugin_row_meta', array( 'MWTSA_Dashboard', 'add_plugin_meta_links' ), 10, 2 );
 
 			new MWTSA_Review_Notice();
+
+			add_action( 'admin_init', array( 'MWTSA_Search_Steer', 'save_dismissal' ) );
 		}
 
         public function init_menus_and_screens()

@@ -23,6 +23,7 @@ if ( ! class_exists( 'MWTSA_Uninstall' ) ) {
             if ( $removed_data ) {
                 delete_metadata( 'user', 0, 'mwtsa_entries_per_page', '', true );
                 delete_metadata( 'user', 0, 'mwtsa_review_notice', '', true );
+                delete_metadata( 'user', 0, 'mwtsa_search_steer_line', '', true );
             }
         }
 

@@ -170,6 +170,13 @@ if ( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
                                 </div>
 							<?php endif; ?>
 							<?php $this->stats_table->prepare_items(); ?>
+							<?php
+							$results_view = isset( $_REQUEST['results_view'] ) ? (int) $_REQUEST['results_view'] : 0;
+
+							// In the "No Group" view the rows are single searches, so only its "Only Without Results" view qualifies.
+							if ( ! $this->is_delete && empty( $_REQUEST['search-term'] ) && ( 2 === $results_view || ( 0 === $results_view && empty( $_REQUEST['grouped_view'] ) ) ) ) {
+								MWTSA_Search_Steer::render( $this->stats_table->no_results_count, 2 === $results_view );
+							} ?>
 
                             <form method="get">
                                 <input type="hidden" name="page" value="<?php echo esc_attr( $this->stats_table->get_this_screen() ) ?>">
