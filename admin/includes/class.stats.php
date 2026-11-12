@@ -222,15 +222,19 @@ if ( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
                             </p>
 
                             <ul class="changelog-list">
-                                <li>A redesigned dashboard widget: the last 7 days compared with the week before, a bar per day, trending terms and the busiest day and time</li>
-                                <li>"When people search" on this page shows the busiest days and times of the last 4 weeks</li>
-                                <li>Popular Searches and Latest Searches blocks, with the same settings as the shortcodes</li>
-                                <li>Searches made by bots, and junk searches with a link or HTML, are no longer recorded</li>
+                                <li>A new Extensions page in the menu, with MWT Search Steer, a free plugin by the same author that gives posts search keywords</li>
+                                <li>When the list on this page includes searches that found nothing, a line above it points to MWT Search Steer, so they can find a post</li>
                             </ul>
-                            <p><?php
-	                            /* translators: %d: Number of other changes in this version */
-                                printf( esc_html( _n( '+%d other change', '+%d other changes', 10, 'search-analytics' ) ), 10 ); ?>
-                            </p>
+							<?php
+							// The changelog entries of this version not listed above.
+							$other_changes = 0;
+
+							if ( $other_changes > 0 ) : ?>
+                                <p><?php
+									/* translators: %d: Number of other changes in this version */
+									printf( esc_html( _n( '+%d other change', '+%d other changes', $other_changes, 'search-analytics' ) ), (int) $other_changes ); ?>
+                                </p>
+							<?php endif; ?>
                             <p><a href="<?php echo esc_url( MWTSA_CHANGELOG_URL ) ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Click here to check the complete log', 'search-analytics' ) ?></a></p>
                             <h3><?php esc_html_e( 'Useful Links', 'search-analytics' ) ?></h3>
                             <ul>

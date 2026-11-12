@@ -4,7 +4,7 @@ Tags: search analytics, site search, search, statistics, history
 Requires at least: 4.7
 Tested up to: 7.1
 Requires PHP: 5.6
-Stable tag: 1.6.1
+Stable tag: 1.6.2
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -369,6 +369,9 @@ Country flags on Windows use the "Twemoji Country Flags" font from [country-flag
 The changes in versions 1.0 to 1.3.6 are listed in the [full changelog](https://wpsearchanalytics.com/changelog).
 
 == Upgrade Notice ==
+
+= 1.6.2 =
+Adds an Extensions page and a line on the statistics page about MWT Search Steer, a free plugin by the same author that makes searches with no results find a post.
 
 = 1.6.1 =
 A redesigned dashboard widget, a new "When people search" chart, and Popular Searches and Latest Searches blocks. Searches made by bots are no longer recorded, and a live search no longer leaves partial terms. Also fixes the statistics on SQLite databases, such as WordPress Playground.
