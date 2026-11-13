@@ -304,10 +304,19 @@ if ( ! class_exists( 'MWTSA_Stats_Table' ) ) :
 
 			$this->get_items();
 
+			$this->no_results_count = count( array_filter( $this->items, function ( $item ) {
+				return isset( $item['results_count'] ) && 0.0 === (float) $item['results_count'];
+			} ) );
+
 			$this->sort_items();
 
 			$this->paginate_results();
 		}
+
+		/**
+		 * How many of all the listed rows, not just the current page, found nothing.
+		 */
+		public $no_results_count = 0;
 
 		protected $sort_column = 'last_search_date';
 		protected $sort_order  = 'desc';

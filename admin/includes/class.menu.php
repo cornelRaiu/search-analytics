@@ -15,6 +15,24 @@ if ( ! class_exists( 'MWTSA_Admin_Menu' ) ) {
 
 			add_action( 'admin_menu', array( $this, 'register' ) );
 			add_action( 'init', array( $this, 'redirect_legacy_urls' ) );
+			add_filter( 'plugin_action_links', array( $this, 'add_action_links' ), 10, 2 );
+		}
+
+		// "Docs" and "Settings" before "Deactivate" on the Plugins screen.
+		public function add_action_links( $links, $file ) {
+			if ( MWTSAI()->plugin_basename !== $file ) {
+				return $links;
+			}
+
+			$new_links = array(
+				'docs' => '<a href="' . esc_url( MWTSA_DOCS_URL ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Docs', 'search-analytics' ) . '<span class="screen-reader-text"> ' . esc_html__( '(opens in a new tab)', 'search-analytics' ) . '</span></a>',
+			);
+
+			if ( ! empty( $this->get_settings_roles() ) ) {
+				$new_links['settings'] = '<a href="' . esc_url( admin_url( 'admin.php?page=mwtsa-search-analytics-settings' ) ) . '">' . esc_html__( 'Settings', 'search-analytics' ) . '</a>';
+			}
+
+			return array_merge( $new_links, $links );
 		}
 
 		// The plugin's icon as add_menu_page() takes an SVG. WordPress repaints its fills to match the admin color scheme.
@@ -76,6 +94,15 @@ if ( ! class_exists( 'MWTSA_Admin_Menu' ) ) {
 					array( $this->settings, 'options_page' )
 				);
 			}
+
+			add_submenu_page(
+				'mwtsa-search-analytics',
+				__( 'Search Analytics Extensions', 'search-analytics' ),
+				__( 'Extensions', 'search-analytics' ),
+				'activate_plugins',
+				MWTSA_Admin_Extensions::PAGE,
+				array( 'MWTSA_Admin_Extensions', 'render' )
+			);
 
 			// Backward-compat: keep the old Dashboard entry visible and redirect to new location
 			if ( ! empty( $stats_roles ) ) {

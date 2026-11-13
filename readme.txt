@@ -4,7 +4,7 @@ Tags: search analytics, site search, search, statistics, history
 Requires at least: 4.7
 Tested up to: 7.1
 Requires PHP: 5.6
-Stable tag: 1.6.1
+Stable tag: 1.6.2
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -53,7 +53,9 @@ One setting is worth changing on day one: **exclude your own role**, so your tes
 
 = Privacy =
 
-There's no account to create and no API key. **Nothing is sent anywhere unless you turn on "Save Search Country"**, which is off by default. It sends visitors' IP addresses to ip-api.com or ip2c.org to look up the country (see External services below).
+There's no account to create and no API key. **No search data is sent anywhere unless you turn on "Save Search Country"**, which is off by default. It sends visitors' IP addresses to ip-api.com or ip2c.org to look up the country (see External services below).
+
+When you deactivate the plugin, it asks why. Answering is optional, and only an answer you choose to send leaves your site.
 
 IP addresses are never saved with the searches, and no cookies are set unless you use one of two optional settings. The FAQ lists exactly what is stored.
 
@@ -137,6 +139,7 @@ Here is everything it keeps and shares, so you can check it against the GDPR or 
 * A cookie is only set if you use the repeat-search interval or the "even after the user has logged out" option. It holds the IDs of recently searched terms and when they were searched, or a flag that the user's role is ignored.
 * To merge the requests a live search sends while a visitor types, the plugin keeps a note of the last term under a hash of the visitor's IP address and browser. The note expires after one minute, and nothing about the visitor is saved with the search.
 * You can erase all data, or everything older than a number of days, from the settings at any time.
+* When you deactivate the plugin, it asks why. If you send an answer, it goes to wpsearchanalytics.com with the plugin, WordPress and PHP versions and the site language (see External services). Your site address and search data are not sent.
 
 = Can I export the search data? =
 
@@ -173,6 +176,8 @@ Please report security bugs found in the source code of the Search Analytics for
 
 == External services ==
 
+The plugin connects to outside services for two things only: the country lookup, which is off by default, and the answer to the optional question it asks when you deactivate it. Both are described below.
+
 Search Analytics for WP can look up the country each search was made from. This only happens when the "Save Search Country" setting is enabled; it is off by default.
 
 When a search is recorded, the visitor's IP address is sent to the service chosen in the "Country lookup service" setting. Each IP address is looked up at most once per day, and private or reserved addresses are never sent.
@@ -189,11 +194,28 @@ The IP address is sent over HTTPS. The service is free (LGPL) and allows around 
 
 Service terms and privacy policy: [https://about.ip2c.org](https://about.ip2c.org)
 
+= Feedback when deactivating (wpsearchanalytics.com) =
+
+When you click Deactivate on the Plugins screen, the plugin asks why. Nothing is sent unless you pick an answer and click "Send & Deactivate". Then your answer, any text you typed, the plugin, WordPress and PHP versions and the site language are sent over HTTPS to wpsearchanalytics.com, the plugin's website. Your site address, your email address and your search data are not sent. Answers are kept for a year and used to decide what to fix and build next.
+
+Terms: [https://wpsearchanalytics.com/terms](https://wpsearchanalytics.com/terms)
+
+Privacy policy: [https://wpsearchanalytics.com/privacy](https://wpsearchanalytics.com/privacy)
+
 == Credits ==
 
 Country flags on Windows use the "Twemoji Country Flags" font from [country-flag-emoji-polyfill](https://github.com/talkjs/country-flag-emoji-polyfill) by TalkJS (MIT license). The flag artwork comes from [Twemoji](https://github.com/twitter/twemoji) and is licensed under [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/). The font and polyfill are bundled with the plugin and loaded from your own site.
 
 == Changelog ==
+= 1.6.2 =
+
+**Others:**
+
+* A new Extensions page in the Search Analytics menu lists MWT Search Steer, a free plugin by the same author that gives posts search keywords, with buttons to install or activate it. The page is shown to users who can activate plugins
+* When the statistics page lists searches that found nothing, a line points to MWT Search Steer, so those searches can find a post. It links to installing or activating it for users who are allowed to, and each user can dismiss it. It is not shown on sites below WordPress 6.6 or PHP 7.4, which Search Steer needs
+* Deactivating the plugin asks why, in a short optional form. Nothing is sent unless you click "Send & Deactivate", and the answers about the plugin not working link to the support forum. See External services for what is sent
+* The plugin's row on the Plugins screen has Docs and Settings links before Deactivate. Settings is only shown to users who can open the settings page
+
 = 1.6.1 =
 
 **Features:**
@@ -362,6 +384,9 @@ Country flags on Windows use the "Twemoji Country Flags" font from [country-flag
 The changes in versions 1.0 to 1.3.6 are listed in the [full changelog](https://wpsearchanalytics.com/changelog).
 
 == Upgrade Notice ==
+
+= 1.6.2 =
+Adds an Extensions page and a line on the statistics page about MWT Search Steer, a free plugin by the same author that makes searches with no results find a post. Deactivating the plugin now asks why, and answering is optional.
 
 = 1.6.1 =
 A redesigned dashboard widget, a new "When people search" chart, and Popular Searches and Latest Searches blocks. Searches made by bots are no longer recorded, and a live search no longer leaves partial terms. Also fixes the statistics on SQLite databases, such as WordPress Playground.
