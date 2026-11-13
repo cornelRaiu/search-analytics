@@ -72,7 +72,8 @@ To run the development version, clone this repository into `wp-content/plugins/s
 ## Privacy
 
 - Searches are stored in your own database, without IP addresses.
-- Nothing is sent anywhere unless you turn on **Save Search Country** (off by default). It sends the visitor's IP address to [ip-api.com](https://ip-api.com/) (HTTP, free for non-commercial use) or [ip2c.org](https://ip2c.org/) (HTTPS, IPv4 only), at most once a day per address. Private and reserved addresses are never sent.
+- No search data is sent anywhere unless you turn on **Save Search Country** (off by default). It sends the visitor's IP address to [ip-api.com](https://ip-api.com/) (HTTP, free for non-commercial use) or [ip2c.org](https://ip2c.org/) (HTTPS, IPv4 only), at most once a day per address. Private and reserved addresses are never sent.
+- Deactivating the plugin asks why. Nothing is sent unless you click "Send & Deactivate"; then your answer and the plugin, WordPress and PHP versions and site language go to [wpsearchanalytics.com](https://wpsearchanalytics.com/privacy), without your site address.
 - A cookie is only set if you use the repeat-search interval or the "even after the user has logged out" setting.
 - To merge the requests a live search sends while a visitor types, a note of the last term is kept for one minute under a hash of the visitor's IP address and browser. Nothing about the visitor is saved with the search.
 

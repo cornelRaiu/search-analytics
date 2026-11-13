@@ -22,6 +22,7 @@ if ( ! class_exists( 'MWTSA_Admin' ) ) {
 			include_once( 'includes/class.pro-waitlist.php' );
 			include_once( 'includes/class.search-steer.php' );
 			include_once( 'includes/class.extensions.php' );
+			include_once( 'includes/class.deactivation-feedback.php' );
 		}
 
 		public function add_actions_and_filters() {
@@ -32,6 +33,8 @@ if ( ! class_exists( 'MWTSA_Admin' ) ) {
 			new MWTSA_Review_Notice();
 
 			add_action( 'admin_init', array( 'MWTSA_Search_Steer', 'save_dismissal' ) );
+
+			new MWTSA_Deactivation_Feedback();
 		}
 
         public function init_menus_and_screens()

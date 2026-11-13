@@ -227,7 +227,7 @@ if ( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
                             </ul>
 							<?php
 							// The changelog entries of this version not listed above.
-							$other_changes = 0;
+							$other_changes = 1;
 
 							if ( $other_changes > 0 ) : ?>
                                 <p><?php
