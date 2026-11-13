@@ -32,6 +32,10 @@ if ( ! defined( 'MWTSA_CHANGELOG_URL' ) ) {
 	define( 'MWTSA_CHANGELOG_URL', 'https://wpsearchanalytics.com/changelog' );
 }
 
+if ( ! defined( 'MWTSA_DOCS_URL' ) ) {
+	define( 'MWTSA_DOCS_URL', 'https://wpsearchanalytics.com/docs' );
+}
+
 if ( ! defined( 'MWTSA_FEEDBACK_URL' ) ) {
 	define( 'MWTSA_FEEDBACK_URL', 'https://wpsearchanalytics.com/api/v1/feedback' );
 }

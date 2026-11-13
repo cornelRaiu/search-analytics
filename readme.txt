@@ -214,6 +214,7 @@ Country flags on Windows use the "Twemoji Country Flags" font from [country-flag
 * A new Extensions page in the Search Analytics menu lists MWT Search Steer, a free plugin by the same author that gives posts search keywords, with buttons to install or activate it. The page is shown to users who can activate plugins
 * When the statistics page lists searches that found nothing, a line points to MWT Search Steer, so those searches can find a post. It links to installing or activating it for users who are allowed to, and each user can dismiss it. It is not shown on sites below WordPress 6.6 or PHP 7.4, which Search Steer needs
 * Deactivating the plugin asks why, in a short optional form. Nothing is sent unless you click "Send & Deactivate", and the answers about the plugin not working link to the support forum. See External services for what is sent
+* The plugin's row on the Plugins screen has Docs and Settings links before Deactivate. Settings is only shown to users who can open the settings page
 
 = 1.6.1 =
 
