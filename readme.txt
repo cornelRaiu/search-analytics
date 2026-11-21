@@ -4,7 +4,7 @@ Tags: search analytics, site search, search, statistics, history
 Requires at least: 4.7
 Tested up to: 7.1
 Requires PHP: 5.6
-Stable tag: 1.6.2
+Stable tag: 1.6.3
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -207,6 +207,12 @@ Privacy policy: [https://wpsearchanalytics.com/privacy](https://wpsearchanalytic
 Country flags on Windows use the "Twemoji Country Flags" font from [country-flag-emoji-polyfill](https://github.com/talkjs/country-flag-emoji-polyfill) by TalkJS (MIT license). The flag artwork comes from [Twemoji](https://github.com/twitter/twemoji) and is licensed under [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/). The font and polyfill are bundled with the plugin and loaded from your own site.
 
 == Changelog ==
+= 1.6.3 =
+
+**Security:**
+
+* The Latest Searches and Popular Searches blocks now always print search terms as plain text. Reported by [Santh](https://patchstack.com/database/researchers/4cd974a2-649f-492c-87a9-900f357105e4)
+
 = 1.6.2 =
 
 **Others:**
@@ -385,14 +391,5 @@ The changes in versions 1.0 to 1.3.6 are listed in the [full changelog](https://
 
 == Upgrade Notice ==
 
-= 1.6.2 =
-Adds an Extensions page and a line on the statistics page about MWT Search Steer, a free plugin by the same author that makes searches with no results find a post. Deactivating the plugin now asks why, and answering is optional.
-
-= 1.6.1 =
-A redesigned dashboard widget, a new "When people search" chart, and Popular Searches and Latest Searches blocks. Searches made by bots are no longer recorded, and a live search no longer leaves partial terms. Also fixes the statistics on SQLite databases, such as WordPress Playground.
-
-= 1.6.0 =
-Fixes the charts, a multisite bug that could delete other sites' search data, and several counting errors. Search data is now only removed when you delete the plugin. Database indexes are added on your next admin page load.
-
-= 1.5.0 =
-Fix a few security issues, change the way the statistics page is accessed, and make some performance improvements
+= 1.6.3 =
+Security fix for the Latest Searches and Popular Searches blocks. Please update.

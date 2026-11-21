@@ -222,12 +222,11 @@ if ( ! class_exists( 'MWTSA_Admin_Stats' ) ) {
                             </p>
 
                             <ul class="changelog-list">
-                                <li>A new Extensions page in the menu, with MWT Search Steer, a free plugin by the same author that gives posts search keywords</li>
-                                <li>When the list on this page includes searches that found nothing, a line above it points to MWT Search Steer, so they can find a post</li>
+                                <li>Security fix: the Latest Searches and Popular Searches blocks now always print search terms as plain text</li>
                             </ul>
 							<?php
 							// The changelog entries of this version not listed above.
-							$other_changes = 2;
+							$other_changes = 0;
 
 							if ( $other_changes > 0 ) : ?>
                                 <p><?php
