@@ -274,11 +274,14 @@ if ( ! function_exists( 'mwtsa_listed_term_html' ) ) {
 	 * A term as the shortcodes and blocks list it: plain text, or a link to its search results.
 	 */
 	function mwtsa_listed_term_html( $term, $link, $counted = false ) {
-		if ( ! $link ) {
-			return esc_html( $term );
+		$html = esc_html( $term );
+
+		if ( $link ) {
+			$html = sprintf( '<a href="%s" rel="nofollow">%s</a>', esc_url( mwtsa_term_search_link( $term, $counted ) ), $html );
 		}
 
-		return sprintf( '<a href="%s" rel="nofollow">%s</a>', esc_url( mwtsa_term_search_link( $term, $counted ) ), esc_html( $term ) );
+		// Blocks render before do_shortcode, which would run a term containing a shortcode.
+		return str_replace( array( '[', ']' ), array( '&#091;', '&#093;' ), $html );
 	}
 }
 
