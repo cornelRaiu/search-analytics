@@ -3,7 +3,7 @@
 Plugin Name: Search Analytics for WP - Site Search Tracking
 Plugin URI: https://wpsearchanalytics.com/
 Description: See what visitors search for on your site and which searches come up empty. Popular search terms and statistics, stored in your own database.
-Version: 1.6.2
+Version: 1.6.3
 Author: Cornel Raiu
 Author URI: https://www.cornelraiu.com/
 Text Domain: search-analytics
@@ -44,7 +44,7 @@ if ( ! class_exists( 'MWTSA' ) ) {
 
 	final class MWTSA {
 
-		public $version = '1.6.2';
+		public $version = '1.6.3';
 		public $db_version = '1.2.1';
 
 		public $plugin_dir;
